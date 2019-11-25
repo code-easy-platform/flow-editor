@@ -3368,6 +3368,17 @@ dnd-core@^9.4.0:
     invariant "^2.2.4"
     redux "^4.0.4"
 
+dnd-core@^9.5.0:
+  version "9.5.0"
+  resolved "https://registry.yarnpkg.com/dnd-core/-/dnd-core-9.5.0.tgz#3fb1fe1f24036c4352587002711e2590cb8c0e9a"
+  integrity sha512-UZyNMJKhxukwJHcTCXJg/PtmOwPnSQLCmYCIrgUOf+UX6gS3lKRiik/hJzIX0HzqadyMrLAO7PxazF6UmFLsBQ==
+  dependencies:
+    "@types/asap" "^2.0.0"
+    "@types/invariant" "^2.2.30"
+    asap "^2.0.6"
+    invariant "^2.2.4"
+    redux "^4.0.4"
+
 dns-equal@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/dns-equal/-/dns-equal-1.0.0.tgz#b39e7f1da6eb0a75ba9c17324b34753c47e0654d"
@@ -4887,6 +4898,13 @@ immer@1.10.0:
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/immer/-/immer-1.10.0.tgz#bad67605ba9c810275d91e1c2a47d4582e98286d"
   integrity sha512-O3sR1/opvCDGLEVcvrGTMtLac8GJ5IwZC4puPrLuRj3l7ICKvkmA0vGuU9OW8mV9WIBRnaxp5GJh9IEAaNOoYg==
+
+immutability-helper@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/immutability-helper/-/immutability-helper-3.0.1.tgz#4f609c5afbf8d78cb297970e8af2fba8b0eda1d6"
+  integrity sha512-U92ROQQt7XkIwrdqCByUI118TQM1hXdKnRQpvKeA0HRyGSnJipu9IWHe4UD8zCN00O8UnQjQzPCgZ1CC3yBzHA==
+  dependencies:
+    invariant "^2.2.4"
 
 import-cwd@^2.0.0:
   version "2.1.0"
@@ -8339,6 +8357,13 @@ react-dev-utils@^9.1.0:
     sockjs-client "1.4.0"
     strip-ansi "5.2.0"
     text-table "0.2.0"
+
+react-dnd-html5-backend@^9.5.0:
+  version "9.5.0"
+  resolved "https://registry.yarnpkg.com/react-dnd-html5-backend/-/react-dnd-html5-backend-9.5.0.tgz#2bdc2defc8d2cbdc55abb73263c26bb7d510c859"
+  integrity sha512-0kLZoUIXRfSFBjssRRc4oU0v+nGI+21GfKHQukRvvGGOtlsJNmdqpNxJ9BjStNEYub59TbbgPIjKM/Ba6IDbVw==
+  dependencies:
+    dnd-core "^9.5.0"
 
 react-dnd@^9.4.0:
   version "9.4.0"

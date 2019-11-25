@@ -22,6 +22,10 @@
     background-color: $color-background;
   }
 
+  svg {
+    flex: 1;
+  }
+
   div {
     display: flex;
   }

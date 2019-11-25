@@ -14,30 +14,34 @@ const style: React.CSSProperties = {
 
 export interface ItemDragProps {
     id?: any
-    top?: number
-    left?: number
     title: string
-    width?: number
-    height?: number
-    border?: number
+    style: CustomStyle
     children?: any
     refItemPai?: any
     allowDrag?: boolean
-    lineTargetTop?: number
-    lineTargetLeft?: number
     componentType?: any/* ComponentType */
     hideSourceOnDrag?: boolean
 
     onSucessorChange?: Function
+    /** Devolve 'itemId, top, left'. */
     outputPosition: Function
 }
 
+interface CustomStyle {
+    top?: number
+    left?: number
+    width?: number
+    height?: number
+    border?: number
+    lineTargetTop?: number
+    lineTargetLeft?: number
+}
+
 export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
-    const { lineTargetLeft, lineTargetTop } = props;
-    const { componentType, outputPosition } = props;
+    const { top, left, lineTargetLeft, lineTargetTop } = props.style;
+    const { componentType, id, outputPosition, title } = props;
     const { allowDrag, refItemPai, children } = props;
-    const { width, height, border } = props;
-    const { id, top, left, title } = props;
+    const { width, height, border } = props.style;
     const { onSucessorChange } = props;
 
     const [internalPosition, setInternalPosition] = useState({ top: top, left: left });
@@ -61,11 +65,11 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     }
 
     const mouseUp = (event: any) => {
-        outputPosition({
-            itemId: id,
-            top: event.clientY - (40 + ((height || 0) / 2)),
-            left: event.clientX - (150 + ((width || 0) / 2))
-        });
+        outputPosition(
+            id,
+            event.clientX - (150 + ((width || 0) / 2)),
+            event.clientY - (40 + ((height || 0) / 2)),
+        );
         setIsSelecionado(false);
         if (refItemPai.current)
             refItemPai.current.onmousemove = null;
@@ -73,8 +77,8 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
 
     const mouseMove = (event: any) => {
         setInternalPosition({
-            top: event.clientY - (40 + ((height || 0) / 2)),
-            left: event.clientX - (150 + ((width || 0) / 2))
+            top: event.clientY - ((height || 0) / 2),
+            left: event.clientX - ((width || 0) / 2),
         });
     }
 
@@ -88,7 +92,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     else
         return (
             <g key={id} id={id}>
-                <text x={internalPosition.left} y={(internalPosition.top || 0) - 5}>{title}</text>
+                <text x={internalPosition.left} y={(internalPosition.top || 0) - 5} fill="#fff">{title}</text>
                 <rect
                     id={id}
                     y={internalPosition.top}

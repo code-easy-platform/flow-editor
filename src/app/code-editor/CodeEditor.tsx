@@ -1,4 +1,7 @@
-import React, { useContext, useRef } from 'react';
+import React, { useState, useRef } from 'react';
+import { ItemToDrag } from './components/item-drag/ItemDrag';
+import { DndProvider } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 // import { DropTargetMonitor, XYCoord, useDrop } from 'react-dnd';
 
 // import { Component, Tab, EMPTY_COMPONENT } from '../../../../../../shared/interfaces/Aplication';
@@ -7,15 +10,52 @@ import React, { useContext, useRef } from 'react';
 // import { ItemToDrag } from './components/item-drag/ItemDrag';
 // import FluxoComponentTypes from './enuns/FluxoList';
 
+const itens: any[] = [
+    { id: 1, nome: "item 1", top: 100, left: 20, width: 50, height: 50 },
+    { id: 2, nome: "item 2", top: 200, left: 20, width: 50, height: 50 },
+    { id: 3, nome: "item 3", top: 300, left: 20, width: 50, height: 50 },
+    { id: 4, nome: "item 4", top: 400, left: 20, width: 50, height: 50 },
+    { id: 5, nome: "item 5", top: 500, left: 20, width: 50, height: 50 },
+    { id: 6, nome: "item 6", top: 600, left: 20, width: 50, height: 50 },
+    { id: 7, nome: "item 7", top: 700, left: 20, width: 50, height: 50 },
+    { id: 8, nome: "item 8", top: 800, left: 20, width: 50, height: 50 },
+];
+
 export const CodeEditor = () => {
 
+    const [flowItens, setFlowItens] = useState(itens);
+    const svgRef = useRef(null);
+
+    const positionChange = (itemId: number, positionTop: number, positionLeft: number) => {
+        let component = flowItens[flowItens.findIndex((item: any) => { if (item.id === itemId) return item; return undefined; })];
+        component.top = positionTop;
+        component.left = positionLeft;
+        setFlowItens(flowItens);
+    }
+
     return (
-        <div>
-            code editor
-        </div>
+        <DndProvider backend={HTML5Backend}>
+            <svg ref={svgRef}>
+                {
+                    flowItens.map((item) => {
+                        return <ItemToDrag
+                            id={item.id}
+                            key={item.id}
+                            title={item.nome}
+                            refItemPai={svgRef}
+                            outputPosition={positionChange}
+                            style={{
+                                top: item.top,
+                                left: item.left,
+                                width: item.width,
+                                height: item.height,
+                            }}
+                        />;
+                    })
+                }
+            </svg>
+        </DndProvider>
     );
-
-
 }
 
 
