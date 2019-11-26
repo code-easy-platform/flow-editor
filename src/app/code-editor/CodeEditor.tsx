@@ -10,34 +10,55 @@ import HTML5Backend from 'react-dnd-html5-backend';
 // import { ItemToDrag } from './components/item-drag/ItemDrag';
 // import FluxoComponentTypes from './enuns/FluxoList';
 
-const itens: any[] = [
-    { id: 1, nome: "item 1", top: 100, left: 20, width: 50, height: 50 },
-    { id: 2, nome: "item 2", top: 200, left: 20, width: 50, height: 50 },
-    { id: 3, nome: "item 3", top: 300, left: 20, width: 50, height: 50 },
-    { id: 4, nome: "item 4", top: 400, left: 20, width: 50, height: 50 },
-    { id: 5, nome: "item 5", top: 500, left: 20, width: 50, height: 50 },
-    { id: 6, nome: "item 6", top: 600, left: 20, width: 50, height: 50 },
-    { id: 7, nome: "item 7", top: 700, left: 20, width: 50, height: 50 },
-    { id: 8, nome: "item 8", top: 800, left: 20, width: 50, height: 50 },
+interface ItemFluxo {
+    sucessorId: number,
+    height: number,
+    width: number,
+    nome: string,
+    left: number,
+    top: number,
+    id: number,
+}
+
+const itens: ItemFluxo[] = [
+    { id: 1, sucessorId: 8, nome: "item 1", top: 100, left: 20, width: 50, height: 50 },
+    { id: 2, sucessorId: 8, nome: "item 2", top: 200, left: 20, width: 50, height: 50 },
+    { id: 3, sucessorId: 8, nome: "item 3", top: 300, left: 20, width: 50, height: 50 },
+    { id: 4, sucessorId: 8, nome: "item 4", top: 400, left: 20, width: 50, height: 50 },
+    { id: 5, sucessorId: 8, nome: "item 5", top: 500, left: 20, width: 50, height: 50 },
+    { id: 6, sucessorId: 8, nome: "item 6", top: 600, left: 20, width: 50, height: 50 },
+    { id: 7, sucessorId: 8, nome: "item 7", top: 700, left: 20, width: 50, height: 50 },
+    { id: 8, sucessorId: 0, nome: "item 8", top: 800, left: 20, width: 50, height: 50 },
 ];
 
 export const CodeEditor = () => {
 
     const [flowItens, setFlowItens] = useState(itens);
     const svgRef = useRef(null);
+    const [svgSize, setSvgSize] = useState({
+        svgHeight: flowItens.sort((a, b) => b.top - a.top)[0].top + 200,
+        svgWidth: flowItens.sort((a, b) => b.left - a.left)[0].left + 200,
+    });
 
     const positionChange = (itemId: number, positionTop: number, positionLeft: number) => {
         let component = flowItens[flowItens.findIndex((item: any) => { if (item.id === itemId) return item; return undefined; })];
         component.top = positionTop;
         component.left = positionLeft;
         setFlowItens(flowItens);
+        setSvgSize({
+            svgHeight: flowItens.sort((a, b) => b.top - a.top)[0].top + 200,
+            svgWidth: flowItens.sort((a, b) => b.left - a.left)[0].left + 200,
+        });
     }
 
     return (
-        <DndProvider backend={HTML5Backend}>
-            <svg ref={svgRef}>
-                {
-                    flowItens.map((item) => {
+        <div style={{ flex: 1, overflow: "auto", }}>
+            <DndProvider backend={HTML5Backend}>
+                <svg ref={svgRef} style={{ height: svgSize.svgHeight, width: svgSize.svgWidth, minWidth: "100%" }}>
+                    {flowItens.map((item) => {
+
+                        let sucessorItem: any = flowItens.find((sucessorItem: ItemFluxo) => sucessorItem.id === item.sucessorId);
+
                         return <ItemToDrag
                             id={item.id}
                             key={item.id}
@@ -49,12 +70,14 @@ export const CodeEditor = () => {
                                 left: item.left,
                                 width: item.width,
                                 height: item.height,
+                                lineTargetLeft: sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2),
+                                lineTargetTop: sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20),
                             }}
                         />;
-                    })
-                }
-            </svg>
-        </DndProvider>
+                    })}
+                </svg>
+            </DndProvider>
+        </div>
     );
 }
 
