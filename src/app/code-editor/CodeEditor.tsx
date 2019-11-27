@@ -1,29 +1,23 @@
 import React, { useState, useRef } from 'react';
 import HTML5Backend from 'react-dnd-html5-backend';
-import { DndProvider } from 'react-dnd';
+import { DndProvider, useDrop, DropTargetMonitor, XYCoord } from 'react-dnd';
 
 import { ItemToDrag } from './components/item-drag/ItemDrag';
-import { ItemFluxo } from './interfaces/ItemFluxo';
-
-// import { DropTargetMonitor, XYCoord, useDrop } from 'react-dnd';
-// import { Component, Tab, EMPTY_COMPONENT } from '../../../../../../shared/interfaces/Aplication';
-// import { CodeEditorContext } from '../../../../../../shared/services/contexts/CodeEditorContext';
-// import { ComponentType } from '../../../../../../shared/enuns/ComponentType';
-// import { ItemToDrag } from './components/item-drag/ItemDrag';
-// import FluxoComponentTypes from './enuns/FluxoList';
+import { ItemFluxo, ItemType } from './interfaces/ItemFluxo';
+import { Line } from './components/lines/Line';
 
 const itens: ItemFluxo[] = [
-    { id: 1, sucessorId: 8, nome: "item 1", top: 100, left: 20, width: 50, height: 50 },
-    { id: 2, sucessorId: 8, nome: "item 2", top: 200, left: 20, width: 50, height: 50 },
-    { id: 3, sucessorId: 8, nome: "item 3", top: 300, left: 20, width: 50, height: 50 },
-    { id: 4, sucessorId: 8, nome: "item 4", top: 400, left: 20, width: 50, height: 50 },
-    { id: 5, sucessorId: 8, nome: "item 5", top: 500, left: 20, width: 50, height: 50 },
-    { id: 6, sucessorId: 8, nome: "item 6", top: 600, left: 20, width: 50, height: 50 },
-    { id: 7, sucessorId: 8, nome: "item 7", top: 700, left: 20, width: 50, height: 50 },
-    { id: 8, sucessorId: 0, nome: "item 8", top: 800, left: 20, width: 50, height: 50 },
+    { id: 1, sucessorId: 8, nome: "item 1", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 2, sucessorId: 8, nome: "item 2", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 3, sucessorId: 8, nome: "item 3", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 4, sucessorId: 8, nome: "item 4", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 5, sucessorId: 8, nome: "item 5", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 6, sucessorId: 8, nome: "item 6", top: 600, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 7, sucessorId: 8, nome: "item 7", top: 700, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 8, sucessorId: 0, nome: "item 8", top: 800, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
 ];
 
-export const CodeEditor = () => {
+export const CodeEditor = (props: any) => {
 
     const [flowItens, setFlowItens] = useState(itens);
     const svgRef = useRef(null);
@@ -31,6 +25,38 @@ export const CodeEditor = () => {
         svgHeight: flowItens.sort((a, b) => b.top - a.top)[0].top + 200,
         svgWidth: flowItens.sort((a, b) => b.left - a.left)[0].left + 200,
     });
+
+    const [, drop] = useDrop({
+        accept: [
+            ItemType.ASSIGN,
+        ],
+        hover(item, monitor) {
+            console.log(monitor.getDifferenceFromInitialOffset());
+        },
+        drop(item: any, monitor: DropTargetMonitor) {
+            if (item.itemProps.id) return;
+
+            const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
+            const left = Math.round((item.itemProps.left || 0) + delta.x - 150);
+            const top = Math.round((item.itemProps.top || 0) + delta.y - 40);
+
+            flowItens.push({
+                sucessorId: item.itemProps.sucessorId,
+                itemType: ItemType.ASSIGN,
+                nome: item.itemProps.nome,
+                id: item.itemProps.id,
+                left: left,
+                height: 50,
+                width: 50,
+                top: top,
+            });
+
+            setFlowItens(flowItens);
+        },
+    });
+
+    // Agrupa as referencias do drop com as da ref.
+    drop(svgRef);
 
     const positionChange = (itemId: number, positionTop: number, positionLeft: number) => {
         let component = flowItens[flowItens.findIndex((item: any) => { if (item.id === itemId) return item; return undefined; })];
@@ -58,31 +84,54 @@ export const CodeEditor = () => {
     }
 
     return (
-        <div style={{ flex: 1, overflow: "auto", }}>
-            <DndProvider backend={HTML5Backend}>
+        <div style={{ flex: 1, maxHeight: "100%", overflow: "auto", }}>
+            <div style={{ flexDirection: "column", alignItems: "center", width: 80, height: "100%", borderWidth: 0, borderRightWidth: 0.5, borderColor: "#949494bf", borderStyle: "solid" }}>
+                {flowItens.map((item) => {
+                    return <ItemToDrag
+                        id={item.id}
+                        key={item.id}
+                        title={item.nome}
+                        allowDrag={true}
+                        style={{ }}
+                    />;
+                })}
+            </div>
+            <div style={{ flex: 1, overflow: "auto", }}>
                 <svg ref={svgRef} style={{ height: svgSize.svgHeight, width: svgSize.svgWidth, minWidth: "100%" }}>
-                    {flowItens.map((item) => {
-                        let sucessorItem: any = flowItens.find((sucessorItem: ItemFluxo) => sucessorItem.id === item.sucessorId);
 
+                    {flowItens.map((item: ItemFluxo) => {
+                        let sucessorItem: any = flowItens.find((sucessorItem: ItemFluxo) => sucessorItem.id === item.sucessorId);
+                        return <Line
+                            id={item.id.toString()}
+                            key={item.id}
+                            color="gray"
+                            top1={(item.top || 0) + (item.height || 0) - 15}
+                            left1={(item.left || 0) + ((item.width || 0) / 2)}
+                            left2={sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2)}
+                            top2={sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20)}
+                            onSucessorChange={onSucessorChange}
+                            refItemPai={svgRef}
+                        />;
+                    })}
+
+                    {flowItens.map((item) => {
                         return <ItemToDrag
                             id={item.id}
                             key={item.id}
                             title={item.nome}
                             refItemPai={svgRef}
                             outputPosition={positionChange}
-                            onSucessorChange={onSucessorChange}
                             style={{
                                 top: item.top,
                                 left: item.left,
                                 width: item.width,
                                 height: item.height,
-                                lineTargetLeft: sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2),
-                                lineTargetTop: sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20),
                             }}
                         />;
                     })}
+
                 </svg>
-            </DndProvider>
+            </div>
         </div>
     );
 }

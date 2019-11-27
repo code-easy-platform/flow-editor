@@ -1,12 +1,16 @@
 import React from 'react';
+import { DndProvider } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
-import './App.scss';
 import { CodeEditor } from './code-editor/CodeEditor';
+import './App.scss';
 
 const App: React.FC = () => {
   return (
     <div className="App">
-      <CodeEditor />
+      <DndProvider backend={HTML5Backend}>
+        <CodeEditor />
+      </DndProvider>
     </div>
   );
 }

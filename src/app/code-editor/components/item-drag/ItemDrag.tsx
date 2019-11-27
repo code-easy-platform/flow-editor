@@ -1,17 +1,7 @@
 import React, { useState } from 'react';
 import { useDrag } from 'react-dnd';
-import { FluxoComponentTypes } from '../../enuns/FluxoList';
-import { Line } from '../lines/Line';
-// import ComponentType from '../../../../../../../../shared/enuns/ComponentType';
-// import { Line } from '../../../../../../../../shared/components/lines/Line';
 
-const style: React.CSSProperties = {
-    position: 'absolute',
-    border: '1px solid gray',
-    backgroundColor: 'gray',
-    padding: '0.5rem 1rem',
-    cursor: 'move',
-}
+import { ItemType } from '../../interfaces/ItemFluxo';
 
 export interface ItemDragProps {
     id?: any
@@ -23,9 +13,8 @@ export interface ItemDragProps {
     componentType?: any/* ComponentType */
     hideSourceOnDrag?: boolean
 
-    onSucessorChange?: Function
     /** Devolve 'itemId, top, left'. */
-    outputPosition: Function
+    outputPosition?: Function
 }
 
 interface CustomStyle {
@@ -34,21 +23,18 @@ interface CustomStyle {
     width?: number
     height?: number
     border?: number
-    lineTargetTop?: number
-    lineTargetLeft?: number
 }
 
 export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
-    const { top, left, lineTargetLeft, lineTargetTop } = props.style;
     const { componentType, id, outputPosition, title } = props;
     const { allowDrag, refItemPai, children } = props;
     const { width, height, border } = props.style;
-    const { onSucessorChange } = props;
+    const { top, left } = props.style;
 
     const [isSelecionado, setIsSelecionado] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [{ isDragging }, dragRef] = useDrag({
-        item: { type: componentType || FluxoComponentTypes.flowItem, itemDetail: { id, left, top, title } },
+        item: { type: ItemType.ASSIGN, itemProps: { id, left, top, title } },
         collect: monitor => ({ isDragging: monitor.isDragging() }),
     });
 
@@ -71,6 +57,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     }
 
     const mouseMove = (event: any) => {
+        outputPosition &&
         outputPosition(
             id,
             event.offsetY - ((height || 0) / 2),
@@ -83,9 +70,18 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
         event.preventDefault();
     }
 
-    if (allowDrag)
-        return <div id={id} ref={dragRef} style={{ ...style, left, top, backgroundColor: isDragging ? "blue" : "gray" }}>{children}</div>;
-    else
+    if (allowDrag) {
+        const style: React.CSSProperties = {
+            border: '1px solid gray',
+            backgroundColor: 'gray',
+            cursor: 'move',
+            padding: "5px",
+            margin: "5px",
+            width: "60%",
+            height: 50,
+        };
+        return <div id={id} ref={dragRef} style={{ ...style, backgroundColor: isDragging ? "blue" : "gray" }}>{children || title}</div>;
+    } else
         return (
             <g key={id} id={id} >
                 <text x={left} y={(top || 0) - 5} fill="#fff">{title}</text>
@@ -97,22 +93,11 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
                     rx={border}
                     width={width}
                     height={height}
-                    style={{ ...style, fill: "gray", stroke: isSelecionado ? "blue" : "gray", strokeWidth: 1 }}
+                    style={{ fill: "gray", cursor: 'move', stroke: isSelecionado ? "blue" : "gray", strokeWidth: 1 }}
                     onContextMenu={contextMenu}
                     onMouseDown={mouseDown}
                     onMouseUp={mouseUp}
                 ></rect>
-                <Line
-                    id={id}
-                    key={id}
-                    color="gray"
-                    top1={(top || 0) + (height || 0) - 15}
-                    left1={(left || 0) + ((width || 0) / 2)}
-                    top2={ lineTargetTop ? (lineTargetTop || 0) : 10}
-                    left2={ lineTargetLeft ? (lineTargetLeft || 0) : 10}
-                    onSucessorChange={onSucessorChange}
-                    refItemPai={refItemPai}
-                />
             </g>
         );
 
