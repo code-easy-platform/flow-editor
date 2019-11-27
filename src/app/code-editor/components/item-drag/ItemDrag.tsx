@@ -87,7 +87,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
         return <div id={id} ref={dragRef} style={{ ...style, left, top, backgroundColor: isDragging ? "blue" : "gray" }}>{children}</div>;
     else
         return (
-            <g key={id} id={id}>
+            <g key={id} id={id} >
                 <text x={left} y={(top || 0) - 5} fill="#fff">{title}</text>
                 <rect
                     id={id}

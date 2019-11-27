@@ -1,24 +1,16 @@
 import React, { useState, useRef } from 'react';
-import { ItemToDrag } from './components/item-drag/ItemDrag';
-import { DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
-// import { DropTargetMonitor, XYCoord, useDrop } from 'react-dnd';
+import { DndProvider } from 'react-dnd';
 
+import { ItemToDrag } from './components/item-drag/ItemDrag';
+import { ItemFluxo } from './interfaces/ItemFluxo';
+
+// import { DropTargetMonitor, XYCoord, useDrop } from 'react-dnd';
 // import { Component, Tab, EMPTY_COMPONENT } from '../../../../../../shared/interfaces/Aplication';
 // import { CodeEditorContext } from '../../../../../../shared/services/contexts/CodeEditorContext';
 // import { ComponentType } from '../../../../../../shared/enuns/ComponentType';
 // import { ItemToDrag } from './components/item-drag/ItemDrag';
 // import FluxoComponentTypes from './enuns/FluxoList';
-
-interface ItemFluxo {
-    sucessorId: number,
-    height: number,
-    width: number,
-    nome: string,
-    left: number,
-    top: number,
-    id: number,
-}
 
 const itens: ItemFluxo[] = [
     { id: 1, sucessorId: 8, nome: "item 1", top: 100, left: 20, width: 50, height: 50 },
@@ -51,12 +43,25 @@ export const CodeEditor = () => {
         });
     }
 
+    const onSucessorChange = (itemId: number, sucessorId: string) => {
+        let localFlowItens = flowItens;
+        let itemCurrent: ItemFluxo = localFlowItens[localFlowItens.findIndex((item: ItemFluxo) => { if (item.id === itemId) return item; else return undefined; })];
+
+        // OBS: O update no fluxo é feito pela referencia entre variáveis js.
+        itemCurrent.sucessorId = Number(sucessorId);
+
+        setFlowItens(localFlowItens);
+        setSvgSize({
+            svgHeight: flowItens.sort((a, b) => b.top - a.top)[0].top + 200,
+            svgWidth: flowItens.sort((a, b) => b.left - a.left)[0].left + 200,
+        });
+    }
+
     return (
         <div style={{ flex: 1, overflow: "auto", }}>
             <DndProvider backend={HTML5Backend}>
                 <svg ref={svgRef} style={{ height: svgSize.svgHeight, width: svgSize.svgWidth, minWidth: "100%" }}>
                     {flowItens.map((item) => {
-
                         let sucessorItem: any = flowItens.find((sucessorItem: ItemFluxo) => sucessorItem.id === item.sucessorId);
 
                         return <ItemToDrag
@@ -65,6 +70,7 @@ export const CodeEditor = () => {
                             title={item.nome}
                             refItemPai={svgRef}
                             outputPosition={positionChange}
+                            onSucessorChange={onSucessorChange}
                             style={{
                                 top: item.top,
                                 left: item.left,

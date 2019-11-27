@@ -21,10 +21,10 @@ interface LineProps {
 }
 
 export const Line: React.FC<LineProps> = (props: LineProps) => {
-    const { id="0", top1=0, top2=0  }= props;
-    const { lineWidth=1, color="blue", left1, left2=0 }= props;
+    const { id = "0", top1 = 0, top2 = 0 } = props;
+    const { lineWidth = 1, color = "blue", left1, left2 = 0 } = props;
     const refItemPai: any = props.refItemPai;
-    const onSucessorChange: Function = props.onSucessorChange || (() => {});
+    const onSucessorChange: Function = props.onSucessorChange || (() => { });
 
     const polygonTop: number = (top2 - 10);
     const polygonBotton: number = top2;
@@ -36,9 +36,9 @@ export const Line: React.FC<LineProps> = (props: LineProps) => {
     const [position, setPosition] = useState({ polygonTop: polygonTop, polygonLeft: polygonLeft });
 
     window.onmouseup = (event: any) => {
-        onMouseEvent(false);
-        if (event.target.id)
+        if (event.target.id && isSelecionado)
             onSucessorChange(id, event.target.id);
+        onMouseEvent(false);
     }
 
     const onMouseEvent = (value: boolean) => {
@@ -50,7 +50,6 @@ export const Line: React.FC<LineProps> = (props: LineProps) => {
     }
 
     const mouseMove = (event: any) => {
-        console.log(event);
         setPosition({
             polygonTop: event.offsetY,
             polygonLeft: event.offsetX,
