@@ -1,18 +1,17 @@
 import React, { useState, useRef } from 'react';
-import HTML5Backend from 'react-dnd-html5-backend';
-import { DndProvider, useDrop, DropTargetMonitor, XYCoord } from 'react-dnd';
+import { useDrop, DropTargetMonitor, XYCoord } from 'react-dnd';
 
 import { ItemToDrag } from './components/item-drag/ItemDrag';
 import { ItemFluxo, ItemType } from './interfaces/ItemFluxo';
 import { Line } from './components/lines/Line';
 
 const itens: ItemFluxo[] = [
-    { id: 1, sucessorId: 8, nome: "item 1", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 2, sucessorId: 8, nome: "item 2", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 3, sucessorId: 8, nome: "item 3", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 4, sucessorId: 8, nome: "item 4", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 5, sucessorId: 8, nome: "item 5", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 6, sucessorId: 8, nome: "item 6", top: 600, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 1, sucessorId: 2, nome: "item 1", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 2, sucessorId: 3, nome: "item 2", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 3, sucessorId: 4, nome: "item 3", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 4, sucessorId: 5, nome: "item 4", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 5, sucessorId: 6, nome: "item 5", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 6, sucessorId: 7, nome: "item 6", top: 600, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
     { id: 7, sucessorId: 8, nome: "item 7", top: 700, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
     { id: 8, sucessorId: 0, nome: "item 8", top: 800, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
 ];
@@ -27,31 +26,31 @@ export const CodeEditor = (props: any) => {
     });
 
     const [, drop] = useDrop({
-        accept: [
-            ItemType.ASSIGN,
-        ],
-        hover(item, monitor) {
-            console.log(monitor.getDifferenceFromInitialOffset());
-        },
+        accept: [ItemType.ASSIGN],
         drop(item: any, monitor: DropTargetMonitor) {
-            if (item.itemProps.id) return;
+            const target: any = svgRef.current;
+            const targetSize: any = target.getBoundingClientRect();
+            const draggedOffSet: any = monitor.getClientOffset();
+            const targetOffsetY: number = draggedOffSet.y + (targetSize.top - targetSize.top - targetSize.top);
 
             const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
-            const left = Math.round((item.itemProps.left || 0) + delta.x - 150);
-            const top = Math.round((item.itemProps.top || 0) + delta.y - 40);
+            const left = Math.round((item.itemProps.left || 0) + delta.x);
+            const top = Math.round((item.itemProps.top || 0) + targetOffsetY - 40);
 
-            flowItens.push({
+            let _flowItens = flowItens;
+
+            _flowItens.push({
                 sucessorId: item.itemProps.sucessorId,
                 itemType: ItemType.ASSIGN,
                 nome: item.itemProps.nome,
-                id: item.itemProps.id,
+                id: 8646546565,
                 left: left,
                 height: 50,
                 width: 50,
                 top: top,
             });
 
-            setFlowItens(flowItens);
+            setFlowItens(_flowItens);
         },
     });
 
@@ -92,7 +91,7 @@ export const CodeEditor = (props: any) => {
                         key={item.id}
                         title={item.nome}
                         allowDrag={true}
-                        style={{ }}
+                        style={{}}
                     />;
                 })}
             </div>
