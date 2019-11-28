@@ -72,13 +72,15 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
 
     if (allowDrag) {
         const style: React.CSSProperties = {
-            border: '1px solid gray',
+            justifyContent: "center",
             backgroundColor: 'gray',
+            alignItems: "center",
+            marginTop: "5px",
             cursor: 'move',
             padding: "5px",
-            margin: "5px",
-            width: "60%",
-            minHeight: 50,
+            width: "100%",
+            minHeight: 35,
+            fontSize: 10,
         };
         return <div id={id} ref={dragRef} style={{ ...style, backgroundColor: isDragging ? "blue" : "gray" }}>{children || title}</div>;
     } else

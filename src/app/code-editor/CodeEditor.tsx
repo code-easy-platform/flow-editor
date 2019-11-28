@@ -17,6 +17,17 @@ const itens: ItemFluxo[] = [
     { id: 8, sucessorId: 0, nome: "item 8", top: 800, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
 ];
 
+const itensLogica: ItemFluxo[] = [
+    { id: 1, sucessorId: 2, nome: "Assign", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 2, sucessorId: 3, nome: "Assign", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 3, sucessorId: 4, nome: "Assign", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 4, sucessorId: 5, nome: "Assign", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 5, sucessorId: 6, nome: "Assign", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 6, sucessorId: 7, nome: "Assign", top: 600, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 7, sucessorId: 8, nome: "Assign", top: 700, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 8, sucessorId: 0, nome: "Assign", top: 800, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+];
+
 export const CodeEditor = (props: any) => {
 
     const [flowItens, setFlowItens] = useState(itens);
@@ -84,9 +95,9 @@ export const CodeEditor = (props: any) => {
     }
 
     return (
-        <div style={{ flex: 1, maxHeight: "100%", overflow: "auto", }}>
-            <div style={{ flexDirection: "column", overflow: "auto", alignItems: "center", width: 80, height: "100%", maxHeight: "100%", borderWidth: 0, borderRightWidth: 0.5, borderColor: "#949494bf", borderStyle: "solid" }}>
-                {flowItens.map((item) => {
+        <div style={{ flex: 1, maxHeight: "100%", }}>
+            <div className="mini-scroll-bar" style={{ padding: "10px", flexDirection: "column", overflow: "auto", alignItems: "center", width: 35, height: "100%", borderWidth: 0, borderRightWidth: 0.5, borderColor: "#949494bf", borderStyle: "solid" }}>
+                {itensLogica.map((item) => {
                     return <ItemToDrag
                         id={item.id}
                         key={item.id}

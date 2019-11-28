@@ -130,18 +130,25 @@ a:active {
 
 // Ajusta o scroll de todos os elementos.
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 100%;
+  width: $size-x-scroll-bar;
+  height: $size-fill;
 }
 ::-webkit-scrollbar-button {
   display: none;
 }
 ::-webkit-scrollbar-track {
-  background-color: transparent;
+  background-color: $color-transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: $color-top-bar;
+  background-color: $color-scroll-bar;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: $color-top-bar-light;
+  background-color: $color-scroll-bar-hover;
+}
+::-webkit-scrollbar-thumb:active {
+  background-color: $color-scroll-bar-active;
+}
+
+.mini-scroll-bar::-webkit-scrollbar {
+  width: $size-x-scroll-bar-small;
 }
