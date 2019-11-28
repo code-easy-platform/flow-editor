@@ -4,6 +4,7 @@ import { useDrop, DropTargetMonitor, XYCoord } from 'react-dnd';
 import { ItemToDrag } from './components/item-drag/ItemDrag';
 import { ItemFluxo, ItemType } from './interfaces/ItemFluxo';
 import { Line } from './components/lines/Line';
+import { Utils } from '../shared/Utils';
 
 const itens: ItemFluxo[] = [
     { id: 1, sucessorId: 2, nome: "item 1", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
@@ -43,7 +44,7 @@ export const CodeEditor = (props: any) => {
                 sucessorId: item.itemProps.sucessorId,
                 itemType: ItemType.ASSIGN,
                 nome: item.itemProps.nome,
-                id: 8646546565,
+                id: Utils.getRandomId(10000, 100000000),
                 left: left,
                 height: 50,
                 width: 50,
@@ -84,7 +85,7 @@ export const CodeEditor = (props: any) => {
 
     return (
         <div style={{ flex: 1, maxHeight: "100%", overflow: "auto", }}>
-            <div style={{ flexDirection: "column", alignItems: "center", width: 80, height: "100%", borderWidth: 0, borderRightWidth: 0.5, borderColor: "#949494bf", borderStyle: "solid" }}>
+            <div style={{ flexDirection: "column", overflow: "auto", alignItems: "center", width: 80, height: "100%", maxHeight: "100%", borderWidth: 0, borderRightWidth: 0.5, borderColor: "#949494bf", borderStyle: "solid" }}>
                 {flowItens.map((item) => {
                     return <ItemToDrag
                         id={item.id}

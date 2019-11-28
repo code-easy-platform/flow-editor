@@ -26,7 +26,7 @@ interface CustomStyle {
 }
 
 export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
-    const { componentType, id, outputPosition, title } = props;
+    const { id, outputPosition, title } = props;
     const { allowDrag, refItemPai, children } = props;
     const { width, height, border } = props.style;
     const { top, left } = props.style;
@@ -78,7 +78,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
             padding: "5px",
             margin: "5px",
             width: "60%",
-            height: 50,
+            minHeight: 50,
         };
         return <div id={id} ref={dragRef} style={{ ...style, backgroundColor: isDragging ? "blue" : "gray" }}>{children || title}</div>;
     } else
