@@ -80,19 +80,19 @@ export const Line: React.FC<LineProps> = (props: LineProps) => {
                             polygonBottonCenter + ", " +
                             polygonBotton
                         }
-                        style={{ fill: color || "blue", stroke: color || "blue", strokeWidth: lineWidth }}
+                        style={{ cursor: 'move', fill: color || "blue", stroke: color || "blue", strokeWidth: lineWidth }}
                         onMouseDown={() => onMouseEvent(true)}
                     />
                     : <rect
                         ry="50"
                         rx="50"
-                        width="20"
-                        height="20"
-                        y={position.polygonTop - 10}
+                        width="10"
+                        height="10"
+                        y={position.polygonTop - 5}
                         x={position.polygonLeft - 5}
                         onMouseUp={() => onMouseEvent(false)}
                         onMouseDown={() => onMouseEvent(true)}
-                        style={{ ...style, fill: "gray", stroke: isSelecionado ? "blue" : "gray", strokeWidth: 1 }}
+                        style={{ ...style, cursor: 'default', fill: "gray", stroke: isSelecionado ? "blue" : "gray", strokeWidth: 1 }}
                     />
             }
         </g>

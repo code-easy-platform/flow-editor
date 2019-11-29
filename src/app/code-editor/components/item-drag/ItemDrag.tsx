@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDrag } from 'react-dnd';
 
 import { ItemType } from '../../interfaces/ItemFluxo';
+import { is } from '@babel/types';
 
 export interface ItemDragProps {
     id?: any
@@ -31,42 +32,64 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     const { width, height, border } = props.style;
     const { top, left } = props.style;
 
-    const [isSelecionado, setIsSelecionado] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [state, setState] = useState({
+        isSelecionado: false,
+        isMenuOpen: false,
+    });
+
     const [{ isDragging }, dragRef] = useDrag({
         item: { type: ItemType.ASSIGN, itemProps: { id, left, top, title } },
         collect: monitor => ({ isDragging: monitor.isDragging() }),
     });
 
     window.onmouseup = () => mouseUp;
-    window.onmousedown = () => {
-        if (isMenuOpen)
-            setIsMenuOpen(false);
+    window.onmousedown = (event: any) => {
+        if (state.isMenuOpen) {
+            setState({ ...state, isMenuOpen: false });
+        }
     };
 
-    const mouseDown = () => {
-        setIsSelecionado(true);
-        if (refItemPai.current)
+    if (refItemPai && refItemPai.current) {
+        refItemPai.current.onmousedown = () => {
+            setState({ ...state, isSelecionado: false });
+        }
+    }
+
+    const mouseDown = (event: any) => {
+        if (Number(event.target.id) !== id && state.isSelecionado) {
+            setState({ ...state, isSelecionado: false });
+        } else if (Number(event.target.id) === id && state.isSelecionado == false) {
+            setState({ ...state, isSelecionado: true });
+        }
+
+        if (refItemPai.current) {
             refItemPai.current.onmousemove = mouseMove;
+            refItemPai.current.onmousedown = changeSelecionado;
+        }
+    }
+
+    const changeSelecionado = () => {
+        refItemPai.current.onmousedown = () => {
+            setState({ ...state, isSelecionado: false });
+        }
     }
 
     const mouseUp = (event: any) => {
-        setIsSelecionado(false);
         if (refItemPai.current)
             refItemPai.current.onmousemove = null;
     }
 
     const mouseMove = (event: any) => {
         outputPosition &&
-        outputPosition(
-            id,
-            event.offsetY - ((height || 0) / 2),
-            event.offsetX - ((width || 0) / 2),
-        );
+            outputPosition(
+                id,
+                event.offsetY - ((height || 0) / 2),
+                event.offsetX - ((width || 0) / 2),
+            );
     }
 
     const contextMenu = (event: any) => {
-        setIsMenuOpen(true);
+        setState({ ...state, isMenuOpen: true });
         event.preventDefault();
     }
 
@@ -95,7 +118,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
                     rx={border}
                     width={width}
                     height={height}
-                    style={{ fill: "gray", cursor: 'move', stroke: isSelecionado ? "blue" : "gray", strokeWidth: 1 }}
+                    style={{ fill: "gray", cursor: 'move', stroke: state.isSelecionado ? "blue" : "gray", strokeWidth: 1 }}
                     onContextMenu={contextMenu}
                     onMouseDown={mouseDown}
                     onMouseUp={mouseUp}

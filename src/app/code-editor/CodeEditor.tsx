@@ -27,31 +27,25 @@ const itensLogica: ItemFluxo[] = [
     { id: 7, sucessorId: 8, nome: "END", top: 700, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
 ];
 
+const itensceitosNoDrop: ItemType[] = [ItemType.ASSIGN];
+
 export const CodeEditor = (props: any) => {
 
+    const svgRef = useRef(null);
     const [state, setState] = useState({
         flowItens: itens,
         svgSize: { svgHeight: 0, svgWidth: 0 }
     });
+
+    // Não precisou do setState por que está no fluxo de render.
     state.svgSize = {
         svgHeight: state.flowItens.sort((a, b) => b.top - a.top)[0].top + 200,
         svgWidth: state.flowItens.sort((a, b) => b.left - a.left)[0].left + 200,
     };
-    setState(state);
 
-
-
-    const [flowItens, setFlowItens] = useState(itens);
-    const svgRef = useRef(null);
-    const [svgSize, setSvgSize] = useState({
-        svgHeight: flowItens.sort((a, b) => b.top - a.top)[0].top + 200,
-        svgWidth: flowItens.sort((a, b) => b.left - a.left)[0].left + 200,
-    });
-
-
-
-    const [, drop] = useDrop({
-        accept: [ItemType.ASSIGN],
+    // Usado para que seja possível o drop de itens no editor.
+    const [, dropRef] = useDrop({
+        accept: itensceitosNoDrop,
         drop(item: any, monitor: DropTargetMonitor) {
 
             const target: any = svgRef.current;
@@ -60,7 +54,7 @@ export const CodeEditor = (props: any) => {
             const targetOffsetY: number = ((draggedOffSet.y) + (targetSize.top - targetSize.top - targetSize.top) - 25);
             const targetOffsetX: number = ((draggedOffSet.x) + (targetSize.left - targetSize.left - targetSize.left) - 25);
 
-            flowItens.push({
+            state.flowItens.push({
                 sucessorId: item.itemProps.sucessorId,
                 itemType: ItemType.ASSIGN,
                 nome: item.itemProps.nome,
@@ -71,40 +65,54 @@ export const CodeEditor = (props: any) => {
                 width: 50,
             });
 
-            setFlowItens(flowItens);
-            setSvgSize({
-                svgHeight: flowItens.sort((a, b) => b.top - a.top)[0].top + 200,
-                svgWidth: flowItens.sort((a, b) => b.left - a.left)[0].left + 200,
+            setState({
+                ...state,
+                flowItens: state.flowItens,
             });
         },
     });
 
     // Agrupa as referencias do drop com as da ref.
-    drop(svgRef);
+    dropRef(svgRef);
 
+    // Depois que um elemento já está na tela, esta função muda a posição dele!
     const positionChange = (itemId: number, positionTop: number, positionLeft: number) => {
-        let component = flowItens[flowItens.findIndex((item: any) => { if (item.id === itemId) return item; return undefined; })];
+        let component = state.flowItens[state.flowItens.findIndex((item: any) => { if (item.id === itemId) return item; return undefined; })];
         component.top = positionTop;
         component.left = positionLeft;
-        setFlowItens(flowItens);
-        setSvgSize({
-            svgHeight: flowItens.sort((a, b) => b.top - a.top)[0].top + 200,
-            svgWidth: flowItens.sort((a, b) => b.left - a.left)[0].left + 200,
+
+        state.svgSize.svgHeight = state.flowItens.sort((a, b) => b.top - a.top)[0].top + 200;
+        state.svgSize.svgWidth = state.flowItens.sort((a, b) => b.left - a.left)[0].left + 200;
+
+        setState({
+            flowItens: state.flowItens,
+            svgSize: state.svgSize
         });
     }
 
+    // Usado para mudar o "sucessorId" de um elemento.
+    // Sucessor é usado para indicar onde o apontamento deve estar.
     const onSucessorChange = (itemId: number, sucessorId: string) => {
-        let localFlowItens = flowItens;
-        let itemCurrent: ItemFluxo = localFlowItens[localFlowItens.findIndex((item: ItemFluxo) => { if (item.id === itemId) return item; else return undefined; })];
 
-        // OBS: O update no fluxo é feito pela referencia entre variáveis js.
+        const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.id === Number(itemId)) return item; else return undefined; });
+        let itemCurrent: ItemFluxo = state.flowItens[itemCurrentIndex];
+
+        // Se tentar ligar um item nele mesmo deve ser perdida a ligação com qualquer elemento anterior.
+        if (Number(itemId) === Number(sucessorId)) {
+            sucessorId = "";
+        }
+
+        // OBS: O update no fluxo principal é feito pela referencia entre variáveis js.
         itemCurrent.sucessorId = Number(sucessorId);
 
-        setFlowItens(localFlowItens);
-        setSvgSize({
-            svgHeight: flowItens.sort((a, b) => b.top - a.top)[0].top + 200,
-            svgWidth: flowItens.sort((a, b) => b.left - a.left)[0].left + 200,
+        setState({
+            ...state,
+            flowItens: state.flowItens
         });
+    }
+
+    const onRemoveItem = () => {
+        
     }
 
     return (
@@ -121,24 +129,27 @@ export const CodeEditor = (props: any) => {
                 })}
             </div>
             <div style={{ flex: 1, overflow: "auto", }}>
-                <svg ref={svgRef} style={{ height: svgSize.svgHeight, width: svgSize.svgWidth, minWidth: "100%" }}>
+                <svg ref={svgRef} style={{ height: state.svgSize.svgHeight, width: state.svgSize.svgWidth, minWidth: "100%" }}>
 
-                    {flowItens.map((item: ItemFluxo) => {
-                        let sucessorItem: any = flowItens.find((sucessorItem: ItemFluxo) => sucessorItem.id === item.sucessorId);
+                    {state.flowItens.map((item: ItemFluxo) => {
+                        const sucessorItem: any = state.flowItens.find((sucessorItem: ItemFluxo) => sucessorItem.id === item.sucessorId);
+                        const left2 = sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2);
+                        const top2 = sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20);
+
                         return <Line
-                            id={item.id.toString()}
-                            key={item.id}
-                            color="gray"
-                            top1={(item.top || 0) + (item.height || 0) - 15}
                             left1={(item.left || 0) + ((item.width || 0) / 2)}
-                            left2={sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2)}
-                            top2={sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20)}
+                            top1={(item.top || 0) + (item.height || 0) - 15}
                             onSucessorChange={onSucessorChange}
+                            id={item.id.toString()}
                             refItemPai={svgRef}
+                            key={item.id}
+                            left2={left2}
+                            color="gray"
+                            top2={top2}
                         />;
                     })}
 
-                    {flowItens.map((item) => {
+                    {state.flowItens.map((item) => {
                         return <ItemToDrag
                             id={item.id}
                             key={item.id}
