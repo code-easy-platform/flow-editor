@@ -29,12 +29,27 @@ const itensLogica: ItemFluxo[] = [
 
 export const CodeEditor = (props: any) => {
 
+    const [state, setState] = useState({
+        flowItens: itens,
+        svgSize: { svgHeight: 0, svgWidth: 0 }
+    });
+    state.svgSize = {
+        svgHeight: state.flowItens.sort((a, b) => b.top - a.top)[0].top + 200,
+        svgWidth: state.flowItens.sort((a, b) => b.left - a.left)[0].left + 200,
+    };
+    setState(state);
+
+
+
     const [flowItens, setFlowItens] = useState(itens);
     const svgRef = useRef(null);
     const [svgSize, setSvgSize] = useState({
         svgHeight: flowItens.sort((a, b) => b.top - a.top)[0].top + 200,
         svgWidth: flowItens.sort((a, b) => b.left - a.left)[0].left + 200,
     });
+
+
+
     const [, drop] = useDrop({
         accept: [ItemType.ASSIGN],
         drop(item: any, monitor: DropTargetMonitor) {
