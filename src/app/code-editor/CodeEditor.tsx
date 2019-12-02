@@ -5,6 +5,7 @@ import { ItemToDrag } from './components/item-drag/ItemDrag';
 import { ItemFluxo, ItemType } from './interfaces/ItemFluxo';
 import { Line } from './components/lines/Line';
 import { Utils } from '../shared/Utils';
+import { Toolbar } from './components/tool-bar/ToolBar';
 
 const itens: ItemFluxo[] = [
     { id: 1, sucessorId: 2, nome: "item 1", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
@@ -147,20 +148,10 @@ export const CodeEditor = (props: any) => {
 
     return (
         <div style={{ flex: 1, maxHeight: "100%" }}>
-            <div className="mini-scroll-bar" style={{ padding: "10px", flexDirection: "column", overflow: "auto", alignItems: "center", width: 35, height: "100%", borderWidth: 0, borderRightWidth: 0.5, borderColor: "#949494bf", borderStyle: "solid" }}>
-                {itensLogica.map((item) => {
-                    return <ItemToDrag
-                        isSelecionado={item.isSelecionado}
-                        title={item.nome}
-                        allowDrag={true}
-                        key={item.id}
-                        id={item.id}
-                        style={{}}
-                    />;
-                })}
-            </div>
+            <Toolbar itensLogica={itensLogica} />
+
             <div style={{ flex: 1, overflow: "auto", }}>
-                <svg ref={svgRef} onKeyUp={onRemoveItem} onMouseDown={onMouseDown} style={{ height: state.svgSize.svgHeight, width: state.svgSize.svgWidth, minWidth: "100%" }}>
+                <svg ref={svgRef} onKeyPress={onRemoveItem} onMouseDown={onMouseDown} style={{ height: state.svgSize.svgHeight, width: state.svgSize.svgWidth, minWidth: "100%" }}>
 
                     {state.flowItens.map((item: ItemFluxo) => {
                         const sucessorItem: any = state.flowItens.find((sucessorItem: ItemFluxo) => sucessorItem.id === item.sucessorId);
