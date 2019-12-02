@@ -113,6 +113,12 @@ export const CodeEditor = (props: any) => {
         });
     }
 
+    const handleKeyPress = (event: any) => {
+        if (event.keyCode === 'KeyDelete') {
+            console.log('Delete press here! ');
+        }
+    }
+
     const onRemoveItem = () => {
         const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.isSelecionado === true) return item; else return undefined; });
         if (!itemCurrentIndex) return;
@@ -151,7 +157,7 @@ export const CodeEditor = (props: any) => {
             <Toolbar itensLogica={itensLogica} />
 
             <div style={{ flex: 1, overflow: "auto", }}>
-                <svg ref={svgRef} onKeyPress={onRemoveItem} onMouseDown={onMouseDown} style={{ height: state.svgSize.svgHeight, width: state.svgSize.svgWidth, minWidth: "100%" }}>
+                <svg tabIndex={0} ref={svgRef} onKeyPress={handleKeyPress} onMouseDown={onMouseDown} style={{ height: state.svgSize.svgHeight, width: state.svgSize.svgWidth, minWidth: "100%" }}>
 
                     {state.flowItens.map((item: ItemFluxo) => {
                         const sucessorItem: any = state.flowItens.find((sucessorItem: ItemFluxo) => sucessorItem.id === item.sucessorId);
