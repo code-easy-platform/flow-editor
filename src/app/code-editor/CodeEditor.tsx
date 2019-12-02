@@ -7,24 +7,24 @@ import { Line } from './components/lines/Line';
 import { Utils } from '../shared/Utils';
 
 const itens: ItemFluxo[] = [
-    { id: 1, sucessorId: 2, nome: "item 1", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 2, sucessorId: 3, nome: "item 2", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 3, sucessorId: 4, nome: "item 3", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 4, sucessorId: 5, nome: "item 4", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 5, sucessorId: 6, nome: "item 5", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 6, sucessorId: 7, nome: "item 6", top: 600, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 7, sucessorId: 8, nome: "item 7", top: 700, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 8, sucessorId: 0, nome: "item 8", top: 800, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 1, sucessorId: 2, nome: "item 1", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 2, sucessorId: 3, nome: "item 2", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 3, sucessorId: 4, nome: "item 3", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 4, sucessorId: 5, nome: "item 4", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 5, sucessorId: 6, nome: "item 5", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 6, sucessorId: 7, nome: "item 6", top: 600, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 7, sucessorId: 8, nome: "item 7", top: 700, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 8, sucessorId: 0, nome: "item 8", top: 800, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
 ];
 
 const itensLogica: ItemFluxo[] = [
-    { id: 1, sucessorId: 2, nome: "START", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 2, sucessorId: 3, nome: "IF", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 3, sucessorId: 4, nome: "FOREACH", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 4, sucessorId: 5, nome: "ACTION", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 5, sucessorId: 6, nome: "SWICTH", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 6, sucessorId: 7, nome: "ASSIGN", top: 600, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
-    { id: 7, sucessorId: 8, nome: "END", top: 700, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, },
+    { id: 1, sucessorId: 2, nome: "START", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 2, sucessorId: 3, nome: "IF", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 3, sucessorId: 4, nome: "FOREACH", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 4, sucessorId: 5, nome: "ACTION", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 5, sucessorId: 6, nome: "SWICTH", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 6, sucessorId: 7, nome: "ASSIGN", top: 600, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 7, sucessorId: 8, nome: "END", top: 700, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
 ];
 
 const itensceitosNoDrop: ItemType[] = [ItemType.ASSIGN];
@@ -55,10 +55,11 @@ export const CodeEditor = (props: any) => {
             const targetOffsetX: number = ((draggedOffSet.x) + (targetSize.left - targetSize.left - targetSize.left) - 25);
 
             state.flowItens.push({
+                id: Utils.getRandomId(10000, 100000000),
                 sucessorId: item.itemProps.sucessorId,
                 itemType: ItemType.ASSIGN,
                 nome: item.itemProps.nome,
-                id: Utils.getRandomId(10000, 100000000),
+                isSelecionado: false,
                 left: targetOffsetX,
                 top: targetOffsetY,
                 height: 50,
@@ -112,7 +113,36 @@ export const CodeEditor = (props: any) => {
     }
 
     const onRemoveItem = () => {
-        
+        const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.isSelecionado === true) return item; else return undefined; });
+        if (!itemCurrentIndex) return;
+
+        state.flowItens.splice(itemCurrentIndex, 1);
+
+        setState({
+            ...state,
+            flowItens: state.flowItens
+        });
+    }
+
+    const onMouseDown = () => {
+        state.flowItens.forEach((item: ItemFluxo) => {
+            item.isSelecionado = false;
+        });
+        setState({
+            ...state,
+            flowItens: state.flowItens,
+        });
+    }
+
+    const onChangeSelecionado = (itemId: number) => {
+        const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.id === Number(itemId)) return item; else return undefined; });
+
+        state.flowItens[itemCurrentIndex].isSelecionado = true;
+
+        setState({
+            ...state,
+            flowItens: state.flowItens
+        });
     }
 
     return (
@@ -120,16 +150,17 @@ export const CodeEditor = (props: any) => {
             <div className="mini-scroll-bar" style={{ padding: "10px", flexDirection: "column", overflow: "auto", alignItems: "center", width: 35, height: "100%", borderWidth: 0, borderRightWidth: 0.5, borderColor: "#949494bf", borderStyle: "solid" }}>
                 {itensLogica.map((item) => {
                     return <ItemToDrag
-                        id={item.id}
-                        key={item.id}
+                        isSelecionado={item.isSelecionado}
                         title={item.nome}
                         allowDrag={true}
+                        key={item.id}
+                        id={item.id}
                         style={{}}
                     />;
                 })}
             </div>
             <div style={{ flex: 1, overflow: "auto", }}>
-                <svg ref={svgRef} style={{ height: state.svgSize.svgHeight, width: state.svgSize.svgWidth, minWidth: "100%" }}>
+                <svg ref={svgRef} onKeyUp={onRemoveItem} onMouseDown={onMouseDown} style={{ height: state.svgSize.svgHeight, width: state.svgSize.svgWidth, minWidth: "100%" }}>
 
                     {state.flowItens.map((item: ItemFluxo) => {
                         const sucessorItem: any = state.flowItens.find((sucessorItem: ItemFluxo) => sucessorItem.id === item.sucessorId);
@@ -151,11 +182,13 @@ export const CodeEditor = (props: any) => {
 
                     {state.flowItens.map((item) => {
                         return <ItemToDrag
-                            id={item.id}
-                            key={item.id}
-                            title={item.nome}
-                            refItemPai={svgRef}
+                            onChangeSelecionado={onChangeSelecionado}
+                            isSelecionado={item.isSelecionado}
                             outputPosition={positionChange}
+                            refItemPai={svgRef}
+                            title={item.nome}
+                            key={item.id}
+                            id={item.id}
                             style={{
                                 top: item.top,
                                 left: item.left,

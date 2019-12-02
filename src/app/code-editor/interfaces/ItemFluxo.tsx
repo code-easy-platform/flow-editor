@@ -1,4 +1,5 @@
 export interface ItemFluxo {
+    isSelecionado: boolean
     sucessorId: number,
     itemType: ItemType
     height: number,
