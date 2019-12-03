@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDrag } from 'react-dnd';
 
 import { ItemType } from '../../interfaces/ItemFluxo';
+import { Start } from '../flow-componets/FlowComponents';
 
 export interface ItemDragProps {
     id?: any
@@ -58,7 +59,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
         if (refItemPai.current)
             refItemPai.current.onmousemove = null;
 
-            onChangeSelecionado(id);
+        onChangeSelecionado(id);
     }
 
     const mouseMove = (event: any) => {
@@ -90,21 +91,16 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
         return <div id={id} ref={dragRef} style={{ ...style, backgroundColor: isDragging ? "blue" : "gray" }}>{children || title}</div>;
     } else {
         return (
-            <g key={id} id={id}>
+            <g
+                onContextMenu={contextMenu}
+                style={{ cursor: 'move' }}
+                onMouseDown={mouseDown}
+                onMouseUp={mouseUp}
+                key={id}
+                id={id}
+            >
                 <text x={left} y={(top || 0) - 5} fill="#fff">{title}</text>
-                <rect
-                    id={id}
-                    y={top}
-                    x={left}
-                    ry={border}
-                    rx={border}
-                    width={width}
-                    height={height}
-                    style={{ fill: "gray", cursor: 'move', stroke: isSelecionado ? "blue" : "gray", strokeWidth: 1 }}
-                    onContextMenu={contextMenu}
-                    onMouseDown={mouseDown}
-                    onMouseUp={mouseUp}
-                />
+                <Start id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />
             </g>
         );
     }

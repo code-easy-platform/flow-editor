@@ -21,16 +21,16 @@ interface LineProps {
 }
 
 export const Line: React.FC<LineProps> = (props: LineProps) => {
-    const { id = "0", top1 = 0, top2 = 0 } = props;
-    const { lineWidth = 1, color = "blue", left1, left2 = 0 } = props;
-    const refItemPai: any = props.refItemPai;
     const onSucessorChange: Function = props.onSucessorChange || (() => { });
+    const { lineWidth = 1, color = "blue", left1, left2 = 0 } = props;
+    const { id = "0", top1 = 0, top2 = 0 } = props;
+    const refItemPai: any = props.refItemPai;
 
+    const polygonBottonCenter: number = left2;
+    const polygonRight: number = (left2 + 5);
+    const polygonLeft: number = (left2 - 5);
     const polygonTop: number = (top2 - 10);
     const polygonBotton: number = top2;
-    const polygonLeft: number = (left2 - 5);
-    const polygonRight: number = (left2 + 5);
-    const polygonBottonCenter: number = left2;
 
     const [isSelecionado, setIsSelecionado] = useState(false);
     const [position, setPosition] = useState({ polygonTop: polygonTop, polygonLeft: polygonLeft });
@@ -92,7 +92,7 @@ export const Line: React.FC<LineProps> = (props: LineProps) => {
                         x={position.polygonLeft - 5}
                         onMouseUp={() => onMouseEvent(false)}
                         onMouseDown={() => onMouseEvent(true)}
-                        style={{ ...style, cursor: 'default', fill: "gray", stroke: isSelecionado ? "blue" : "gray", strokeWidth: 1 }}
+                        style={{ ...style, cursor: 'default', fill: "#1e1e1e", stroke: isSelecionado ? "#999fff" : "gray", strokeWidth: 1 }}
                     />
             }
         </g>

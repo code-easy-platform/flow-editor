@@ -173,7 +173,7 @@ export const CodeEditor = (props: any) => {
 
                         return <Line
                             left1={(item.left || 0) + ((item.width || 0) / 2)}
-                            top1={(item.top || 0) + (item.height || 0) - 15}
+                            top1={(item.top || 0) + (item.height || 0) / 2}
                             onSucessorChange={onSucessorChange}
                             id={item.id.toString()}
                             refItemPai={svgRef}
