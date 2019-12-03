@@ -40,8 +40,8 @@ export const CodeEditor = (props: any) => {
 
     // Não precisou do setState por que está no fluxo de render.
     state.svgSize = {
-        svgHeight: state.flowItens.sort((a, b) => b.top - a.top)[0].top + 200,
-        svgWidth: state.flowItens.sort((a, b) => b.left - a.left)[0].left + 200,
+        svgHeight: (state.flowItens.length !== 0 ? (state.flowItens.sort((a, b) => b.top - a.top)[0].top + 200) : 0),
+        svgWidth: (state.flowItens.length !== 0 ? (state.flowItens.sort((a, b) => b.left - a.left)[0].left + 200) : 0),
     };
 
     // Usado para que seja possível o drop de itens no editor.
@@ -113,24 +113,26 @@ export const CodeEditor = (props: any) => {
         });
     }
 
+    // Identifica teclas que foram acionadas enquando o editor está focado.
     const handleKeyPress = (event: any) => {
-        if (event.keyCode === 'KeyDelete') {
-            console.log('Delete press here! ');
-        }
+        if (event.key === 'Delete') onRemoveItem();
+
     }
 
+    // Remove o item que estiver selecionado no fluxo.
     const onRemoveItem = () => {
         const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.isSelecionado === true) return item; else return undefined; });
-        if (!itemCurrentIndex) return;
+        if (itemCurrentIndex === -1) return;
+
+        const itemAntecessorIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.sucessorId === state.flowItens[itemCurrentIndex].id) return item; else return undefined; });
+        if (itemAntecessorIndex !== -1) { state.flowItens[itemAntecessorIndex].sucessorId = 0; }
 
         state.flowItens.splice(itemCurrentIndex, 1);
 
-        setState({
-            ...state,
-            flowItens: state.flowItens
-        });
+        setState({ ...state, flowItens: state.flowItens });
     }
 
+    // Desabilita qualquer item que esteja selecionado.
     const onMouseDown = () => {
         state.flowItens.forEach((item: ItemFluxo) => {
             item.isSelecionado = false;
@@ -141,23 +143,28 @@ export const CodeEditor = (props: any) => {
         });
     }
 
+    // Muda item que está selecionado.
     const onChangeSelecionado = (itemId: number) => {
         const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.id === Number(itemId)) return item; else return undefined; });
 
         state.flowItens[itemCurrentIndex].isSelecionado = true;
 
-        setState({
-            ...state,
-            flowItens: state.flowItens
-        });
+        setState({ ...state, flowItens: state.flowItens });
     }
 
     return (
         <div style={{ flex: 1, maxHeight: "100%" }}>
+
             <Toolbar itensLogica={itensLogica} />
 
             <div style={{ flex: 1, overflow: "auto", }}>
-                <svg tabIndex={0} ref={svgRef} onKeyPress={handleKeyPress} onMouseDown={onMouseDown} style={{ height: state.svgSize.svgHeight, width: state.svgSize.svgWidth, minWidth: "100%" }}>
+                <svg tabIndex={0} ref={svgRef} onKeyPress={handleKeyPress} onMouseDown={onMouseDown} style={{
+                    height: state.svgSize.svgHeight,
+                    width: state.svgSize.svgWidth,
+                    minHeight: "100%",
+                    minWidth: "100%",
+                    outline: "none"
+                }}>
 
                     {state.flowItens.map((item: ItemFluxo) => {
                         const sucessorItem: any = state.flowItens.find((sucessorItem: ItemFluxo) => sucessorItem.id === item.sucessorId);
@@ -177,7 +184,7 @@ export const CodeEditor = (props: any) => {
                         />;
                     })}
 
-                    {state.flowItens.map((item) => {
+                    {state.flowItens.map((item: ItemFluxo) => {
                         return <ItemToDrag
                             onChangeSelecionado={onChangeSelecionado}
                             isSelecionado={item.isSelecionado}
@@ -200,3 +207,4 @@ export const CodeEditor = (props: any) => {
         </div>
     );
 }
+
