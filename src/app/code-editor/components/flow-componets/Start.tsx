@@ -18,20 +18,23 @@ export const Start = (props: any) => {
         <>
             <rect
                 stroke={props.isSelecionado ? "#999fff" : "#219653"}
-                stroke-linejoin="round"
+                strokeLinejoin="round"
                 height={props.height}
                 width={props.width}
-                stroke-width="2"
+                strokeWidth="2"
                 fill="#1e1e1e"
+                key={props.id}
                 x={props.left}
                 y={props.top}
+                id={props.id}
                 rx="25"
             />
             <polygon
-                id={props.id}
-                fill="#1e1e1e"
-                stroke-width="2"
                 stroke={props.isSelecionado ? "#999fff" : "#219653"}
+                strokeWidth="2"
+                key={props.id}
+                fill="#1e1e1e"
+                id={props.id}
                 points={
                     pgTopLeft + ", " +
                     pgTopTop + ", " +

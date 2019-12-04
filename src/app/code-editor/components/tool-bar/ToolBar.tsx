@@ -11,6 +11,7 @@ export const Toolbar = (props: any) => {
             {itensLogica.map((item: ItemFluxo) => {
                 return <ItemToDrag
                     isSelecionado={item.isSelecionado}
+                    itemType={item.itemType}
                     title={item.nome}
                     allowDrag={true}
                     key={item.id}

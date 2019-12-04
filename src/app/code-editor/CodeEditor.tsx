@@ -8,27 +8,28 @@ import { Utils } from '../shared/Utils';
 import { Toolbar } from './components/tool-bar/ToolBar';
 
 const itens: ItemFluxo[] = [
-    { id: 1, sucessorId: 2, nome: "item 1", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 1, sucessorId: 2, nome: "item 1", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.START, isSelecionado: false },
     { id: 2, sucessorId: 3, nome: "item 2", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
     { id: 3, sucessorId: 4, nome: "item 3", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
     { id: 4, sucessorId: 5, nome: "item 4", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
     { id: 5, sucessorId: 6, nome: "item 5", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
     { id: 6, sucessorId: 7, nome: "item 6", top: 600, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
     { id: 7, sucessorId: 8, nome: "item 7", top: 700, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 8, sucessorId: 0, nome: "item 8", top: 800, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 8, sucessorId: 0, nome: "item 8", top: 800, left: 20, width: 50, height: 50, itemType: ItemType.END, isSelecionado: false },
 ];
 
 const itensLogica: ItemFluxo[] = [
-    { id: 1, sucessorId: 2, nome: "START", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 2, sucessorId: 3, nome: "IF", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 3, sucessorId: 4, nome: "FOREACH", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 4, sucessorId: 5, nome: "ACTION", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 5, sucessorId: 6, nome: "SWICTH", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 6, sucessorId: 7, nome: "ASSIGN", top: 600, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 7, sucessorId: 8, nome: "END", top: 700, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 1, sucessorId: 2, top: 100, left: 20, width: 50, height: 50, nome: "START", itemType: ItemType.START, isSelecionado: false },
+    { id: 2, sucessorId: 3, top: 200, left: 20, width: 50, height: 50, nome: "IF", itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 3, sucessorId: 4, top: 300, left: 20, width: 50, height: 50, nome: "FOREACH", itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 4, sucessorId: 5, top: 400, left: 20, width: 50, height: 50, nome: "ACTION", itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 5, sucessorId: 6, top: 500, left: 20, width: 50, height: 50, nome: "SWICTH", itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 6, sucessorId: 7, top: 600, left: 20, width: 50, height: 50, nome: "ASSIGN", itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 7, sucessorId: 8, top: 700, left: 20, width: 50, height: 50, nome: "END", itemType: ItemType.END, isSelecionado: false },
 ];
 
-const itensceitosNoDrop: ItemType[] = [ItemType.ASSIGN];
+// Define quais itens são aceitos no drop do start.
+const itensceitosNoDrop: ItemType[] = [ItemType.ASSIGN, ItemType.START, ItemType.END];
 
 export const CodeEditor = (props: any) => {
 
@@ -58,7 +59,7 @@ export const CodeEditor = (props: any) => {
             state.flowItens.push({
                 id: Utils.getRandomId(10000, 100000000),
                 sucessorId: item.itemProps.sucessorId,
-                itemType: ItemType.ASSIGN,
+                itemType: item.itemProps.itemType,
                 nome: item.itemProps.nome,
                 isSelecionado: false,
                 left: targetOffsetX,
@@ -171,6 +172,8 @@ export const CodeEditor = (props: any) => {
                         const left2 = sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2);
                         const top2 = sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20);
 
+                        if (item.itemType === ItemType.END) return <></>;
+
                         return <Line
                             left1={(item.left || 0) + ((item.width || 0) / 2)}
                             top1={(item.top || 0) + (item.height || 0) / 2}
@@ -189,6 +192,7 @@ export const CodeEditor = (props: any) => {
                             onChangeSelecionado={onChangeSelecionado}
                             isSelecionado={item.isSelecionado}
                             outputPosition={positionChange}
+                            itemType={item.itemType}
                             refItemPai={svgRef}
                             title={item.nome}
                             key={item.id}
@@ -207,4 +211,3 @@ export const CodeEditor = (props: any) => {
         </div>
     );
 }
-

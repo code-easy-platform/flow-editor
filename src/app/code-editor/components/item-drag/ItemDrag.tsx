@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useDrag } from 'react-dnd';
 
 import { ItemType } from '../../interfaces/ItemFluxo';
-import { Start } from '../flow-componets/FlowComponents';
+import { Start } from '../flow-componets/Start';
+import { End } from '../flow-componets/End';
 
 export interface ItemDragProps {
     id?: any
@@ -13,7 +14,7 @@ export interface ItemDragProps {
     allowDrag?: boolean
     isSelecionado: boolean
     hideSourceOnDrag?: boolean
-    componentType?: any/* ComponentType */
+    itemType?: any/* ComponentType */
 
     /** Devolve 'itemId, top, left'. */
     outputPosition?: Function
@@ -30,8 +31,8 @@ interface CustomStyle {
 
 export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     const { id, outputPosition, title, isSelecionado, onChangeSelecionado = () => { } } = props;
-    const { allowDrag, refItemPai, children } = props;
-    const { width, height, border } = props.style;
+    const { allowDrag, refItemPai, itemType, children } = props;
+    const { width, height } = props.style;
     const { top, left } = props.style;
 
     const [state, setState] = useState({
@@ -39,7 +40,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     });
 
     const [{ isDragging }, dragRef] = useDrag({
-        item: { type: ItemType.ASSIGN, itemProps: { id, left, top, title } },
+        item: { type: ItemType.ASSIGN, itemProps: { id, left, top, title, itemType } },
         collect: monitor => ({ isDragging: monitor.isDragging() }),
     });
 
@@ -88,6 +89,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
             minHeight: 35,
             fontSize: 10,
         };
+
         return <div id={id} ref={dragRef} style={{ ...style, backgroundColor: isDragging ? "blue" : "gray" }}>{children || title}</div>;
     } else {
         return (
@@ -99,8 +101,10 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
                 key={id}
                 id={id}
             >
-                <text x={left} y={(top || 0) - 5} fill="#fff">{title}</text>
-                <Start id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />
+                <text id={id} x={left} y={(top || 0) - 5} fill="#fff">{title}</text>
+                {itemType === ItemType.START && <Start id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
+                {itemType === ItemType.ASSIGN && <Start id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
+                {itemType === ItemType.END && <End id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
             </g>
         );
     }
