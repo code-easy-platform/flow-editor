@@ -16,7 +16,7 @@ export const End = (props: any) => {
                 strokeWidth="2"
                 fill="#1e1e1e"
                 x={props.left}
-                key={props.id}
+                key={"End_" + props.id}
                 y={props.top}
                 id={props.id}
                 rx="25"

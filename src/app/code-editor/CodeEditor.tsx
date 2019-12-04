@@ -158,7 +158,7 @@ export const CodeEditor = (props: any) => {
 
             <Toolbar itensLogica={itensLogica} />
 
-            <div style={{ flex: 1, overflow: "auto", }}>
+            <div key={"CodeEditor"} style={{ flex: 1, overflow: "auto", }}>
                 <svg tabIndex={0} ref={svgRef} onKeyPress={handleKeyPress} onMouseDown={onMouseDown} style={{
                     height: state.svgSize.svgHeight,
                     width: state.svgSize.svgWidth,
@@ -172,7 +172,7 @@ export const CodeEditor = (props: any) => {
                         const left2 = sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2);
                         const top2 = sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20);
 
-                        if (item.itemType === ItemType.END) return <></>;
+                        if (item.itemType === ItemType.END) return null;
 
                         return <Line
                             left1={(item.left || 0) + ((item.width || 0) / 2)}

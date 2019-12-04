@@ -60,6 +60,7 @@ export const Line: React.FC<LineProps> = (props: LineProps) => {
         <g fill="none">
             <line
                 id={id}
+                key={"line_" + id}
                 x1={left1}
                 x2={isSelecionado ? position.polygonLeft : left2}
                 y1={top1}
@@ -72,6 +73,7 @@ export const Line: React.FC<LineProps> = (props: LineProps) => {
                 !isSelecionado
                     ? <polygon
                         id={id}
+                        key={"polygon_" + id}
                         points={
                             polygonLeft + ", " +
                             polygonTop + ", " +
@@ -84,10 +86,12 @@ export const Line: React.FC<LineProps> = (props: LineProps) => {
                         onMouseDown={() => onMouseEvent(true)}
                     />
                     : <rect
+                        id={id}
                         ry="50"
                         rx="50"
                         width="10"
                         height="10"
+                        key={"rect_" + id}
                         y={position.polygonTop - 5}
                         x={position.polygonLeft - 5}
                         onMouseUp={() => onMouseEvent(false)}

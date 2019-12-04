@@ -23,7 +23,7 @@ export const Start = (props: any) => {
                 width={props.width}
                 strokeWidth="2"
                 fill="#1e1e1e"
-                key={props.id}
+                key={"Start_" + props.id}
                 x={props.left}
                 y={props.top}
                 id={props.id}
