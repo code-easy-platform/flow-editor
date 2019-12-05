@@ -8,14 +8,13 @@ import { Utils } from '../shared/Utils';
 import { Toolbar } from './components/tool-bar/ToolBar';
 
 const itens: ItemFluxo[] = [
-    { id: 1, sucessorId: 2, nome: "item 1", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.START, isSelecionado: false },
-    { id: 2, sucessorId: 3, nome: "item 2", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 3, sucessorId: 4, nome: "item 3", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 4, sucessorId: 5, nome: "item 4", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 5, sucessorId: 6, nome: "item 5", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 6, sucessorId: 7, nome: "item 6", top: 600, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 7, sucessorId: 8, nome: "item 7", top: 700, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
-    { id: 8, sucessorId: 0, nome: "item 8", top: 800, left: 20, width: 50, height: 50, itemType: ItemType.END, isSelecionado: false },
+    { id: 1, sucessorId: 2, nome: "START", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.START, isSelecionado: false },
+    { id: 2, sucessorId: 3, nome: "IF", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 3, sucessorId: 4, nome: "FOREACH", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 4, sucessorId: 5, nome: "ACTION", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 5, sucessorId: 6, nome: "SWICTH", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 6, sucessorId: 7, nome: "ASSIGN", top: 600, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 7, sucessorId: 0, nome: "END", top: 800, left: 20, width: 50, height: 50, itemType: ItemType.END, isSelecionado: false },
 ];
 
 const itensLogica: ItemFluxo[] = [
@@ -117,7 +116,6 @@ export const CodeEditor = (props: any) => {
     // Identifica teclas que foram acionadas enquando o editor está focado.
     const handleKeyPress = (event: any) => {
         if (event.key === 'Delete') onRemoveItem();
-
     }
 
     // Remove o item que estiver selecionado no fluxo.
@@ -155,11 +153,10 @@ export const CodeEditor = (props: any) => {
 
     return (
         <div style={{ flex: 1, maxHeight: "100%" }}>
-
             <Toolbar itensLogica={itensLogica} />
 
             <div key={"CodeEditor"} style={{ flex: 1, overflow: "auto", }}>
-                <svg tabIndex={0} ref={svgRef} onKeyPress={handleKeyPress} onMouseDown={onMouseDown} style={{
+                <svg tabIndex={0} ref={svgRef} onKeyPressCapture={handleKeyPress} onMouseDown={onMouseDown} style={{
                     height: state.svgSize.svgHeight,
                     width: state.svgSize.svgWidth,
                     minHeight: "100%",

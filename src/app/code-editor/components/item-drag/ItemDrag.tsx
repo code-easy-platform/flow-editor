@@ -37,6 +37,8 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
 
     const [state, setState] = useState({
         isMenuOpen: false,
+        /** Usado para não bugar o onchangesucessor da linha que estou trocando.  */
+        isMouseDown: false, 
     });
 
     const [{ isDragging }, dragRef] = useDrag({
@@ -54,13 +56,18 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     const mouseDown = () => {
         if (refItemPai.current)
             refItemPai.current.onmousemove = mouseMove;
+
+        setState({ ...state, isMouseDown: true });
     }
 
     const mouseUp = (event: any) => {
         if (refItemPai.current)
             refItemPai.current.onmousemove = null;
 
-        onChangeSelecionado(id);
+        if (state.isMouseDown) {
+            onChangeSelecionado(id);
+            setState({ ...state, isMouseDown: false });
+        }
     }
 
     const mouseMove = (event: any) => {
@@ -101,7 +108,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
                 key={id}
                 id={id}
             >
-                <text id={id} x={left} y={(top || 0) - 5} fill="#fff">{title}</text>
+                <text id={id} x={left} y={(top || 0) - 5} fill="#fff" >{title}</text>
                 {itemType === ItemType.START && <Start id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.ASSIGN && <Start id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.END && <End id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}

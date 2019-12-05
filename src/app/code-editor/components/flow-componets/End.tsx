@@ -10,13 +10,13 @@ export const End = (props: any) => {
         <>
             <rect
                 stroke={props.isSelecionado ? "#999fff" : "#219653"}
+                key={"End_" + props.id}
                 strokeLinejoin="round"
                 height={props.height}
                 width={props.width}
                 strokeWidth="2"
                 fill="#1e1e1e"
                 x={props.left}
-                key={"End_" + props.id}
                 y={props.top}
                 id={props.id}
                 rx="25"

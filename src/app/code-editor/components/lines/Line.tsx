@@ -43,10 +43,11 @@ export const Line: React.FC<LineProps> = (props: LineProps) => {
 
     const onMouseEvent = (value: boolean) => {
         setIsSelecionado(value);
-        if (value)
+        if (value) {
             refItemPai.current.onmousemove = mouseMove;
-        else
+        } else {
             refItemPai.current.onmousemove = null;
+        }
     }
 
     const mouseMove = (event: any) => {
@@ -84,6 +85,7 @@ export const Line: React.FC<LineProps> = (props: LineProps) => {
                         }
                         style={{ cursor: 'move', fill: color || "blue", stroke: color || "blue", strokeWidth: lineWidth }}
                         onMouseDown={() => onMouseEvent(true)}
+                        onMouseUp={() => onMouseEvent(false)}
                     />
                     : <rect
                         id={id}
