@@ -9,7 +9,7 @@ import { Toolbar } from './components/tool-bar/ToolBar';
 
 const itens: ItemFluxo[] = [
     { id: 1, sucessorId: 2, nome: "START", top: 100, left: 20, width: 50, height: 50, itemType: ItemType.START, isSelecionado: false },
-    { id: 2, sucessorId: 3, nome: "IF", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 2, sucessorId: 3, nome: "IF", top: 200, left: 20, width: 50, height: 50, itemType: ItemType.IF, isSelecionado: false },
     { id: 3, sucessorId: 4, nome: "FOREACH", top: 300, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
     { id: 4, sucessorId: 5, nome: "ACTION", top: 400, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
     { id: 5, sucessorId: 6, nome: "SWICTH", top: 500, left: 20, width: 50, height: 50, itemType: ItemType.ASSIGN, isSelecionado: false },
@@ -19,7 +19,7 @@ const itens: ItemFluxo[] = [
 
 const itensLogica: ItemFluxo[] = [
     { id: 1, sucessorId: 2, top: 100, left: 20, width: 50, height: 50, nome: "START", itemType: ItemType.START, isSelecionado: false },
-    { id: 2, sucessorId: 3, top: 200, left: 20, width: 50, height: 50, nome: "IF", itemType: ItemType.ASSIGN, isSelecionado: false },
+    { id: 2, sucessorId: 3, top: 200, left: 20, width: 50, height: 50, nome: "IF", itemType: ItemType.IF, isSelecionado: false },
     { id: 3, sucessorId: 4, top: 300, left: 20, width: 50, height: 50, nome: "FOREACH", itemType: ItemType.ASSIGN, isSelecionado: false },
     { id: 4, sucessorId: 5, top: 400, left: 20, width: 50, height: 50, nome: "ACTION", itemType: ItemType.ASSIGN, isSelecionado: false },
     { id: 5, sucessorId: 6, top: 500, left: 20, width: 50, height: 50, nome: "SWICTH", itemType: ItemType.ASSIGN, isSelecionado: false },

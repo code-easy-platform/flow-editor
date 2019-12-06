@@ -13,5 +13,6 @@ export interface ItemFluxo {
 export enum ItemType {
     START="START",
     ASSIGN="ASSAGN",
+    IF="IF",
     END="END",
 }
