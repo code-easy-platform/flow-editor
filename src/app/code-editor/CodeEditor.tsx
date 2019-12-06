@@ -35,16 +35,17 @@ export const CodeEditor = (props: any) => {
     const svgRef = useRef(null);
     const [state, setState] = useState({
         flowItens: itens,
-        svgSize: { svgHeight: 0, svgWidth: 0 }
+        svgSize: { svgHeight: 0, svgWidth: 0 },
+        selectionProps: { isMouseDown: false, top: 0, left: 0, finalTop: 10, finalLeft: 0 }
     });
 
-    // Não precisou do setState por que está no fluxo de render.
+    /** Não precisou do setState por que está no fluxo de render. */
     state.svgSize = {
         svgHeight: (state.flowItens.length !== 0 ? (state.flowItens.sort((a, b) => b.top - a.top)[0].top + 200) : 0),
         svgWidth: (state.flowItens.length !== 0 ? (state.flowItens.sort((a, b) => b.left - a.left)[0].left + 200) : 0),
     };
 
-    // Usado para que seja possível o drop de itens no editor.
+    /** Usado para que seja possível o drop de itens no editor. */
     const [, dropRef] = useDrop({
         accept: itensceitosNoDrop,
         drop(item: any, monitor: DropTargetMonitor) {
@@ -59,7 +60,7 @@ export const CodeEditor = (props: any) => {
                 id: Utils.getRandomId(10000, 100000000),
                 sucessorId: item.itemProps.sucessorId,
                 itemType: item.itemProps.itemType,
-                nome: item.itemProps.nome,
+                nome: item.itemProps.title,
                 isSelecionado: false,
                 left: targetOffsetX,
                 top: targetOffsetY,
@@ -74,10 +75,10 @@ export const CodeEditor = (props: any) => {
         },
     });
 
-    // Agrupa as referencias do drop com as da ref.
+    /** Agrupa as referencias do drop com as da ref. */
     dropRef(svgRef);
 
-    // Depois que um elemento já está na tela, esta função muda a posição dele!
+    /** Depois que um elemento já está na tela, esta função muda a posição dele! */
     const positionChange = (itemId: number, positionTop: number, positionLeft: number) => {
         let component = state.flowItens[state.flowItens.findIndex((item: any) => { if (item.id === itemId) return item; return undefined; })];
         component.top = positionTop;
@@ -87,13 +88,16 @@ export const CodeEditor = (props: any) => {
         state.svgSize.svgWidth = state.flowItens.sort((a, b) => b.left - a.left)[0].left + 200;
 
         setState({
+            ...state,
             flowItens: state.flowItens,
             svgSize: state.svgSize
         });
     }
 
-    // Usado para mudar o "sucessorId" de um elemento.
-    // Sucessor é usado para indicar onde o apontamento deve estar.
+    /** 
+     * Usado para mudar o "sucessorId" de um elemento.
+     * Sucessor é usado para indicar onde o apontamento deve estar.
+     */
     const onSucessorChange = (itemId: number, sucessorId: string) => {
 
         const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.id === Number(itemId)) return item; else return undefined; });
@@ -113,12 +117,35 @@ export const CodeEditor = (props: any) => {
         });
     }
 
-    // Identifica teclas que foram acionadas enquando o editor está focado.
+    /** Identifica teclas que foram acionadas enquando o editor está focado. */
     const handleKeyPress = (event: any) => {
         if (event.key === 'Delete') onRemoveItem();
+
+        if (event.key === 'ArrowUp') { moveComponenteByKey("ArrowUp"); event.preventDefault(); };
+        if (event.key === 'ArrowDown') { moveComponenteByKey("ArrowDown"); event.preventDefault(); };
+        if (event.key === 'ArrowLeft') { moveComponenteByKey("ArrowLeft"); event.preventDefault(); };
+        if (event.key === 'ArrowRight') { moveComponenteByKey("ArrowRight"); event.preventDefault(); };
     }
 
-    // Remove o item que estiver selecionado no fluxo.
+    /** Move o componente pelas setas do teclado. */
+    const moveComponenteByKey = (direction: string) => {
+        const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.isSelecionado === true) return item; else return undefined; });
+        if (itemCurrentIndex === -1) return;
+
+        if (direction === 'ArrowUp')
+            state.flowItens[itemCurrentIndex].top = state.flowItens[itemCurrentIndex].top - 5;
+        if (direction === 'ArrowDown')
+            state.flowItens[itemCurrentIndex].top = state.flowItens[itemCurrentIndex].top + 5;
+
+        if (direction === 'ArrowLeft')
+            state.flowItens[itemCurrentIndex].left = state.flowItens[itemCurrentIndex].left - 5;
+        if (direction === 'ArrowRight')
+            state.flowItens[itemCurrentIndex].left = state.flowItens[itemCurrentIndex].left + 5;
+
+        setState({ ...state, flowItens: state.flowItens });
+    }
+
+    /** Remove o item que estiver selecionado no fluxo. */
     const onRemoveItem = () => {
         const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.isSelecionado === true) return item; else return undefined; });
         if (itemCurrentIndex === -1) return;
@@ -131,8 +158,48 @@ export const CodeEditor = (props: any) => {
         setState({ ...state, flowItens: state.flowItens });
     }
 
-    // Desabilita qualquer item que esteja selecionado.
-    const onMouseDown = () => {
+    const removeSelection = () => {
+        state.selectionProps = { isMouseDown: false, top:0, left: 0, finalTop:0, finalLeft: 0 };
+        setState({ ...state, selectionProps: state.selectionProps });
+        document.onmousemove = null;
+        document.onmouseup = null;
+    }
+
+    /** Ativa a seleção na tela. */
+    const exibiSelection = (event: any) => {
+
+        document.onmousemove = (event: any) => {
+            if (state.selectionProps.isMouseDown) {
+                state.selectionProps = {
+                    ...state.selectionProps,
+                    isMouseDown: true,
+                    finalTop: Number(event.offsetY),
+                    finalLeft: Number(event.offsetX),
+                };
+                setState({ ...state, selectionProps: state.selectionProps });
+            } else { removeSelection(); }
+        }
+
+        document.onmouseup = removeSelection;
+
+        state.selectionProps = {
+            isMouseDown: true,
+            top: Number(event.nativeEvent.offsetY),
+            left: Number(event.nativeEvent.offsetX),
+            finalTop: Number(event.nativeEvent.offsetY),
+            finalLeft: Number(event.nativeEvent.offsetX),
+        };
+
+        setState({
+            ...state,
+            selectionProps: state.selectionProps
+        });
+
+    }
+
+    /** Desabilita qualquer item que esteja selecionado. */
+    const onMouseDown = (event: any) => {
+        exibiSelection(event);
         state.flowItens.forEach((item: ItemFluxo) => {
             item.isSelecionado = false;
         });
@@ -142,8 +209,9 @@ export const CodeEditor = (props: any) => {
         });
     }
 
-    // Muda item que está selecionado.
+    /** Muda item que está selecionado. */
     const onChangeSelecionado = (itemId: number) => {
+
         const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.id === Number(itemId)) return item; else return undefined; });
 
         state.flowItens[itemCurrentIndex].isSelecionado = true;
@@ -156,13 +224,23 @@ export const CodeEditor = (props: any) => {
             <Toolbar itensLogica={itensLogica} />
 
             <div key={"CodeEditor"} style={{ flex: 1, overflow: "auto", }}>
-                <svg tabIndex={0} ref={svgRef} onKeyPressCapture={handleKeyPress} onMouseDown={onMouseDown} style={{
+                <svg tabIndex={0} ref={svgRef} onKeyDown={handleKeyPress} onMouseDown={onMouseDown} style={{
                     height: state.svgSize.svgHeight,
                     width: state.svgSize.svgWidth,
                     minHeight: "100%",
                     minWidth: "100%",
                     outline: "none"
                 }}>
+                    <rect
+                        fill="#ffffff11"
+                        stroke="#999fff"
+                        strokeWidth={1}
+                        onMouseUp={removeSelection}
+                        y={state.selectionProps.top}
+                        x={((state.selectionProps.finalLeft - state.selectionProps.left) > 0) ? state.selectionProps.left : state.selectionProps.finalLeft}
+                        width={((state.selectionProps.finalLeft - state.selectionProps.left) > 0) ? (state.selectionProps.finalLeft - state.selectionProps.left) : (state.selectionProps.left - state.selectionProps.finalLeft)}
+                        height={state.selectionProps.finalTop - state.selectionProps.top}
+                    />
 
                     {state.flowItens.map((item: ItemFluxo) => {
                         const sucessorItem: any = state.flowItens.find((sucessorItem: ItemFluxo) => sucessorItem.id === item.sucessorId);
