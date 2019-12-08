@@ -6,13 +6,15 @@ export const End = (props: any) => {
     const left2 = props.left + (props.width / 3);
     const top2 = props.top + (props.height / 3);
 
+    const strokeColor: string = props.isSelecionado ? "#999fff" : "#219653";
+
     return (
         <>
             <rect
-                stroke={props.isSelecionado ? "#999fff" : "#219653"}
                 key={"End_" + props.id}
                 strokeLinejoin="round"
                 height={props.height}
+                stroke={strokeColor}
                 width={props.width}
                 strokeWidth="2"
                 fill="#1e1e1e"
@@ -22,10 +24,10 @@ export const End = (props: any) => {
                 rx="25"
             />
             <rect
-                stroke={props.isSelecionado ? "#999fff" : "#219653"}
-                strokeLinejoin="round"
                 height={props.height / 3}
                 width={props.width / 3}
+                strokeLinejoin="round"
+                stroke={strokeColor}
                 strokeWidth="2"
                 fill="#1e1e1e"
                 key={props.id}

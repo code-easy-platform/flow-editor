@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDrag } from 'react-dnd';
 
 import { ItemType } from '../../interfaces/ItemFluxo';
+import { Assign } from '../flow-componets/Assign';
 import { Start } from '../flow-componets/Start';
 import { End } from '../flow-componets/End';
 import { If } from '../flow-componets/IF';
@@ -111,7 +112,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
             >
                 <text id={id} x={left} y={(top || 0) - 5} fill="#fff" >{title}</text>
                 {itemType === ItemType.START && <Start id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
-                {itemType === ItemType.ASSIGN && <Start id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
+                {itemType === ItemType.ASSIGN && <Assign id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.IF && <If id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.END && <End id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
             </g>

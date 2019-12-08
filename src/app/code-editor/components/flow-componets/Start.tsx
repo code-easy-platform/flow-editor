@@ -14,23 +14,25 @@ export const Start = (props: any) => {
     const pgTopTop: number = (top2 - 12);
     const pgTopRight: number = top2 - 1;
 
+    const strokeColor: string = props.isSelecionado ? "#999fff" : "#219653";
+
     return (
         <>
             <rect
-                stroke={props.isSelecionado ? "#999fff" : "#219653"}
+                key={"Start_" + props.id}
                 strokeLinejoin="round"
                 height={props.height}
+                stroke={strokeColor}
                 width={props.width}
                 strokeWidth="2"
                 fill="#1e1e1e"
-                key={"Start_" + props.id}
                 x={props.left}
                 y={props.top}
                 id={props.id}
                 rx="25"
             />
             <polygon
-                stroke={props.isSelecionado ? "#999fff" : "#219653"}
+                stroke={strokeColor}
                 strokeWidth="2"
                 key={props.id}
                 fill="#1e1e1e"

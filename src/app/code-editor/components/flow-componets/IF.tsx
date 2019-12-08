@@ -17,10 +17,12 @@ export const If = (props: any) => {
     const pgBottonRight_Left: number = pgTopLeft_Left + 50;
     const pgBottonRight_Top: number = pgTopLeft_Top;
 
+    const strokeColor: string = props.isSelecionado ? "#999fff" : "#219653";
+
     return (
         <>
             <polygon
-                stroke={props.isSelecionado ? "#999fff" : "#219653"}
+                stroke={strokeColor}
                 strokeWidth="2"
                 key={props.id}
                 fill="#1e1e1e"
