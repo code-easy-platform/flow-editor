@@ -8,8 +8,8 @@ import { ItemType } from './code-editor/interfaces/ItemFluxo';
 
 
 const itens: any[] = [
-    { id: 1, sucessorId: 2, top: 100, left: 80, width: 50, height: 50, isSelecionado: true, nome: "START",   itemType: ItemType.START  },
-    { id: 8, sucessorId: 2, top: 100, left: 200,width: 50, height: 50, isSelecionado: true, nome: "ACTION",  itemType: ItemType.ACTION },
+    { id: 1, sucessorId: 2, top: 100, left: 80, width: 50, height: 50, isSelecionado: false, nome: "START",   itemType: ItemType.START  },
+    { id: 8, sucessorId: 2, top: 100, left: 200,width: 50, height: 50, isSelecionado: false, nome: "ACTION",  itemType: ItemType.ACTION },
     { id: 2, sucessorId: 3, top: 200, left: 80, width: 50, height: 50, isSelecionado: false, nome: "IF",      itemType: ItemType.IF     },
     { id: 3, sucessorId: 4, top: 300, left: 80, width: 50, height: 50, isSelecionado: false, nome: "FOREACH", itemType: ItemType.ASSIGN },
     { id: 4, sucessorId: 5, top: 400, left: 80, width: 50, height: 50, isSelecionado: false, nome: "ACTION",  itemType: ItemType.ASSIGN },

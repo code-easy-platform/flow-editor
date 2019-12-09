@@ -171,11 +171,24 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
         document.onmouseup = null;
     }
 
-    const selecionaBySelection = (runtimeStartTop: number, runtimeStartLeft: number, endTop: number, endLeft: number) => {
+    const selecionaBySelection = (startTop: number, startLeft: number, endTop: number, endLeft: number) => {
         let filteredList: ItemFluxo[] = state.flowItens.filter((item: ItemFluxo) => {
+            const top2 = item.top + item.height;
+            const left2 = item.left + item.width;
             return (
-                (((item.top >= runtimeStartTop) || (item.top + 50 >= runtimeStartTop)) && ((item.left >= runtimeStartLeft) || (item.left + 50 >= runtimeStartLeft))) &&
-                (((item.top <= endTop) || (item.top >= endTop)) && ((item.left <= endLeft) || (item.left >= -endLeft)))
+                (
+                    (
+                        ((endTop - startTop) > 0)
+                            ? ((item.top >= startTop) || (top2 >= startTop)) && ((item.top <= endTop) || (top2 <= endTop))
+                            : ((item.top <= startTop) || (top2 <= startTop)) && ((item.top >= endTop) || (top2 >= endTop))
+                    )
+                    &&
+                    (
+                        ((endLeft - startLeft) > 0)
+                            ? ((item.left >= startLeft) || (left2 >= startLeft)) && ((item.left <= endLeft) || (left2 <= endLeft))
+                            : ((item.left <= startLeft) || (left2 <= startLeft)) && ((item.left >= endLeft) || (left2 >= endLeft))
+                    )
+                )
             );
         });
 
@@ -202,7 +215,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
                     runtimeStartTop: ((state.selectionProps.endTop - state.selectionProps.startTop) > 0) ? state.selectionProps.startTop : state.selectionProps.endTop,
                 };
 
-                selecionaBySelection(state.selectionProps.runtimeStartTop, state.selectionProps.runtimeStartLeft, state.selectionProps.endTop, state.selectionProps.endLeft);
+                selecionaBySelection(state.selectionProps.startTop, state.selectionProps.startLeft, state.selectionProps.endTop, state.selectionProps.endLeft);
 
                 setState({ ...state, selectionProps: state.selectionProps });
             } else { removeSelection(); }
