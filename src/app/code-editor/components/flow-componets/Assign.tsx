@@ -37,7 +37,7 @@ export const Assign = (props: any) => {
                 rx="25"
             />
             <line
-                stroke-line-cap="round"
+                strokeLinecap="round"
                 stroke={strokeColor}
                 x2={pgTopRight_Left}
                 x1={pgTopLeft_Left}
@@ -46,7 +46,7 @@ export const Assign = (props: any) => {
                 strokeWidth={3}
             />
             <line
-                stroke-line-cap="round"
+                strokeLinecap="round"
                 x2={pgBottonRight_Left}
                 x1={pgBottonLeft_Left}
                 y2={pgBottonRight_Top}

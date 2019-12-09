@@ -151,11 +151,13 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
         state.flowItens.splice(itemCurrentIndex, 1);
 
         setState({ ...state, flowItens: state.flowItens });
+
+        onRemoveItem(); // Remove mais itens se estiverem selecionado.
     }
 
     /** Remove a selection da tela. */
     const removeSelection = () => {
-        state.selectionProps = { isMouseDown: false, top:0, left: 0, finalTop:0, finalLeft: 0 };
+        state.selectionProps = { isMouseDown: false, top: 0, left: 0, finalTop: 0, finalLeft: 0 };
         setState({ ...state, selectionProps: state.selectionProps });
         document.onmousemove = null;
         document.onmouseup = null;
@@ -199,10 +201,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
         state.flowItens.forEach((item: ItemFluxo) => {
             item.isSelecionado = false;
         });
-        setState({
-            ...state,
-            flowItens: state.flowItens,
-        });
+        setState({ ...state, flowItens: state.flowItens });
     }
 
     /** Muda item que está selecionado. */

@@ -32,6 +32,7 @@ export const Start = (props: any) => {
                 rx="25"
             />
             <polygon
+                strokeLinejoin="round"
                 stroke={strokeColor}
                 strokeWidth="2"
                 key={props.id}
