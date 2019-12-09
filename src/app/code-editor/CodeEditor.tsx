@@ -31,7 +31,15 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
     const [state, setState] = useState({
         flowItens: itens,
         svgSize: { svgHeight: 0, svgWidth: 0 },
-        selectionProps: { isMouseDown: false, top: 0, left: 0, finalTop: 10, finalLeft: 0 }
+        selectionProps: {
+            isMouseDown: false,
+            runtimeStartLeft: 0,
+            runtimeStartTop: 0,
+            startLeft: 0,
+            startTop: 0,
+            endTop: 10,
+            endLeft: 0
+        }
     });
 
     /** Não precisou do setState por que está no fluxo de render. */
@@ -157,10 +165,22 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
 
     /** Remove a selection da tela. */
     const removeSelection = () => {
-        state.selectionProps = { isMouseDown: false, top: 0, left: 0, finalTop: 0, finalLeft: 0 };
+        state.selectionProps = { isMouseDown: false, runtimeStartLeft: 0, runtimeStartTop: 0, startTop: 0, startLeft: 0, endTop: 0, endLeft: 0 };
         setState({ ...state, selectionProps: state.selectionProps });
         document.onmousemove = null;
         document.onmouseup = null;
+    }
+
+    const selecionaBySelection = (runtimeStartTop: number, runtimeStartLeft: number, endTop: number, endLeft: number) => {
+        let filteredList: ItemFluxo[] = state.flowItens.filter((item: ItemFluxo) => {
+            return (
+                (((item.top >= runtimeStartTop) || (item.top + 50 >= runtimeStartTop)) && ((item.left >= runtimeStartLeft) || (item.left + 50 >= runtimeStartLeft))) &&
+                (((item.top <= endTop) || (item.top >= endTop)) && ((item.left <= endLeft) || (item.left >= -endLeft)))
+            );
+        });
+
+        state.flowItens.forEach((item: ItemFluxo) => { item.isSelecionado = false; });
+        filteredList.forEach((item: ItemFluxo) => { item.isSelecionado = true; });
     }
 
     /** Ativa a seleção na tela. */
@@ -172,9 +192,18 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
                 state.selectionProps = {
                     ...state.selectionProps,
                     isMouseDown: true,
-                    finalTop: Number(event.offsetY),
-                    finalLeft: Number(event.offsetX),
+                    endTop: Number(event.offsetY),
+                    endLeft: Number(event.offsetX),
                 };
+
+                state.selectionProps = {
+                    ...state.selectionProps,
+                    runtimeStartLeft: ((state.selectionProps.endLeft - state.selectionProps.startLeft) > 0) ? state.selectionProps.startLeft : state.selectionProps.endLeft,
+                    runtimeStartTop: ((state.selectionProps.endTop - state.selectionProps.startTop) > 0) ? state.selectionProps.startTop : state.selectionProps.endTop,
+                };
+
+                selecionaBySelection(state.selectionProps.runtimeStartTop, state.selectionProps.runtimeStartLeft, state.selectionProps.endTop, state.selectionProps.endLeft);
+
                 setState({ ...state, selectionProps: state.selectionProps });
             } else { removeSelection(); }
         }
@@ -182,11 +211,18 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
         document.onmouseup = removeSelection;
 
         state.selectionProps = {
+            ...state.selectionProps,
             isMouseDown: true,
-            top: Number(event.nativeEvent.offsetY),
-            left: Number(event.nativeEvent.offsetX),
-            finalTop: Number(event.nativeEvent.offsetY),
-            finalLeft: Number(event.nativeEvent.offsetX),
+            startTop: Number(event.nativeEvent.offsetY),
+            startLeft: Number(event.nativeEvent.offsetX),
+            endTop: Number(event.nativeEvent.offsetY),
+            endLeft: Number(event.nativeEvent.offsetX),
+        };
+
+        state.selectionProps = {
+            ...state.selectionProps,
+            runtimeStartLeft: ((state.selectionProps.endLeft - state.selectionProps.startLeft) > 0) ? state.selectionProps.startLeft : state.selectionProps.endLeft,
+            runtimeStartTop: ((state.selectionProps.endTop - state.selectionProps.startTop) > 0) ? state.selectionProps.startTop : state.selectionProps.endTop,
         };
 
         setState({
@@ -231,10 +267,10 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
                         stroke="#999fff"
                         strokeWidth={1}
                         onMouseUp={removeSelection}
-                        y={((state.selectionProps.finalTop - state.selectionProps.top) > 0) ? state.selectionProps.top : state.selectionProps.finalTop}
-                        x={((state.selectionProps.finalLeft - state.selectionProps.left) > 0) ? state.selectionProps.left : state.selectionProps.finalLeft}
-                        width={((state.selectionProps.finalLeft - state.selectionProps.left) > 0) ? (state.selectionProps.finalLeft - state.selectionProps.left) : (state.selectionProps.left - state.selectionProps.finalLeft)}
-                        height={((state.selectionProps.finalTop - state.selectionProps.top) > 0) ? (state.selectionProps.finalTop - state.selectionProps.top) : (state.selectionProps.top - state.selectionProps.finalTop)}
+                        y={state.selectionProps.runtimeStartTop}
+                        x={state.selectionProps.runtimeStartLeft}
+                        width={((state.selectionProps.endLeft - state.selectionProps.startLeft) > 0) ? (state.selectionProps.endLeft - state.selectionProps.startLeft) : (state.selectionProps.startLeft - state.selectionProps.endLeft)}
+                        height={((state.selectionProps.endTop - state.selectionProps.startTop) > 0) ? (state.selectionProps.endTop - state.selectionProps.startTop) : (state.selectionProps.startTop - state.selectionProps.endTop)}
                     />
 
                     {state.flowItens.map((item: ItemFluxo) => {
