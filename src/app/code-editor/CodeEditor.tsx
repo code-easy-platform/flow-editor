@@ -132,18 +132,18 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
 
     /** Move o componente pelas setas do teclado. */
     const moveComponenteByKey = (direction: string) => {
-        const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.isSelecionado === true) return item; else return undefined; });
-        if (itemCurrentIndex === -1) return;
+        let filteredList: ItemFluxo[] = state.flowItens.filter((item: ItemFluxo) => item.isSelecionado === true);
+        if (filteredList.length === 0) return;
 
-        if (direction === 'ArrowUp')
-            state.flowItens[itemCurrentIndex].top = state.flowItens[itemCurrentIndex].top - 5;
-        if (direction === 'ArrowDown')
-            state.flowItens[itemCurrentIndex].top = state.flowItens[itemCurrentIndex].top + 5;
-
-        if (direction === 'ArrowLeft')
-            state.flowItens[itemCurrentIndex].left = state.flowItens[itemCurrentIndex].left - 5;
-        if (direction === 'ArrowRight')
-            state.flowItens[itemCurrentIndex].left = state.flowItens[itemCurrentIndex].left + 5;
+        if (direction === 'ArrowUp') {
+            filteredList.forEach((item: ItemFluxo) => { item.top = item.top - 5; });
+        } else if (direction === 'ArrowDown') {
+            filteredList.forEach((item: ItemFluxo) => { item.top = item.top + 5; });
+        } else if (direction === 'ArrowLeft') {
+            filteredList.forEach((item: ItemFluxo) => { item.left = item.left - 5; });
+        } else if (direction === 'ArrowRight') {
+            filteredList.forEach((item: ItemFluxo) => { item.left = item.left + 5; });
+        }
 
         setState({ ...state, flowItens: state.flowItens });
     }
