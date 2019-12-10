@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useDrop, DropTargetMonitor } from 'react-dnd';
 
 import { ItemToDrag } from './components/item-drag/ItemDrag';
-import { ItemFluxo, ItemType } from './interfaces/ItemFluxo';
+import { ItemType, FlowItem } from './interfaces/ItemFluxo';
 import { Line } from './components/lines/Line';
 import { Utils } from '../shared/Utils';
 import { Toolbar } from './components/tool-bar/ToolBar';
@@ -11,12 +11,15 @@ import { Toolbar } from './components/tool-bar/ToolBar';
  * Propriedades aceitas pelo editor.
  */
 export interface CodeEditorProps {
-    toolItens?: ItemFluxo[],
-    itens: ItemFluxo[],
+    toolItens?: FlowItem[],
+    itens: FlowItem[],
 
     /** Recebe uma função que devolverá os itens com as alterações feitas a cada mudança. */
-    onChangeItens(itens: ItemFluxo[]): any
+    onChangeItens(itens: FlowItem[]): any
 }
+
+/** Usada para validar houve mudanças no código e impedir de realiza output desnecessários. */
+let backupFlow: string = "";
 
 /** Define quais itens são aceitos no drop do start. */
 const acceptedInDrop: ItemType[] = [ItemType.ASSIGN, ItemType.START, ItemType.END];
@@ -25,7 +28,7 @@ const acceptedInDrop: ItemType[] = [ItemType.ASSIGN, ItemType.START, ItemType.EN
  * Editor de fluxo.
  * 
  */
-export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onChangeItens=()=>{} }) => {
+export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], onChangeItens = () => { } }) => {
 
     /** Referencia o svg onde está todos os itens de fluxo. */
     const svgRef = useRef<any>(null);
@@ -44,10 +47,15 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
             endLeft: 0
         }
     });
-    
+
     /** Usada para emitir os itens para fora do componente. */
     const onChangeFlow = () => {
-        onChangeItens(state.flowItens);
+        if (backupFlow !== JSON.stringify(state.flowItens)) {
+
+            backupFlow = JSON.stringify(state.flowItens); // Salva para fazer as comparações posteriores.
+            onChangeItens(state.flowItens);
+
+        }
     }
 
     /** Não precisou do setState por que está no fluxo de render. */
@@ -67,7 +75,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
             const targetOffsetY: number = ((draggedOffSet.y) + (targetSize.top - targetSize.top - targetSize.top) - 25);
             const targetOffsetX: number = ((draggedOffSet.x) + (targetSize.left - targetSize.left - targetSize.left) - 25);
 
-            state.flowItens.push({
+            state.flowItens.push(new FlowItem({
                 id: Utils.getRandomId(10000, 100000000),
                 sucessorId: item.itemProps.sucessorId,
                 itemType: item.itemProps.itemType,
@@ -77,7 +85,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
                 top: targetOffsetY,
                 height: 50,
                 width: 50,
-            });
+            }));
 
             setState({
                 ...state,
@@ -88,7 +96,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
         },
     });
 
-    /** Agrupa as referencias do drop com as da ref. */
+    /** Agrupa as referências do drop com as da ref. */
     dropRef(svgRef);
 
     /** Depois que um elemento já está na tela, esta função muda a posição dele! */
@@ -98,8 +106,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
         // component.top = positionTop % 1 === 0 ? positionTop : component.top;
         // component.left = positionLeft % 1 === 0 ? positionLeft : component.left;
 
-        component.top = positionTop;
-        component.left = positionLeft;
+        if (component.top > 0 || component.top < positionTop) component.top = positionTop;
+        if (component.left > 0 || component.left < positionLeft) component.left = positionLeft;
 
         state.svgSize.svgHeight = state.flowItens.sort((a, b) => b.top - a.top)[0].top + 200;
         state.svgSize.svgWidth = state.flowItens.sort((a, b) => b.left - a.left)[0].left + 200;
@@ -119,8 +127,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
      */
     const onSucessorChange = (itemId: number, sucessorId: string) => {
 
-        const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.id === Number(itemId)) return item; else return undefined; });
-        let itemCurrent: ItemFluxo = state.flowItens[itemCurrentIndex];
+        const itemCurrentIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.id === Number(itemId)) return item; else return undefined; });
+        let itemCurrent: FlowItem = state.flowItens[itemCurrentIndex];
 
         // Se tentar ligar um item nele mesmo deve ser perdida a ligação com qualquer elemento anterior.
         if (Number(itemId) === Number(sucessorId)) {
@@ -142,25 +150,25 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
     const handleKeyPress = (event: any) => {
         if (event.key === 'Delete') onRemoveItem();
 
-        if (event.key === 'ArrowUp') { moveComponenteByKey("ArrowUp"); event.preventDefault(); };
-        if (event.key === 'ArrowDown') { moveComponenteByKey("ArrowDown"); event.preventDefault(); };
-        if (event.key === 'ArrowLeft') { moveComponenteByKey("ArrowLeft"); event.preventDefault(); };
-        if (event.key === 'ArrowRight') { moveComponenteByKey("ArrowRight"); event.preventDefault(); };
+        if (event.key === 'ArrowUp') { positionChangeByKey("ArrowUp"); event.preventDefault(); };
+        if (event.key === 'ArrowDown') { positionChangeByKey("ArrowDown"); event.preventDefault(); };
+        if (event.key === 'ArrowLeft') { positionChangeByKey("ArrowLeft"); event.preventDefault(); };
+        if (event.key === 'ArrowRight') { positionChangeByKey("ArrowRight"); event.preventDefault(); };
     }
 
     /** Move o componente pelas setas do teclado. */
-    const moveComponenteByKey = (direction: string) => {
-        let filteredList: ItemFluxo[] = state.flowItens.filter((item: ItemFluxo) => item.isSelecionado === true);
+    const positionChangeByKey = (direction: string) => {
+        let filteredList: FlowItem[] = state.flowItens.filter((item: FlowItem) => item.isSelecionado === true);
         if (filteredList.length === 0) return;
 
         if (direction === 'ArrowUp') {
-            filteredList.forEach((item: ItemFluxo) => { item.top = item.top - 5; });
+            filteredList.forEach((item: FlowItem) => { if (item.top > 0) item.top = item.top - 5; });
         } else if (direction === 'ArrowDown') {
-            filteredList.forEach((item: ItemFluxo) => { item.top = item.top + 5; });
+            filteredList.forEach((item: FlowItem) => { item.top = item.top + 5; });
         } else if (direction === 'ArrowLeft') {
-            filteredList.forEach((item: ItemFluxo) => { item.left = item.left - 5; });
+            filteredList.forEach((item: FlowItem) => { if (item.left > 0) item.left = item.left - 5; });
         } else if (direction === 'ArrowRight') {
-            filteredList.forEach((item: ItemFluxo) => { item.left = item.left + 5; });
+            filteredList.forEach((item: FlowItem) => { item.left = item.left + 5; });
         }
 
         setState({ ...state, flowItens: state.flowItens });
@@ -170,10 +178,10 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
 
     /** Remove o item que estiver selecionado no fluxo. */
     const onRemoveItem = () => {
-        const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.isSelecionado === true) return item; else return undefined; });
+        const itemCurrentIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.isSelecionado === true) return item; else return undefined; });
         if (itemCurrentIndex === -1) return;
 
-        const itemAntecessorIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.sucessorId === state.flowItens[itemCurrentIndex].id) return item; else return undefined; });
+        const itemAntecessorIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.sucessorId === state.flowItens[itemCurrentIndex].id) return item; else return undefined; });
         if (itemAntecessorIndex !== -1) { state.flowItens[itemAntecessorIndex].sucessorId = 0; }
 
         state.flowItens.splice(itemCurrentIndex, 1);
@@ -199,7 +207,12 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
 
     /** Seleciona os itens na tela conforma o selection os alcança. */
     const selecionaBySelection = (startTop: number, startLeft: number, endTop: number, endLeft: number) => {
-        let filteredList: ItemFluxo[] = state.flowItens.filter((item: ItemFluxo) => {
+        state.flowItens.map((item: FlowItem) => {
+            item.select(item, startTop, startLeft, endTop, endTop);
+        });
+
+        /* let filteredList: FlowItem[] = state.flowItens.filter((item: FlowItem) => {
+            item.select(startTop, startLeft, endTop, endTop);
             const top2 = item.top + item.height;
             const left2 = item.left + item.width;
             return (
@@ -217,10 +230,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
                     )
                 )
             );
-        });
+        }); 
+        state.flowItens.forEach((item: FlowItem) => { item.isSelecionado = false; });
+        filteredList.forEach((item: FlowItem) => { item.isSelecionado = true; });
+      */
 
-        state.flowItens.forEach((item: ItemFluxo) => { item.isSelecionado = false; });
-        filteredList.forEach((item: ItemFluxo) => { item.isSelecionado = true; });
     }
 
     /** Ativa a seleção na tela. */
@@ -277,7 +291,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
     const onMouseDown = (event: any) => {
         exibiSelection(event);
 
-        state.flowItens.forEach((item: ItemFluxo) => {
+        state.flowItens.forEach((item: FlowItem) => {
             item.isSelecionado = false;
         });
 
@@ -286,7 +300,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
 
     /** Muda item que está selecionado. */
     const onChangeSelecionado = (itemId: number) => {
-        const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.id === Number(itemId)) return item; else return undefined; });
+        const itemCurrentIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.id === Number(itemId)) return item; else return undefined; });
 
         state.flowItens[itemCurrentIndex].isSelecionado = true;
 
@@ -318,8 +332,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
                         height={((state.selectionProps.endTop - state.selectionProps.startTop) > 0) ? (state.selectionProps.endTop - state.selectionProps.startTop) : (state.selectionProps.startTop - state.selectionProps.endTop)}
                     />
 
-                    {state.flowItens.map((item: ItemFluxo) => {
-                        const sucessorItem: any = state.flowItens.find((sucessorItem: ItemFluxo) => sucessorItem.id === item.sucessorId);
+                    {state.flowItens.map((item: FlowItem) => {
+                        const sucessorItem: any = state.flowItens.find((sucessorItem: FlowItem) => sucessorItem.id === item.sucessorId);
                         const left2 = sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2);
                         const top2 = sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20);
 
@@ -338,7 +352,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onC
                         />;
                     })}
 
-                    {state.flowItens.map((item: ItemFluxo) => {
+                    {state.flowItens.map((item: FlowItem) => {
                         return <ItemToDrag
                             onChangeSelecionado={onChangeSelecionado}
                             isSelecionado={item.isSelecionado}
