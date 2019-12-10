@@ -3,9 +3,9 @@ export class Utils {
     /**
      * Retorna um valor randomico.
      */
-    public static getRandomId(min: number, max: number) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
+    public static getRandomId() {
+        const min = Math.ceil(10000);
+        const max = Math.floor(100000000);
         return Math.floor(Math.random() * (max - min)) + min;
     }
     

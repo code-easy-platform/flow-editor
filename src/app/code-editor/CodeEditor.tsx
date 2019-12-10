@@ -76,7 +76,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
             const targetOffsetX: number = ((draggedOffSet.x) + (targetSize.left - targetSize.left - targetSize.left) - 25);
 
             state.flowItens.push(new FlowItem({
-                id: Utils.getRandomId(10000, 100000000),
+                id: Utils.getRandomId(),
                 sucessorId: item.itemProps.sucessorId,
                 itemType: item.itemProps.itemType,
                 nome: item.itemProps.title,
@@ -87,10 +87,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
                 width: 50,
             }));
 
-            setState({
-                ...state,
-                flowItens: state.flowItens,
-            });
+            setState({ ...state, flowItens: state.flowItens });
 
             onChangeFlow();
         },
