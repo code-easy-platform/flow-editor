@@ -11,8 +11,11 @@ import { Toolbar } from './components/tool-bar/ToolBar';
  * Propriedades aceitas pelo editor.
  */
 export interface CodeEditorProps {
-    toolItens: ItemFluxo[],
+    toolItens?: ItemFluxo[],
     itens: ItemFluxo[],
+
+    /** Recebe uma função que devolverá os itens com as alterações feitas a cada mudança. */
+    onChangeItens(itens: ItemFluxo[]): any
 }
 
 /** Define quais itens são aceitos no drop do start. */
@@ -22,7 +25,7 @@ const acceptedInDrop: ItemType[] = [ItemType.ASSIGN, ItemType.START, ItemType.EN
  * Editor de fluxo.
  * 
  */
-export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
+export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens=[], onChangeItens=()=>{} }) => {
 
     /** Referencia o svg onde está todos os itens de fluxo. */
     const svgRef = useRef<any>(null);
@@ -41,6 +44,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
             endLeft: 0
         }
     });
+    
+    /** Usada para emitir os itens para fora do componente. */
+    const onChangeFlow = () => {
+        onChangeItens(state.flowItens);
+    }
 
     /** Não precisou do setState por que está no fluxo de render. */
     state.svgSize = {
@@ -75,6 +83,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
                 ...state,
                 flowItens: state.flowItens,
             });
+
+            onChangeFlow();
         },
     });
 
@@ -84,6 +94,10 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
     /** Depois que um elemento já está na tela, esta função muda a posição dele! */
     const positionChange = (itemId: number, positionTop: number, positionLeft: number) => {
         let component = state.flowItens[state.flowItens.findIndex((item: any) => { if (item.id === itemId) return item; return undefined; })];
+
+        // component.top = positionTop % 1 === 0 ? positionTop : component.top;
+        // component.left = positionLeft % 1 === 0 ? positionLeft : component.left;
+
         component.top = positionTop;
         component.left = positionLeft;
 
@@ -95,6 +109,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
             flowItens: state.flowItens,
             svgSize: state.svgSize
         });
+
+        onChangeFlow();
     }
 
     /** 
@@ -118,6 +134,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
             ...state,
             flowItens: state.flowItens
         });
+
+        onChangeFlow();
     }
 
     /** Identifica teclas que foram acionadas enquando o editor está focado. */
@@ -146,6 +164,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
         }
 
         setState({ ...state, flowItens: state.flowItens });
+
+        onChangeFlow();
     }
 
     /** Remove o item que estiver selecionado no fluxo. */
@@ -161,16 +181,23 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
         setState({ ...state, flowItens: state.flowItens });
 
         onRemoveItem(); // Remove mais itens se estiverem selecionado.
+
+        onChangeFlow();
     }
 
     /** Remove a selection da tela. */
     const removeSelection = () => {
         state.selectionProps = { isMouseDown: false, runtimeStartLeft: 0, runtimeStartTop: 0, startTop: 0, startLeft: 0, endTop: 0, endLeft: 0 };
+
         setState({ ...state, selectionProps: state.selectionProps });
+
         document.onmousemove = null;
         document.onmouseup = null;
+
+        onChangeFlow();
     }
 
+    /** Seleciona os itens na tela conforma o selection os alcança. */
     const selecionaBySelection = (startTop: number, startLeft: number, endTop: number, endLeft: number) => {
         let filteredList: ItemFluxo[] = state.flowItens.filter((item: ItemFluxo) => {
             const top2 = item.top + item.height;
@@ -218,6 +245,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
                 selecionaBySelection(state.selectionProps.startTop, state.selectionProps.startLeft, state.selectionProps.endTop, state.selectionProps.endLeft);
 
                 setState({ ...state, selectionProps: state.selectionProps });
+
+                onChangeFlow();
             } else { removeSelection(); }
         }
 
@@ -247,20 +276,23 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens }) => {
     /** Desabilita qualquer item que esteja selecionado. */
     const onMouseDown = (event: any) => {
         exibiSelection(event);
+
         state.flowItens.forEach((item: ItemFluxo) => {
             item.isSelecionado = false;
         });
+
         setState({ ...state, flowItens: state.flowItens });
     }
 
     /** Muda item que está selecionado. */
     const onChangeSelecionado = (itemId: number) => {
-
         const itemCurrentIndex = state.flowItens.findIndex((item: ItemFluxo) => { if (item.id === Number(itemId)) return item; else return undefined; });
 
         state.flowItens[itemCurrentIndex].isSelecionado = true;
 
         setState({ ...state, flowItens: state.flowItens });
+
+        onChangeFlow();
     }
 
     return (

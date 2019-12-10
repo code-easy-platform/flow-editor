@@ -26,11 +26,15 @@ const itensLogica: ItemFluxo[] = [
     { id: 8, sucessorId: 0, top: 0, left: 0, width: 0, height: 0, isSelecionado: false, nome: "END",     itemType: ItemType.END    },
 ];
 
+const outItens = (itens: ItemFluxo[]) => {
+  console.log(itens);
+}
+
 const App: React.FC = () => {
   return (
     <div className="App">
       <DndProvider backend={HTML5Backend}>
-        <CodeEditor itens={itens} toolItens={itensLogica} />
+        <CodeEditor itens={itens} toolItens={itensLogica} onChangeItens={outItens} />
       </DndProvider>
     </div>
   );
