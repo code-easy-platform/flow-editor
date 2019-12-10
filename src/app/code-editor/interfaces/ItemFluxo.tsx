@@ -1,14 +1,14 @@
 export interface ItemFluxo {
     isSelecionado: boolean
     sucessorId: number,
-    itemType: ItemType
+    itemType: ItemType,
     height: number,
     width: number,
     nome: string,
     left: number,
     top: number,
     id: number,
-    select(item: FlowItem, startTop: number, startLeft: number, endTop: number, endLeft: number): any;
+    select(startTop: number, startLeft: number, endTop: number, endLeft: number): any,
 }
 
 export enum ItemType {
@@ -31,20 +31,20 @@ export class FlowItem implements ItemFluxo {
     public top: number = 0;
     public id: number = 0;
 
-    select = (item: FlowItem, startTop: number, startLeft: number, endTop: number, endLeft: number) => {
-        const top2 = this.props.top + this.props.height;
-        const left2 = this.props.left + this.props.width;
+    select = (startTop: number, startLeft: number, endTop: number, endLeft: number) => {
+        const top2 = this.top + this.height;
+        const left2 = this.left + this.width;
         this.isSelecionado = (
             (
                 ((endTop - startTop) > 0)
-                    ? ((this.props.top >= startTop) || (top2 >= startTop)) && ((this.props.top <= endTop) || (top2 <= endTop))
-                    : ((this.props.top <= startTop) || (top2 <= startTop)) && ((this.props.top >= endTop) || (top2 >= endTop))
+                    ? ((this.top >= startTop) || (top2 >= startTop)) && ((this.top <= endTop) || (top2 <= endTop))
+                    : ((this.top <= startTop) || (top2 <= startTop)) && ((this.top >= endTop) || (top2 >= endTop))
             )
             &&
             (
                 ((endLeft - startLeft) > 0)
-                    ? ((this.props.left >= startLeft) || (left2 >= startLeft)) && ((this.props.left <= endLeft) || (left2 <= endLeft))
-                    : ((this.props.left <= startLeft) || (left2 <= startLeft)) && ((this.props.left >= endLeft) || (left2 >= endLeft))
+                    ? ((this.left >= startLeft) || (left2 >= startLeft)) && ((this.left <= endLeft) || (left2 <= endLeft))
+                    : ((this.left <= startLeft) || (left2 <= startLeft)) && ((this.left >= endLeft) || (left2 >= endLeft))
             )
         );
     };

@@ -205,38 +205,6 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
         onChangeFlow();
     }
 
-    /** Seleciona os itens na tela conforma o selection os alcança. */
-    const selecionaBySelection = (startTop: number, startLeft: number, endTop: number, endLeft: number) => {
-        state.flowItens.map((item: FlowItem) => {
-            item.select(item, startTop, startLeft, endTop, endTop);
-        });
-
-        /* let filteredList: FlowItem[] = state.flowItens.filter((item: FlowItem) => {
-            item.select(startTop, startLeft, endTop, endTop);
-            const top2 = item.top + item.height;
-            const left2 = item.left + item.width;
-            return (
-                (
-                    (
-                        ((endTop - startTop) > 0)
-                            ? ((item.top >= startTop) || (top2 >= startTop)) && ((item.top <= endTop) || (top2 <= endTop))
-                            : ((item.top <= startTop) || (top2 <= startTop)) && ((item.top >= endTop) || (top2 >= endTop))
-                    )
-                    &&
-                    (
-                        ((endLeft - startLeft) > 0)
-                            ? ((item.left >= startLeft) || (left2 >= startLeft)) && ((item.left <= endLeft) || (left2 <= endLeft))
-                            : ((item.left <= startLeft) || (left2 <= startLeft)) && ((item.left >= endLeft) || (left2 >= endLeft))
-                    )
-                )
-            );
-        }); 
-        state.flowItens.forEach((item: FlowItem) => { item.isSelecionado = false; });
-        filteredList.forEach((item: FlowItem) => { item.isSelecionado = true; });
-      */
-
-    }
-
     /** Ativa a seleção na tela. */
     const exibiSelection = (event: any) => {
         if (event.target.id !== svgRef.current.id) return;
@@ -256,7 +224,15 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
                     runtimeStartTop: ((state.selectionProps.endTop - state.selectionProps.startTop) > 0) ? state.selectionProps.startTop : state.selectionProps.endTop,
                 };
 
-                selecionaBySelection(state.selectionProps.startTop, state.selectionProps.startLeft, state.selectionProps.endTop, state.selectionProps.endLeft);
+                /** Seleciona os itens na tela conforma o selection os alcança. */
+                state.flowItens.forEach((item: FlowItem) => {
+                    item.select(
+                        state.selectionProps.startTop,
+                        state.selectionProps.startLeft,
+                        state.selectionProps.endTop,
+                        state.selectionProps.endLeft
+                    )
+                });
 
                 setState({ ...state, selectionProps: state.selectionProps });
 
