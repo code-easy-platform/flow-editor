@@ -80,7 +80,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
                 sucessorId: item.itemProps.sucessorId,
                 itemType: item.itemProps.itemType,
                 nome: item.itemProps.title,
-                isSelecionado: false,
+                isSelecionado: true,
                 left: targetOffsetX,
                 top: targetOffsetY,
                 height: 50,
@@ -88,6 +88,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
             }));
 
             setState({ ...state, flowItens: state.flowItens });
+
+            svgRef.current.focus();
 
             onChangeFlow();
         },

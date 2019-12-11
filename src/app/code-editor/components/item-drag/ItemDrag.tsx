@@ -2,11 +2,19 @@ import React, { useState } from 'react';
 import { useDrag } from 'react-dnd';
 
 import { ItemType } from '../../interfaces/ItemFluxo';
+import { Action } from '../flow-componets/Action';
 import { Assign } from '../flow-componets/Assign';
 import { Start } from '../flow-componets/Start';
 import { End } from '../flow-componets/End';
 import { If } from '../flow-componets/IF';
-import { Action } from '../flow-componets/Action';
+
+import icons_foreach from './../../../../images/foreach.png';
+import icons_switch from './../../../../images/switch.png';
+import icons_assign from './../../../../images/assign.png';
+import icons_action from './../../../../images/action.png';
+import icons_start from './../../../../images/start.png';
+import icons_end from './../../../../images/end.png';
+import icons_if from './../../../../images/if.png';
 
 export interface ItemDragProps {
     id?: any
@@ -41,7 +49,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     const [state, setState] = useState({
         isMenuOpen: false,
         /** Usado para não bugar o onchangesucessor da linha que estou trocando.  */
-        isMouseDown: false, 
+        isMouseDown: false,
     });
 
     const [{ isDragging }, dragRef] = useDrag({
@@ -90,17 +98,22 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     if (allowDrag) {
         const style: React.CSSProperties = {
             justifyContent: "center",
-            backgroundColor: 'gray',
             alignItems: "center",
-            marginTop: "5px",
+            margin: "5px",
             cursor: 'move',
-            padding: "5px",
-            width: "100%",
-            minHeight: 35,
             fontSize: 10,
+            width: 30,
         };
 
-        return <div id={id} ref={dragRef} style={{ ...style, backgroundColor: isDragging ? "blue" : "gray" }}>{children || title}</div>;
+        return <div className="toolbar-item">
+            {/* {itemType === ItemType.ASSIGN && <img id={id} style={style} ref={dragRef} src={icons_foreach} />} */}
+            {/* {itemType === ItemType.ASSIGN && <img id={id} style={style} ref={dragRef} src={icons_switch} />} */}
+            {itemType === ItemType.ASSIGN && <img id={id} style={style} ref={dragRef} src={icons_assign} />}
+            {itemType === ItemType.ACTION && <img id={id} style={style} ref={dragRef} src={icons_action} />}
+            {itemType === ItemType.START && <img id={id} style={style} ref={dragRef} src={icons_start} />}
+            {itemType === ItemType.END && <img id={id} style={style} ref={dragRef} src={icons_end} />}
+            {itemType === ItemType.IF && <img id={id} style={style} ref={dragRef} src={icons_if} />}
+        </div>;
     } else {
         return (
             <g

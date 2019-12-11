@@ -12,6 +12,8 @@ export interface ItemFluxo {
 }
 
 export enum ItemType {
+    FOREACH = "FOREACH",
+    SWITCH = "SWITCH",
     ASSIGN = "ASSIGN",
     ACTION = "ACTION",
     START = "START",
