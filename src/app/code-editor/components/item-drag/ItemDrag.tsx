@@ -15,6 +15,7 @@ import icons_action from './../../../../images/action.png';
 import icons_start from './../../../../images/start.png';
 import icons_end from './../../../../images/end.png';
 import icons_if from './../../../../images/if.png';
+import { Switch } from '../flow-componets/Switch';
 
 /** Usado para definir o tipo de input de parâmetros no item drag. */
 export interface ItemDragProps {
@@ -145,7 +146,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
                 <text id={id} x={left} y={(top || 0) - 5} fill="#fff" >{title}</text>
                 {itemType === ItemType.FOREACH && <Assign id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.ASSIGN && <Assign id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
-                {itemType === ItemType.SWITCH && <Assign id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
+                {itemType === ItemType.SWITCH && <Switch id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.ACTION && <Action id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.START && <Start id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.END && <End id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}

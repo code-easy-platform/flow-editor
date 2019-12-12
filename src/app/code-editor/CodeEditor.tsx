@@ -18,7 +18,7 @@ export interface CodeEditorProps {
     onChangeItens(itens: FlowItem[]): any
 }
 
-/** Usada para validar houve mudanças no código e impedir de realiza output desnecessários. */
+/** Usada para validar houve mudanças no estados dos itens e impedir a realização outputs desnecessários. */
 let backupFlow: string = "";
 
 /** Define quais itens são aceitos no drop do start. */
@@ -105,8 +105,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
         // component.top = positionTop % 1 === 0 ? positionTop : component.top;
         // component.left = positionLeft % 1 === 0 ? positionLeft : component.left;
 
-        if (component.top > 0 || component.top < positionTop) component.top = positionTop;
-        if (component.left > 0 || component.left < positionLeft) component.left = positionLeft;
+        if (component.top > 0 || component.top < positionTop)
+            component.top = component.top + (positionTop - component.top);
+
+        if (component.left > 0 || component.left < positionLeft)
+            component.left = component.left + (positionLeft - component.left);
 
         state.svgSize.svgHeight = state.flowItens.sort((a, b) => b.top - a.top)[0].top + 200;
         state.svgSize.svgWidth = state.flowItens.sort((a, b) => b.left - a.left)[0].left + 200;
@@ -351,3 +354,4 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
         </div>
     );
 }
+ 
