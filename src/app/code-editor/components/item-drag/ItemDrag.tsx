@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDrag } from 'react-dnd';
 
-import { ItemType } from '../../interfaces/ItemFluxo';
+import { ItemType } from '../../models/ItemFluxo';
 import { Action } from '../flow-componets/Action';
 import { Assign } from '../flow-componets/Assign';
 import { Start } from '../flow-componets/Start';
@@ -57,9 +57,11 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
         isMouseDown: false,
     });
 
+    const sucessores: number[] = [0];
+
     /** Permite que uym elemento seja arrastado e adicionado dentro do editor de fluxo. */
     const [, dragRef] = useDrag({
-        item: { type: ItemType.ASSIGN, itemProps: { id, left, top, title, itemType } },
+        item: { type: itemType, itemProps: { id, left, top, title, itemType, sucessor: sucessores } },
         collect: monitor => ({ isDragging: monitor.isDragging() }),
     });
 

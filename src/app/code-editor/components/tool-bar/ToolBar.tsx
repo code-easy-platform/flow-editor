@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ItemFluxo } from '../../interfaces/ItemFluxo';
+import { ItemFluxo } from '../../models/ItemFluxo';
 import { ItemToDrag } from '../item-drag/ItemDrag';
 import './Toolbar.scss';
 

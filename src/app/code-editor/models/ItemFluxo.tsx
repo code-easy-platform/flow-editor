@@ -1,6 +1,6 @@
 export interface ItemFluxo {
     isSelecionado: boolean
-    sucessorId: number,
+    sucessor: number[],
     itemType: ItemType,
     height: number,
     width: number,
@@ -11,6 +11,7 @@ export interface ItemFluxo {
     select(startTop: number, startLeft: number, endTop: number, endLeft: number): any,
 }
 
+/** Tipos de itens existentes na toolbar. */
 export enum ItemType {
     FOREACH = "FOREACH",
     SWITCH = "SWITCH",
@@ -24,7 +25,7 @@ export enum ItemType {
 export class FlowItem implements ItemFluxo {
 
     public isSelecionado: boolean = false;
-    public sucessorId: number = 0;
+    public sucessor: number[] = [0];
     public itemType: ItemType = ItemType.START;
     public height: number = 0;
     public width: number = 0;
@@ -54,7 +55,7 @@ export class FlowItem implements ItemFluxo {
     constructor(
         private props: {
             isSelecionado: boolean,
-            sucessorId: number,
+            sucessor: number[],
             itemType: ItemType,
             height: number,
             width: number,
@@ -65,7 +66,7 @@ export class FlowItem implements ItemFluxo {
         }
     ) {
         this.isSelecionado = this.props.isSelecionado;
-        this.sucessorId = this.props.sucessorId;
+        this.sucessor = this.props.sucessor;
         this.itemType = this.props.itemType;
         this.height = this.props.height;
         this.width = this.props.width;

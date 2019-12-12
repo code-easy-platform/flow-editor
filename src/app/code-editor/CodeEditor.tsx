@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useDrop, DropTargetMonitor } from 'react-dnd';
 
 import { ItemToDrag } from './components/item-drag/ItemDrag';
-import { ItemType, FlowItem } from './interfaces/ItemFluxo';
+import { ItemType, FlowItem } from './models/ItemFluxo';
 import { Line } from './components/lines/Line';
 import { Utils } from '../shared/Utils';
 import { Toolbar } from './components/tool-bar/ToolBar';
@@ -22,13 +22,13 @@ export interface CodeEditorProps {
 let backupFlow: string = "";
 
 /** Define quais itens são aceitos no drop do start. */
-const acceptedInDrop: ItemType[] = [ItemType.ASSIGN, ItemType.START, ItemType.END];
+const acceptedInDrop: ItemType[] = [ItemType.START, ItemType.ACTION, ItemType.IF, ItemType.FOREACH, ItemType.SWITCH, ItemType.ASSIGN, ItemType.END];
 
 /**
  * Editor de fluxo.
  * 
  */
-export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], onChangeItens = () => { } }) => {
+export const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onChangeItens = () => { } }) => {
 
     /** Referencia o svg onde está todos os itens de fluxo. */
     const svgRef = useRef<any>(null);
@@ -77,7 +77,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
 
             state.flowItens.push(new FlowItem({
                 id: Utils.getRandomId(),
-                sucessorId: item.itemProps.sucessorId,
+                sucessor: item.itemProps.sucessor,
                 itemType: item.itemProps.itemType,
                 nome: item.itemProps.title,
                 isSelecionado: true,
@@ -102,14 +102,15 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
     const positionChange = (itemId: number, positionTop: number, positionLeft: number) => {
         let component = state.flowItens[state.flowItens.findIndex((item: any) => { if (item.id === itemId) return item; return undefined; })];
 
-        // component.top = positionTop % 1 === 0 ? positionTop : component.top;
-        // component.left = positionLeft % 1 === 0 ? positionLeft : component.left;
-
-        if (component.top > 0 || component.top < positionTop)
+        if (component.top > 0 || component.top < positionTop) {
             component.top = component.top + (positionTop - component.top);
+            // component.top = positionTop % 10 === 0 ? positionTop : component.top;
+        }
 
-        if (component.left > 0 || component.left < positionLeft)
+        if (component.left > 0 || component.left < positionLeft) {
             component.left = component.left + (positionLeft - component.left);
+            // component.left = positionLeft % 10 === 0 ? positionLeft : component.left;
+        }
 
         state.svgSize.svgHeight = state.flowItens.sort((a, b) => b.top - a.top)[0].top + 200;
         state.svgSize.svgWidth = state.flowItens.sort((a, b) => b.left - a.left)[0].left + 200;
@@ -138,7 +139,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
         }
 
         // OBS: O update no fluxo principal é feito pela referencia entre variáveis js.
-        itemCurrent.sucessorId = Number(sucessorId);
+        itemCurrent.sucessor[0] = Number(sucessorId);
 
         setState({
             ...state,
@@ -183,8 +184,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
         const itemCurrentIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.isSelecionado === true) return item; else return undefined; });
         if (itemCurrentIndex === -1) return;
 
-        const itemAntecessorIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.sucessorId === state.flowItens[itemCurrentIndex].id) return item; else return undefined; });
-        if (itemAntecessorIndex !== -1) { state.flowItens[itemAntecessorIndex].sucessorId = 0; }
+        const itemAntecessorIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.sucessor[0] === state.flowItens[itemCurrentIndex].id) return item; else return undefined; });
+        if (itemAntecessorIndex !== -1) { state.flowItens[itemAntecessorIndex].sucessor[0] = 0; }
 
         state.flowItens.splice(itemCurrentIndex, 1);
 
@@ -311,23 +312,30 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
                     />
 
                     {state.flowItens.map((item: FlowItem) => {
-                        const sucessorItem: any = state.flowItens.find((sucessorItem: FlowItem) => sucessorItem.id === item.sucessorId);
-                        const left2 = sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2);
-                        const top2 = sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20);
+                        const itensSucessores: FlowItem[] = state.flowItens.filter((sucessorItem: FlowItem) => item.sucessor.includes(sucessorItem.id));
 
-                        if (item.itemType === ItemType.END) return null;
+                        return <>
+                            {itensSucessores.map((sucessorItem: FlowItem) => {
 
-                        return <Line
-                            left1={(item.left || 0) + ((item.width || 0) / 2)}
-                            top1={(item.top || 0) + (item.height || 0) / 2}
-                            onSucessorChange={onSucessorChange}
-                            id={item.id.toString()}
-                            refItemPai={svgRef}
-                            key={item.id}
-                            left2={left2}
-                            color="gray"
-                            top2={top2}
-                        />;
+                                const left2 = sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2);
+                                const top2 = sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20);
+
+                                if (item.itemType === ItemType.END) return null;
+
+                                return <Line
+                                    left1={(item.left || 0) + ((item.width || 0) / 2)}
+                                    top1={(item.top || 0) + (item.height || 0) / 2}
+                                    onSucessorChange={onSucessorChange}
+                                    id={item.id.toString()}
+                                    refItemPai={svgRef}
+                                    key={item.id}
+                                    left2={left2}
+                                    color="gray"
+                                    top2={top2}
+                                />;
+
+                            })}
+                        </>;
                     })}
 
                     {state.flowItens.map((item: FlowItem) => {
@@ -354,4 +362,3 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens, toolItens = [], o
         </div>
     );
 }
- 
