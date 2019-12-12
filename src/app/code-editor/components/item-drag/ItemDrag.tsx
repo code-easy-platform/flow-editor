@@ -124,13 +124,13 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
         };
 
         return <div className="toolbar-item">
-            {itemType === ItemType.FOREACH && <img id={id} style={style} ref={dragRef} src={icons_foreach} alt="FOREACH" />}
-            {itemType === ItemType.SWITCH && <img id={id} style={style} ref={dragRef} src={icons_switch} alt="SWITCH" />}
-            {itemType === ItemType.ASSIGN && <img id={id} style={style} ref={dragRef} src={icons_assign} alt="ASSIGN" />}
-            {itemType === ItemType.ACTION && <img id={id} style={style} ref={dragRef} src={icons_action} alt="ACTION" />}
-            {itemType === ItemType.START && <img id={id} style={style} ref={dragRef} src={icons_start} alt="START" />}
-            {itemType === ItemType.END && <img id={id} style={style} ref={dragRef} src={icons_end} alt="END" />}
-            {itemType === ItemType.IF && <img id={id} style={style} ref={dragRef} src={icons_if} alt="IF" />}
+            {itemType === ItemType.FOREACH && <img id={id} title="FOREACH" style={style} ref={dragRef} src={icons_foreach} alt="FOREACH" />}
+            {itemType === ItemType.SWITCH && <img id={id} title="SWITCH" style={style} ref={dragRef} src={icons_switch} alt="SWITCH" />}
+            {itemType === ItemType.ASSIGN && <img id={id} title="ASSIGN" style={style} ref={dragRef} src={icons_assign} alt="ASSIGN" />}
+            {itemType === ItemType.ACTION && <img id={id} title="ACTION" style={style} ref={dragRef} src={icons_action} alt="ACTION" />}
+            {itemType === ItemType.START && <img id={id} title="START" style={style} ref={dragRef} src={icons_start} alt="START" />}
+            {itemType === ItemType.END && <img id={id} title="END" style={style} ref={dragRef} src={icons_end} alt="END" />}
+            {itemType === ItemType.IF && <img id={id} title="IF" style={style} ref={dragRef} src={icons_if} alt="IF" />}
         </div>;
     } else {
         /** Reinderiza um tipo de tag svg na tela, somente dentro do editor de fluxo. */

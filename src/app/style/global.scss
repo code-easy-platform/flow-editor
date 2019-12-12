@@ -128,17 +128,6 @@ a:active {
   width: -webkit-fill-available;
 }
 
-.toolbar-item {
-  border: $border-size-1 solid $color-transparent;
-  cursor: 'move';
-}
-.toolbar-item:hover {
-  border: $border-size-1 solid $toolbar-item-border-hover;
-}
-.toolbar-item:active {
-  background-color: $toolbar-item-background-active;
-}
-
 // Ajusta o scroll de todos os elementos.
 ::-webkit-scrollbar {
   width: $size-x-scroll-bar;

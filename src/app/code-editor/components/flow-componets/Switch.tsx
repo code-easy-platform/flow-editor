@@ -56,7 +56,7 @@ export const Switch = (props: any) => {
                     pgPonto05_Top + ", " +
 
                     pgPonto06_Left + ", " +
-                    pgPonto06_Top + ", "/*  */
+                    pgPonto06_Top + ", "
                 }
             />
             />
