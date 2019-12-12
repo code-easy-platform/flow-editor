@@ -16,6 +16,7 @@ import icons_start from './../../../../images/start.png';
 import icons_end from './../../../../images/end.png';
 import icons_if from './../../../../images/if.png';
 
+/** Usado para definir o tipo de input de parâmetros no item drag. */
 export interface ItemDragProps {
     id?: any
     title: string
@@ -32,6 +33,7 @@ export interface ItemDragProps {
     onChangeSelecionado?: Function
 }
 
+/** Auxilia na hora de passar configurações para o editor de fluxo. */
 interface CustomStyle {
     top?: number
     left?: number
@@ -40,30 +42,36 @@ interface CustomStyle {
     border?: number
 }
 
+/** Usado para representar os itens de lógica no fluxo do editor e na toolbar. */
 export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     const { id, outputPosition, title, isSelecionado, onChangeSelecionado = () => { } } = props;
-    const { allowDrag, refItemPai, itemType, children } = props;
+    const { allowDrag, refItemPai, itemType } = props;
     const { width, height } = props.style;
     const { top, left } = props.style;
 
+    /** Usado para manter e gerenciar o stado deste componente. */
     const [state, setState] = useState({
         isMenuOpen: false,
         /** Usado para não bugar o onchangesucessor da linha que estou trocando.  */
         isMouseDown: false,
     });
 
-    const [{ isDragging }, dragRef] = useDrag({
+    /** Permite que uym elemento seja arrastado e adicionado dentro do editor de fluxo. */
+    const [, dragRef] = useDrag({
         item: { type: ItemType.ASSIGN, itemProps: { id, left, top, title, itemType } },
         collect: monitor => ({ isDragging: monitor.isDragging() }),
     });
 
     window.onmouseup = () => mouseUp;
-    window.onmousedown = (event: any) => {
+
+    /** Serve para fechar o menu de contexto, caso ele esteja aberto. */
+    window.onmousedown = () => {
         if (state.isMenuOpen) {
             setState({ ...state, isMenuOpen: false });
         }
     };
 
+    /** Declara a fun no ref da svg para que o item atual possa ser arrastado na tela. */
     const mouseDown = () => {
         if (refItemPai.current)
             refItemPai.current.onmousemove = mouseMove;
@@ -71,7 +79,13 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
         setState({ ...state, isMouseDown: true });
     }
 
-    const mouseUp = (event: any) => {
+    /**
+     * Ajuda a evitar que bugs aconteçam por estar uma fun declarada
+     * na ref do svg que está no container de fora.
+     * 
+     * Também serve para fechar o menu de contexto.
+     */
+    const mouseUp = () => {
         if (refItemPai.current)
             refItemPai.current.onmousemove = null;
 
@@ -81,6 +95,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
         }
     }
 
+    /** Quando um item estiver selecionado e for arrastado na tale esta fun vai fazer isso acontecer. */
     const mouseMove = (event: any) => {
         outputPosition &&
             outputPosition(
@@ -90,11 +105,13 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
             );
     }
 
+    // Assim que configurado exibirá o menu de contexto deste item corrente.
     const contextMenu = (event: any) => {
         setState({ ...state, isMenuOpen: true });
         event.preventDefault();
     }
 
+    /** Com base se é permitido ou não usar o "drag and drop" ele reinderiza o item na tela. */
     if (allowDrag) {
         const style: React.CSSProperties = {
             justifyContent: "center",
@@ -106,15 +123,16 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
         };
 
         return <div className="toolbar-item">
-            {/* {itemType === ItemType.ASSIGN && <img id={id} style={style} ref={dragRef} src={icons_foreach} />} */}
-            {/* {itemType === ItemType.ASSIGN && <img id={id} style={style} ref={dragRef} src={icons_switch} />} */}
-            {itemType === ItemType.ASSIGN && <img id={id} style={style} ref={dragRef} src={icons_assign} />}
-            {itemType === ItemType.ACTION && <img id={id} style={style} ref={dragRef} src={icons_action} />}
-            {itemType === ItemType.START && <img id={id} style={style} ref={dragRef} src={icons_start} />}
-            {itemType === ItemType.END && <img id={id} style={style} ref={dragRef} src={icons_end} />}
-            {itemType === ItemType.IF && <img id={id} style={style} ref={dragRef} src={icons_if} />}
+            {itemType === ItemType.FOREACH && <img id={id} style={style} ref={dragRef} src={icons_foreach} alt="FOREACH" />}
+            {itemType === ItemType.SWITCH && <img id={id} style={style} ref={dragRef} src={icons_switch} alt="SWITCH" />}
+            {itemType === ItemType.ASSIGN && <img id={id} style={style} ref={dragRef} src={icons_assign} alt="ASSIGN" />}
+            {itemType === ItemType.ACTION && <img id={id} style={style} ref={dragRef} src={icons_action} alt="ACTION" />}
+            {itemType === ItemType.START && <img id={id} style={style} ref={dragRef} src={icons_start} alt="START" />}
+            {itemType === ItemType.END && <img id={id} style={style} ref={dragRef} src={icons_end} alt="END" />}
+            {itemType === ItemType.IF && <img id={id} style={style} ref={dragRef} src={icons_if} alt="IF" />}
         </div>;
     } else {
+        /** Reinderiza um tipo de tag svg na tela, somente dentro do editor de fluxo. */
         return (
             <g
                 onContextMenu={contextMenu}
@@ -125,11 +143,13 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
                 id={id}
             >
                 <text id={id} x={left} y={(top || 0) - 5} fill="#fff" >{title}</text>
-                {itemType === ItemType.START && <Start id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
+                {itemType === ItemType.FOREACH && <Assign id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.ASSIGN && <Assign id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
+                {itemType === ItemType.SWITCH && <Assign id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.ACTION && <Action id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
-                {itemType === ItemType.IF && <If id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
+                {itemType === ItemType.START && <Start id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.END && <End id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
+                {itemType === ItemType.IF && <If id={id} top={top} left={left} width={width} height={height} isSelecionado={isSelecionado} />}
             </g>
         );
     }
