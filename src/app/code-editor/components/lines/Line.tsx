@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
 
-const style: React.CSSProperties = {
-    position: 'absolute',
-    border: '1px solid gray',
-    backgroundColor: 'gray',
-    padding: '0.5rem 1rem',
-    cursor: 'move',
-}
-
+/** Propriedades aceitas pela linha. */
 interface LineProps {
     id: string
     top1: number
@@ -98,7 +91,7 @@ export const Line: React.FC<LineProps> = (props: LineProps) => {
                         x={position.polygonLeft - 5}
                         onMouseUp={() => onMouseEvent(false)}
                         onMouseDown={() => onMouseEvent(true)}
-                        style={{ ...style, cursor: 'default', fill: "#1e1e1e", stroke: isSelecionado ? "#999fff" : "gray", strokeWidth: 1 }}
+                        style={{ cursor: 'default', fill: "#1e1e1e", stroke: isSelecionado ? "#999fff" : "gray", strokeWidth: 1 }}
                     />
             }
         </g>

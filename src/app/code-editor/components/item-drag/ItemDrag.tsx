@@ -3,6 +3,7 @@ import { useDrag } from 'react-dnd';
 
 import { ItemType } from '../../models/ItemFluxo';
 import { Action } from '../flow-componets/Action';
+import { Switch } from '../flow-componets/Switch';
 import { Assign } from '../flow-componets/Assign';
 import { Start } from '../flow-componets/Start';
 import { End } from '../flow-componets/End';
@@ -15,7 +16,6 @@ import icons_action from './../../../../images/action.png';
 import icons_start from './../../../../images/start.png';
 import icons_end from './../../../../images/end.png';
 import icons_if from './../../../../images/if.png';
-import { Switch } from '../flow-componets/Switch';
 
 /** Usado para definir o tipo de input de parâmetros no item drag. */
 export interface ItemDragProps {
@@ -45,10 +45,13 @@ interface CustomStyle {
 
 /** Usado para representar os itens de lógica no fluxo do editor e na toolbar. */
 export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
-    const { id, outputPosition, title, isSelecionado, onChangeSelecionado = () => { } } = props;
-    const { allowDrag, refItemPai, itemType } = props;
-    const { width, height } = props.style;
-    const { top, left } = props.style;
+    const {
+        isSelecionado, onChangeSelecionado = () => { },
+        allowDrag, refItemPai, itemType,
+        id, outputPosition, title,
+    } = props;
+
+    const { width, height, top, left } = props.style;
 
     /** Usado para manter e gerenciar o stado deste componente. */
     const [state, setState] = useState({

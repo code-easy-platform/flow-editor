@@ -5,18 +5,24 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { ItemToDrag } from './components/item-drag/ItemDrag';
 import { ItemType, FlowItem } from './models/ItemFluxo';
 import { Line } from './components/lines/Line';
-import { Utils } from '../shared/Utils';
+import { Utils } from './shared/Utils';
 import { Toolbar } from './components/tool-bar/ToolBar';
 
 /**
  * Propriedades aceitas pelo editor.
  */
 export interface CodeEditorProps {
+    
+    /** boolean - Usado para exibir ou não a toolbox cons itens de lógica. */
     isShowToolbar: boolean,
+    
+    /** FlowItem[] - Usado para exibir os itens na toolbox do editor. */
     toolItens?: FlowItem[],
+
+    /** FlowItem[] - Usado para exibir os itens na tela do editor */
     itens: FlowItem[],
 
-    /** Recebe uma função que devolverá os itens com as alterações feitas a cada mudança. */
+    /** Function - Usada para emitir através do output o fluxo atualidado, acontece a cada mudança de estado dos itens de fluxo. */
     onChangeItens(itens: FlowItem[]): any
 }
 
@@ -25,7 +31,7 @@ export interface CodeEditorProps {
  * 
  * @param itens FlowItem[] - Usado para exibir os itens na tela do editor.
  * @param toolItens FlowItem[] - Usado para exibir os itens na toolbox do editor.
- * @param onChangeItens Function - Usada para emitir através do output os fluxo atualidado, acontece a cada mudança de estado dos itens de fluxo.
+ * @param onChangeItens Function - Usada para emitir através do output o fluxo atualidado, acontece a cada mudança de estado dos itens de fluxo.
  * @param isShowToolbar boolean - Usado para exibir ou não a toolbox cons itens de lógica.
  */
 export const FlowEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onChangeItens = () => { }, isShowToolbar = false }) => {

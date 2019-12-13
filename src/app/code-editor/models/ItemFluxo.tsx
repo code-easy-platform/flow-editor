@@ -22,6 +22,7 @@ export enum ItemType {
     IF = "IF",
 }
 
+/** Elemento que é reinderizado na para cada item de fluxo. */
 export class FlowItem implements ItemFluxo {
 
     public isSelecionado: boolean = false;
@@ -34,7 +35,8 @@ export class FlowItem implements ItemFluxo {
     public top: number = 0;
     public id: number = 0;
 
-    select = (startTop: number, startLeft: number, endTop: number, endLeft: number) => {
+    /** Valida se o elemento está ou não na área que está sendo selecionada pelo mouse. */
+    public select = (startTop: number, startLeft: number, endTop: number, endLeft: number) => {
         const top2 = this.top + this.height;
         const left2 = this.left + this.width;
         this.isSelecionado = (
@@ -75,4 +77,5 @@ export class FlowItem implements ItemFluxo {
         this.top = this.props.top;
         this.id = this.props.id;
     }
+
 }
