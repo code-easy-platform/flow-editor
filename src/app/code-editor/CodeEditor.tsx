@@ -11,6 +11,7 @@ import { Toolbar } from './components/tool-bar/ToolBar';
  * Propriedades aceitas pelo editor.
  */
 export interface CodeEditorProps {
+    isShowToolbar: boolean,
     toolItens?: FlowItem[],
     itens: FlowItem[],
 
@@ -28,7 +29,7 @@ const acceptedInDrop: ItemType[] = [ItemType.START, ItemType.ACTION, ItemType.IF
  * Editor de fluxo.
  * 
  */
-export const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onChangeItens = () => { } }) => {
+export const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onChangeItens = () => { }, isShowToolbar = false }) => {
 
     /** Referencia o svg onde está todos os itens de fluxo. */
     const svgRef = useRef<any>(null);
@@ -290,7 +291,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = 
 
     return (
         <div style={{ flex: 1, maxHeight: "100%" }}>
-            {(toolItens.length > 0) && <Toolbar itensLogica={toolItens} />}
+            {((toolItens.length > 0) && isShowToolbar) && <Toolbar itensLogica={toolItens} />}
 
             <div key={"CODE_EDITOR"} style={{ flex: 1, overflow: "auto", }}>
                 <svg tabIndex={0} id={"CODE_EDITOR_SVG"} ref={svgRef} onKeyDown={handleKeyPress} onMouseDown={onMouseDown} style={{

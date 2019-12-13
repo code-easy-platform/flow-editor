@@ -34,7 +34,7 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <DndProvider backend={HTML5Backend}>
-        <CodeEditor itens={itens} toolItens={itensLogica} onChangeItens={outItens} />
+        <CodeEditor itens={itens} toolItens={itensLogica} onChangeItens={outItens} isShowToolbar={true} />
       </DndProvider>
     </div>
   );
