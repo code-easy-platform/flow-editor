@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { useDrop, DropTargetMonitor } from 'react-dnd';
+import { useDrop, DropTargetMonitor, DndProvider } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 
 import { ItemToDrag } from './components/item-drag/ItemDrag';
 import { ItemType, FlowItem } from './models/ItemFluxo';
@@ -19,17 +20,30 @@ export interface CodeEditorProps {
     onChangeItens(itens: FlowItem[]): any
 }
 
-/** Usada para validar houve mudanças no estados dos itens e impedir a realização outputs desnecessários. */
-let backupFlow: string = "";
+/**
+ * Editor de lógica de programação através de fluxo simples.
+ * 
+ * @param itens FlowItem[] - Usado para exibir os itens na tela do editor.
+ * @param toolItens FlowItem[] - Usado para exibir os itens na toolbox do editor.
+ * @param onChangeItens Function - Usada para emitir através do output os fluxo atualidado, acontece a cada mudança de estado dos itens de fluxo.
+ * @param isShowToolbar boolean - Usado para exibir ou não a toolbox cons itens de lógica.
+ */
+export const FlowEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onChangeItens = () => { }, isShowToolbar = false }) => {
+    return (
+        <DndProvider backend={HTML5Backend}>
+            <CodeEditor itens={itens} toolItens={toolItens} onChangeItens={onChangeItens} isShowToolbar={isShowToolbar} />
+        </DndProvider>
+    );
+}
 
 /** Define quais itens são aceitos no drop do start. */
 const acceptedInDrop: ItemType[] = [ItemType.START, ItemType.ACTION, ItemType.IF, ItemType.FOREACH, ItemType.SWITCH, ItemType.ASSIGN, ItemType.END];
 
-/**
- * Editor de fluxo.
- * 
- */
-export const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onChangeItens = () => { }, isShowToolbar = false }) => {
+/** Usada para validar houve mudanças no estados dos itens e impedir a realização outputs desnecessários. */
+let backupFlow: string = ""; 
+
+/** Editor do fluxo. */
+const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onChangeItens = () => { }, isShowToolbar = false }) => {
 
     /** Referencia o svg onde está todos os itens de fluxo. */
     const svgRef = useRef<any>(null);
