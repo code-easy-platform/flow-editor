@@ -1,7 +1,7 @@
 {
-  "name": "flow-editor",
-  "version": "0.1.0",
-  "private": true,
+  "name": "logic-flow-editor",
+  "version": "0.0.0",
+  "private": false,
   "dependencies": {
     "@types/jest": "24.0.23",
     "@types/node": "12.12.11",

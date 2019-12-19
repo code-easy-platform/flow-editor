@@ -9,13 +9,13 @@ import { Start } from '../flow-componets/Start';
 import { End } from '../flow-componets/End';
 import { If } from '../flow-componets/IF';
 
-import icons_foreach from './../../../../images/foreach.png';
-import icons_switch from './../../../../images/switch.png';
-import icons_assign from './../../../../images/assign.png';
-import icons_action from './../../../../images/action.png';
-import icons_start from './../../../../images/start.png';
-import icons_end from './../../../../images/end.png';
-import icons_if from './../../../../images/if.png';
+import icons_foreach from './../../shared/images/foreach.png';
+import icons_switch from './../../shared/images/switch.png';
+import icons_assign from './../../shared/images/assign.png';
+import icons_action from './../../shared/images/action.png';
+import icons_start from './../../shared/images/start.png';
+import icons_end from './../../shared/images/end.png';
+import icons_if from './../../shared/images/if.png';
 
 /** Usado para definir o tipo de input de parâmetros no item drag. */
 export interface ItemDragProps {
