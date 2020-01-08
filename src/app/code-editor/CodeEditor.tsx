@@ -12,10 +12,10 @@ import { Toolbar } from './components/tool-bar/ToolBar';
  * Propriedades aceitas pelo editor.
  */
 export interface CodeEditorProps {
-    
+
     /** boolean - Usado para exibir ou não a toolbox cons itens de lógica. */
     isShowToolbar: boolean,
-    
+
     /** FlowItem[] - Usado para exibir os itens na toolbox do editor. */
     toolItens?: FlowItem[],
 
@@ -46,7 +46,7 @@ export const FlowEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = 
 const acceptedInDrop: ItemType[] = [ItemType.START, ItemType.ACTION, ItemType.IF, ItemType.FOREACH, ItemType.SWITCH, ItemType.ASSIGN, ItemType.END];
 
 /** Usada para validar houve mudanças no estados dos itens e impedir a realização outputs desnecessários. */
-let backupFlow: string = ""; 
+let backupFlow: string = "";
 
 /** Editor do fluxo. */
 const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onChangeItens = () => { }, isShowToolbar = false }) => {
@@ -149,7 +149,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
      * Usado para mudar o "sucessorId" de um elemento.
      * Sucessor é usado para indicar onde o apontamento deve estar.
      */
-    const onSucessorChange = (itemId: number, sucessorId: string) => {
+    const onSucessorChange = (itemId: number, sucessorId: string, index: number = 0) => {
 
         const itemCurrentIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.id === Number(itemId)) return item; else return undefined; });
         let itemCurrent: FlowItem = state.flowItens[itemCurrentIndex];
@@ -160,7 +160,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
         }
 
         // OBS: O update no fluxo principal é feito pela referencia entre variáveis js.
-        itemCurrent.sucessor[0] = Number(sucessorId);
+        itemCurrent.sucessor[index] = Number(sucessorId);
 
         setState({
             ...state,
@@ -335,13 +335,14 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
                     {state.flowItens.map((item: FlowItem) => {
                         const itensSucessores: FlowItem[] = state.flowItens.filter((sucessorItem: FlowItem) => item.sucessor.includes(sucessorItem.id));
 
+
                         return <>
                             {itensSucessores.map((sucessorItem: FlowItem) => {
 
                                 const left2 = sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2);
                                 const top2 = sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20);
 
-                                if (item.itemType === ItemType.END) return null;
+                                if (item.itemType === ItemType.END) return <></>;
 
                                 return <Line
                                     left1={(item.left || 0) + ((item.width || 0) / 2)}
@@ -356,6 +357,19 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
                                 />;
 
                             })}
+                            {((itensSucessores.length === 0 && item.itemType !== ItemType.END) || item.sucessor.includes(0)) &&
+                                <Line
+                                    left1={(item.left || 0) + ((item.width || 0) / 2)}
+                                    top1={(item.top || 0) + (item.height || 0) / 2}
+                                    onSucessorChange={onSucessorChange}
+                                    id={item.id.toString()}
+                                    refItemPai={svgRef}
+                                    key={item.id}
+                                    left2={item.left + (item.width / 2)}
+                                    color="gray"
+                                    top2={item.top + (item.height + 20)}
+                                />
+                            }
                         </>;
                     })}
 
