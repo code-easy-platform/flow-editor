@@ -342,6 +342,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
                         left={state.selectionProps.runtimeStartLeft}
                     />
 
+                    {/* Reinderiza as linhas dos itens arrastáveis da tela. */}
                     {state.flowItens.map((item: FlowItem) => {
                         const itensSucessores: FlowItem[] = state.flowItens.filter((sucessorItem: FlowItem) => item.sucessor.includes(sucessorItem.id));
 
@@ -359,6 +360,14 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
 
                             case ItemType.END:
                                 isUseNewBranch = isHaveNoSucessores && item.sucessor.includes(0); // Sempre usa uma nova branch para um swicth.
+                                break;
+
+                            case ItemType.ASSIGN:
+                                isUseNewBranch = isHaveNoSucessores && item.sucessor.includes(0); // Sempre usa uma nova branch para um swicth.
+                                break;
+
+                            case ItemType.FOREACH:
+                                isUseNewBranch = itensSucessores.length < 2; // Sempre usa uma nova branch para um swicth.
                                 break;
 
                             default:
@@ -410,6 +419,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
                         </>;
                     })}
 
+                    {/* Reinderiza os itens arrastáveis na tela! */}
                     {state.flowItens.map((item: FlowItem) => {
                         return <ItemToDrag
                             onChangeSelecionado={onChangeSelecionado}
