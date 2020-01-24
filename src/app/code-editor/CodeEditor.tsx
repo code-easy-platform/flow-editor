@@ -300,9 +300,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
     const onMouseDown = (event: any) => {
         exibiSelection(event);
 
-        state.flowItens.forEach((item: FlowItem) => {
-            item.isSelecionado = false;
-        });
+        if (!event.ctrlKey) {
+            state.flowItens.forEach((item: FlowItem) => {
+                item.isSelecionado = false;
+            });
+        }
 
         setState({ ...state, flowItens: state.flowItens });
     }
