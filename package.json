@@ -1,6 +1,7 @@
 {
   "name": "logic-flow-editor",
   "version": "0.0.7",
+  "license": "MIT",
   "private": false,
   "dependencies": {
     "@types/jest": "24.0.23",

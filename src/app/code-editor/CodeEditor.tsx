@@ -7,6 +7,7 @@ import { ItemType, FlowItem } from './models/ItemFluxo';
 import { Line } from './components/lines/Line';
 import { Utils } from './shared/Utils';
 import { Toolbar } from './components/tool-bar/ToolBar';
+import { SelectorArea } from './components/selector/SelectorArea';
 
 /**
  * Propriedades aceitas pelo editor.
@@ -148,19 +149,27 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
     /** 
      * Usado para mudar o "sucessorId" de um elemento.
      * Sucessor é usado para indicar onde o apontamento deve estar.
+     * 
+     * @param branchIndex indica qual a branch do item para liga no item sucessor
      */
-    const onSucessorChange = (itemId: number, sucessorId: string, index: number = 0) => {
+    const onSucessorChange = (itemId: number, sucessorId: string, branchIndex: number = 0) => {
 
         const itemCurrentIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.id === Number(itemId)) return item; else return undefined; });
         let itemCurrent: FlowItem = state.flowItens[itemCurrentIndex];
 
-        // Se tentar ligar um item nele mesmo deve ser perdida a ligação com qualquer elemento anterior.
+        // Se tentar ligar um item nele mesmo deve ser perdida a ligação com qualquer elemento anterior desta branch específica.
         if (Number(itemId) === Number(sucessorId)) {
             sucessorId = "";
         }
 
+        // No caso de vim 999999 significa que é um novo branch.
+        if (branchIndex === 999999) {
+            branchIndex = itemCurrent.sucessor.length + 1;
+            itemCurrent.sucessor.push(0);
+        }
+
         // OBS: O update no fluxo principal é feito pela referencia entre variáveis js.
-        itemCurrent.sucessor[index] = Number(sucessorId);
+        itemCurrent.sucessor[branchIndex] = Number(sucessorId);
 
         setState({
             ...state,
@@ -321,23 +330,47 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
                     minWidth: "100%",
                     outline: "none"
                 }}>
-                    <rect
-                        fill="#ffffff11"
-                        stroke="#999fff"
-                        strokeWidth={1}
+
+                    {/* Reinderiza a área de seleção na tela. */}
+                    <SelectorArea
                         onMouseUp={removeSelection}
-                        y={state.selectionProps.runtimeStartTop}
-                        x={state.selectionProps.runtimeStartLeft}
-                        width={((state.selectionProps.endLeft - state.selectionProps.startLeft) > 0) ? (state.selectionProps.endLeft - state.selectionProps.startLeft) : (state.selectionProps.startLeft - state.selectionProps.endLeft)}
-                        height={((state.selectionProps.endTop - state.selectionProps.startTop) > 0) ? (state.selectionProps.endTop - state.selectionProps.startTop) : (state.selectionProps.startTop - state.selectionProps.endTop)}
+                        endTop={state.selectionProps.endTop}
+                        endLeft={state.selectionProps.endLeft}
+                        startTop={state.selectionProps.startTop}
+                        startLeft={state.selectionProps.startLeft}
+                        top={state.selectionProps.runtimeStartTop}
+                        left={state.selectionProps.runtimeStartLeft}
                     />
 
                     {state.flowItens.map((item: FlowItem) => {
                         const itensSucessores: FlowItem[] = state.flowItens.filter((sucessorItem: FlowItem) => item.sucessor.includes(sucessorItem.id));
 
+                        const isHaveNoSucessores = itensSucessores.length === 0;
+
+                        let isUseNewBranch = false;
+                        switch (item.itemType) {
+                            case ItemType.IF:
+                                isUseNewBranch = itensSucessores.length < 2; // Só usa nova branch para um if se ele ainda tiver menos de 2 branchs.
+                                break;
+
+                            case ItemType.SWITCH:
+                                isUseNewBranch = true; // Sempre usa uma nova branch para um swicth.
+                                break;
+
+                            case ItemType.END:
+                                isUseNewBranch = isHaveNoSucessores && item.sucessor.includes(0); // Sempre usa uma nova branch para um swicth.
+                                break;
+
+                            default:
+                                isUseNewBranch = isHaveNoSucessores && item.sucessor.includes(0);
+                                break;
+
+                        }
 
                         return <>
-                            {itensSucessores.map((sucessorItem: FlowItem) => {
+
+                            {/* Reinderiza todos os branchs de um item de fluxo. */}
+                            {itensSucessores.map((sucessorItem: FlowItem, index: number) => {
 
                                 const left2 = sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2);
                                 const top2 = sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20);
@@ -349,6 +382,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
                                     top1={(item.top || 0) + (item.height || 0) / 2}
                                     onSucessorChange={onSucessorChange}
                                     id={item.id.toString()}
+                                    sucessorIndex={index}
                                     refItemPai={svgRef}
                                     key={item.id}
                                     left2={left2}
@@ -357,19 +391,22 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
                                 />;
 
                             })}
-                            {((itensSucessores.length === 0 && item.itemType !== ItemType.END) || item.sucessor.includes(0)) &&
+
+                            {/* Usado para adicionar uma branch caso o item não tenha sucessores ainda, ou tenha bugado */}
+                            {isUseNewBranch &&
                                 <Line
                                     left1={(item.left || 0) + ((item.width || 0) / 2)}
                                     top1={(item.top || 0) + (item.height || 0) / 2}
+                                    left2={item.left + (item.width / 2)}
+                                    top2={item.top + (item.height + 20)}
                                     onSucessorChange={onSucessorChange}
                                     id={item.id.toString()}
                                     refItemPai={svgRef}
                                     key={item.id}
-                                    left2={item.left + (item.width / 2)}
                                     color="gray"
-                                    top2={item.top + (item.height + 20)}
                                 />
                             }
+
                         </>;
                     })}
 

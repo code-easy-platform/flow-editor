@@ -17,7 +17,7 @@ interface LineProps {
 export const Line: React.FC<LineProps> = (props: LineProps) => {
     const onSucessorChange: Function = props.onSucessorChange || (() => { });
     const { lineWidth = 1, color = "blue", left1, left2 = 0 } = props;
-    const { id = "0", top1 = 0, top2 = 0, sucessorIndex = 0 } = props;
+    const { id = "0", top1 = 0, top2 = 0, sucessorIndex = 999999 } = props;
     const refItemPai: any = props.refItemPai;
 
     const polygonBottonCenter: number = left2;
