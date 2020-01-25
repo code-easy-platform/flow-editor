@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, FC } from 'react';
 import { useDrop, DropTargetMonitor, DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
@@ -35,7 +35,7 @@ export interface CodeEditorProps {
  * @param onChangeItens Function - Usada para emitir através do output o fluxo atualidado, acontece a cada mudança de estado dos itens de fluxo.
  * @param isShowToolbar boolean - Usado para exibir ou não a toolbox cons itens de lógica.
  */
-export const FlowEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onChangeItens = () => { }, isShowToolbar = false }) => {
+export const FlowEditor: FC<CodeEditorProps> = ({ itens = [], toolItens = [], onChangeItens = () => { }, isShowToolbar = false }) => {
     return (
         <DndProvider backend={HTML5Backend}>
             <CodeEditor itens={itens} toolItens={toolItens} onChangeItens={onChangeItens} isShowToolbar={isShowToolbar} />
@@ -321,7 +321,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
     }
 
     return (
-        <div style={{ flex: 1, maxHeight: "100%" }}>
+        <div style={{ flex: 1, maxHeight: "100%", overflow: "auto" }}>
             {((toolItens.length > 0) && isShowToolbar) && <Toolbar itensLogica={toolItens} />}
 
             <div key={"CODE_EDITOR"} style={{ flex: 1, overflow: "auto", }}>
