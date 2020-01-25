@@ -361,15 +361,15 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
                                 break;
 
                             case ItemType.END:
-                                isUseNewBranch = isHaveNoSucessores && item.sucessor.includes(0); // Sempre usa uma nova branch para um swicth.
+                                isUseNewBranch = false; // Nunca usa uma nova branch para um END.
                                 break;
 
                             case ItemType.ASSIGN:
-                                isUseNewBranch = isHaveNoSucessores && item.sucessor.includes(0); // Sempre usa uma nova branch para um swicth.
+                                isUseNewBranch = isHaveNoSucessores && item.sucessor.includes(0); // Apenas uma nova branch para um assing.
                                 break;
 
                             case ItemType.FOREACH:
-                                isUseNewBranch = itensSucessores.length < 2; // Sempre usa uma nova branch para um swicth.
+                                isUseNewBranch = itensSucessores.length < 2; // Apenas duas branchs para um FOREACH.
                                 break;
 
                             default:
