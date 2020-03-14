@@ -57,8 +57,18 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
 
     /** Controla o estado do editor inteiro. */
     const [state, setState] = useState({
+        /** Mantem aqui o estado de todos os componentes contidos no fluxo */
         flowItens: itens,
+
+        /** Ajuda a manter o estado do item que está selecionado. */
+        selectedItem: {
+            itemId: 0
+        },
+
+        /** Controla o tamanho do "painel" onde os elementos de fluxo estão */
         svgSize: { svgHeight: 0, svgWidth: 0 },
+
+        /** Controla o svg que faz a seleção de componentes de fluxo na tela. */
         selectionProps: {
             isMouseDown: false,
             runtimeStartLeft: 0,
@@ -122,7 +132,9 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
 
     /** Depois que um elemento já está na tela, esta função muda a posição dele! */
     const positionChange = (itemId: number, positionTop: number, positionLeft: number, event?: any) => {
-        let component = state.flowItens[state.flowItens.findIndex((item: any) => { if (item.id === itemId) return item; return undefined; })];
+
+        // let component = state.flowItens[state.flowItens.findIndex((item: FlowItem) => item.isSelecionado)];
+        let component = state.flowItens[state.flowItens.findIndex((item: any) => { if (item.id === itemId) return true; return false; })];
 
         // Impede que haje erros se o componente não for encontrado.
         if (!component) return;
@@ -146,6 +158,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
 
         setState({
             ...state,
+            selectedItem: { itemId },
             flowItens: state.flowItens,
             svgSize: state.svgSize
         });
@@ -187,8 +200,11 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
     }
 
     /** Identifica teclas que foram acionadas enquando o editor está focado. */
-    const handleKeyPress = (event: any) => {
+    const handleKeyPress = (event: React.KeyboardEvent<SVGSVGElement>) => {
         if (event.key === 'Delete') onRemoveItem();
+
+        /** Ctrl + a */
+        if (event.ctrlKey && (event.key === 'a')) selectAll();
 
         if (event.key === 'ArrowUp') { positionChangeByKey("ArrowUp"); event.preventDefault(); };
         if (event.key === 'ArrowDown') { positionChangeByKey("ArrowDown"); event.preventDefault(); };
@@ -299,17 +315,27 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
 
         setState({
             ...state,
-            selectionProps: state.selectionProps
+            selectionProps: state.selectionProps,
+            selectedItem: { itemId: 0 }
         });
     }
 
+    /** Seleciona todos os itens da tela */
+    const selectAll = () => {
+        state.flowItens.forEach((item: FlowItem) => {
+            item.isSelecionado = true;
+        });
+
+        setState({ ...state, flowItens: state.flowItens, selectedItem: { itemId: 0 } });
+    }
+
     /** Desabilita qualquer item que esteja selecionado. */
-    const onMouseDown = (event: any) => {
+    const onMouseDown = (event: React.MouseEvent<SVGSVGElement, MouseEvent>, reset?: boolean) => {
         exibiSelection(event);
 
         if (!event.ctrlKey) {
             state.flowItens.forEach((item: FlowItem) => {
-                item.isSelecionado = false;
+                item.isSelecionado = (!reset && (item.id === state.selectedItem.itemId));
             });
         }
 
@@ -317,14 +343,14 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
     }
 
     /** Muda item que está selecionado. */
-    const onChangeSelecionado = (itemId: number) => {
-        const itemCurrentIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.id === Number(itemId)) return item; else return undefined; });
+    const onChangeSelecionado = (itemId: number, e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
 
-        state.flowItens[itemCurrentIndex].isSelecionado = true;
+        setState({ ...state, flowItens: state.flowItens, selectedItem: { itemId } });
 
-        setState({ ...state, flowItens: state.flowItens });
+        onMouseDown(e, false);
 
         onChangeFlow();
+
     }
 
     return (
@@ -332,7 +358,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
             {((toolItens.length > 0) && isShowToolbar) && <Toolbar itensLogica={toolItens} />}
 
             <div key={"CODE_EDITOR"} style={{ flex: 1, overflow: "auto", }}>
-                <svg tabIndex={0} id={"CODE_EDITOR_SVG"} ref={svgRef} onKeyDown={handleKeyPress} onMouseDown={onMouseDown} style={{
+                <svg tabIndex={0} id={"CODE_EDITOR_SVG"} ref={svgRef} onKeyDown={handleKeyPress} onMouseDown={e => onMouseDown(e, true)} style={{
                     height: state.svgSize.svgHeight,
                     width: state.svgSize.svgWidth,
                     minHeight: "100%",
