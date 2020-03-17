@@ -27,6 +27,28 @@ export interface CodeEditorProps {
     onChangeItens(itens: FlowItem[]): any
 }
 
+interface CodeEditorState {
+    /** Mantem aqui o estado de todos os componentes contidos no fluxo */
+    flowItens: FlowItem[],
+
+    /** Ajuda a manter o estado do item que está selecionado. */
+    selectedItem: { itemId: number },
+
+    /** Controla o tamanho do "painel" onde os elementos de fluxo estão */
+    svgSize: { svgHeight: number, svgWidth: number },
+
+    /** Controla o svg que faz a seleção de componentes de fluxo na tela. */
+    selectionProps: {
+        isMouseDown: boolean,
+        runtimeStartLeft: number,
+        runtimeStartTop: number,
+        startLeft: number,
+        startTop: number,
+        endTop: number,
+        endLeft: number
+    }
+}
+
 /**
  * Editor de lógica de programação através de fluxo simples.
  * 
@@ -56,19 +78,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
     const svgRef = useRef<any>(null);
 
     /** Controla o estado do editor inteiro. */
-    const [state, setState] = useState({
-        /** Mantem aqui o estado de todos os componentes contidos no fluxo */
+    const [state, setState] = useState<CodeEditorState>({
         flowItens: itens,
-
-        /** Ajuda a manter o estado do item que está selecionado. */
-        selectedItem: {
-            itemId: 0
-        },
-
-        /** Controla o tamanho do "painel" onde os elementos de fluxo estão */
+        selectedItem: { itemId: 0 },
         svgSize: { svgHeight: 0, svgWidth: 0 },
-
-        /** Controla o svg que faz a seleção de componentes de fluxo na tela. */
         selectionProps: {
             isMouseDown: false,
             runtimeStartLeft: 0,
@@ -133,10 +146,17 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
     /** Depois que um elemento já está na tela, esta função muda a posição dele! */
     const positionChange = (itemId: number, positionTop: number, positionLeft: number, event?: any) => {
 
+        /* let components: FlowItem[] | any = state.flowItens.find((item: FlowItem) => {
+            return item.isSelecionado
+        });
+        if (components && components.length === 1)
+            component = components[0]; */
+
         // let component = state.flowItens[state.flowItens.findIndex((item: FlowItem) => item.isSelecionado)];
         let component = state.flowItens[state.flowItens.findIndex((item: any) => { if (item.id === itemId) return true; return false; })];
 
-        // Impede que haje erros se o componente não for encontrado.
+
+        // Impede que haja erros se o componente não for encontrado.
         if (!component) return;
 
         if (component.top > 0 || component.top < positionTop) {
