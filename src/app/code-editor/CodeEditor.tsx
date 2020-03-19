@@ -2,52 +2,14 @@ import React, { useState, useRef, FC } from 'react';
 import { useDrop, DropTargetMonitor, DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
+import { CodeEditorProps, CodeEditorState } from './shared/Interfaces/CodeEditor';
+import { SelectorArea } from './components/selector/SelectorArea';
 import { ItemToDrag } from './components/item-drag/ItemDrag';
 import { ItemType, FlowItem } from './models/ItemFluxo';
+import { Toolbar } from './components/tool-bar/ToolBar';
 import { Line } from './components/lines/Line';
 import { Utils } from './shared/Utils';
-import { Toolbar } from './components/tool-bar/ToolBar';
-import { SelectorArea } from './components/selector/SelectorArea';
 
-/**
- * Propriedades aceitas pelo editor.
- */
-export interface CodeEditorProps {
-
-    /** boolean - Usado para exibir ou não a toolbox cons itens de lógica. */
-    isShowToolbar: boolean,
-
-    /** FlowItem[] - Usado para exibir os itens na toolbox do editor. */
-    toolItens?: FlowItem[],
-
-    /** FlowItem[] - Usado para exibir os itens na tela do editor */
-    itens: FlowItem[],
-
-    /** Function - Usada para emitir através do output o fluxo atualidado, acontece a cada mudança de estado dos itens de fluxo. */
-    onChangeItens(itens: FlowItem[]): any
-}
-
-interface CodeEditorState {
-    /** Mantem aqui o estado de todos os componentes contidos no fluxo */
-    flowItens: FlowItem[],
-
-    /** Ajuda a manter o estado do item que está selecionado. */
-    selectedItem: { itemId: number },
-
-    /** Controla o tamanho do "painel" onde os elementos de fluxo estão */
-    svgSize: { svgHeight: number, svgWidth: number },
-
-    /** Controla o svg que faz a seleção de componentes de fluxo na tela. */
-    selectionProps: {
-        isMouseDown: boolean,
-        runtimeStartLeft: number,
-        runtimeStartTop: number,
-        startLeft: number,
-        startTop: number,
-        endTop: number,
-        endLeft: number
-    }
-}
 
 /**
  * Editor de lógica de programação através de fluxo simples.
@@ -219,54 +181,70 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
         onChangeFlow();
     }
 
-    /** Identifica teclas que foram acionadas enquando o editor está focado. */
-    const handleKeyPress = (event: React.KeyboardEvent<SVGSVGElement>) => {
-        if (event.key === 'Delete') onRemoveItem();
+    console.log(svgRef);
 
-        /** Ctrl + a */
-        if (event.ctrlKey && (event.key === 'a')) selectAll();
+    /** CONFIG TECLAS: Valida se existe um elemento no current e define os eventos das teclas para aquele elemento */
+    if (svgRef.current) {
 
-        if (event.key === 'ArrowUp') { positionChangeByKey("ArrowUp"); event.preventDefault(); };
-        if (event.key === 'ArrowDown') { positionChangeByKey("ArrowDown"); event.preventDefault(); };
-        if (event.key === 'ArrowLeft') { positionChangeByKey("ArrowLeft"); event.preventDefault(); };
-        if (event.key === 'ArrowRight') { positionChangeByKey("ArrowRight"); event.preventDefault(); };
-    }
+        /** Identifica teclas que foram acionadas enquando o editor está focado. */
+        svgRef.current.onkeydown = (event: React.KeyboardEvent<SVGSVGElement>) => {
+            if (event.key === 'Delete') onRemoveItem();
 
-    /** Move o componente pelas setas do teclado. */
-    const positionChangeByKey = (direction: string) => {
-        let filteredList: FlowItem[] = state.flowItens.filter((item: FlowItem) => item.isSelecionado === true);
-        if (filteredList.length === 0) return;
+            /** Ctrl + a */
+            if (event.ctrlKey && (event.key === 'a')) selectAll();
 
-        if (direction === 'ArrowUp') {
-            filteredList.forEach((item: FlowItem) => { if (item.top > 0) item.top = item.top - 5; });
-        } else if (direction === 'ArrowDown') {
-            filteredList.forEach((item: FlowItem) => { item.top = item.top + 5; });
-        } else if (direction === 'ArrowLeft') {
-            filteredList.forEach((item: FlowItem) => { if (item.left > 0) item.left = item.left - 5; });
-        } else if (direction === 'ArrowRight') {
-            filteredList.forEach((item: FlowItem) => { item.left = item.left + 5; });
+            if (event.key === 'ArrowUp') { positionChangeByKey("ArrowUp"); event.preventDefault(); };
+            if (event.key === 'ArrowDown') { positionChangeByKey("ArrowDown"); event.preventDefault(); };
+            if (event.key === 'ArrowLeft') { positionChangeByKey("ArrowLeft"); event.preventDefault(); };
+            if (event.key === 'ArrowRight') { positionChangeByKey("ArrowRight"); event.preventDefault(); };
         }
 
-        setState({ ...state, flowItens: state.flowItens });
+        /** Move o componente pelas setas do teclado. */
+        const positionChangeByKey = (direction: string) => {
+            let filteredList: FlowItem[] = state.flowItens.filter((item: FlowItem) => item.isSelecionado === true);
+            if (filteredList.length === 0) return;
 
-        onChangeFlow();
-    }
+            if (direction === 'ArrowUp') {
+                filteredList.forEach((item: FlowItem) => { if (item.top > 0) item.top = item.top - 5; });
+            } else if (direction === 'ArrowDown') {
+                filteredList.forEach((item: FlowItem) => { item.top = item.top + 5; });
+            } else if (direction === 'ArrowLeft') {
+                filteredList.forEach((item: FlowItem) => { if (item.left > 0) item.left = item.left - 5; });
+            } else if (direction === 'ArrowRight') {
+                filteredList.forEach((item: FlowItem) => { item.left = item.left + 5; });
+            }
 
-    /** Remove o item que estiver selecionado no fluxo. */
-    const onRemoveItem = () => {
-        const itemCurrentIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.isSelecionado === true) return item; else return undefined; });
-        if (itemCurrentIndex === -1) return;
+            setState({ ...state, flowItens: state.flowItens });
 
-        const itemAntecessorIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.sucessor[0] === state.flowItens[itemCurrentIndex].id) return item; else return undefined; });
-        if (itemAntecessorIndex !== -1) { state.flowItens[itemAntecessorIndex].sucessor[0] = 0; }
+            onChangeFlow();
+        }
 
-        state.flowItens.splice(itemCurrentIndex, 1);
+        /** Seleciona todos os itens da tela */
+        const selectAll = () => {
+            state.flowItens.forEach((item: FlowItem) => {
+                item.isSelecionado = true;
+            });
 
-        setState({ ...state, flowItens: state.flowItens });
+            setState({ ...state, flowItens: state.flowItens, selectedItem: { itemId: 0 } });
+        }
 
-        onRemoveItem(); // Remove mais itens se estiverem selecionado.
+        /** Remove o item que estiver selecionado no fluxo. */
+        const onRemoveItem = () => {
+            const itemCurrentIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.isSelecionado === true) return item; else return undefined; });
+            if (itemCurrentIndex === -1) return;
 
-        onChangeFlow();
+            const itemAntecessorIndex = state.flowItens.findIndex((item: FlowItem) => { if (item.sucessor[0] === state.flowItens[itemCurrentIndex].id) return item; else return undefined; });
+            if (itemAntecessorIndex !== -1) { state.flowItens[itemAntecessorIndex].sucessor[0] = 0; }
+
+            state.flowItens.splice(itemCurrentIndex, 1);
+
+            setState({ ...state, flowItens: state.flowItens });
+
+            onRemoveItem(); // Remove mais itens se estiverem selecionado.
+
+            onChangeFlow();
+        }
+
     }
 
     /** Remove a selection da tela. */
@@ -275,8 +253,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
 
         setState({ ...state, selectionProps: state.selectionProps });
 
-        document.onmousemove = null;
-        document.onmouseup = null;
+        window.onmousemove = null;
+        window.onmouseup = null;
 
         onChangeFlow();
     }
@@ -285,7 +263,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
     const exibiSelection = (event: any) => {
         if (event.target.id !== svgRef.current.id) return;
 
-        document.onmousemove = (event: any) => {
+        window.onmousemove = (event: any) => {
             if (state.selectionProps.isMouseDown) {
                 state.selectionProps = {
                     ...state.selectionProps,
@@ -316,7 +294,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
             } else { removeSelection(); }
         }
 
-        document.onmouseup = removeSelection;
+        window.onmouseup = removeSelection;
 
         state.selectionProps = {
             ...state.selectionProps,
@@ -338,15 +316,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
             selectionProps: state.selectionProps,
             selectedItem: { itemId: 0 }
         });
-    }
-
-    /** Seleciona todos os itens da tela */
-    const selectAll = () => {
-        state.flowItens.forEach((item: FlowItem) => {
-            item.isSelecionado = true;
-        });
-
-        setState({ ...state, flowItens: state.flowItens, selectedItem: { itemId: 0 } });
     }
 
     /** Desabilita qualquer item que esteja selecionado. */
@@ -375,10 +344,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
 
     return (
         <div style={{ flex: 1, maxHeight: "100%", overflow: "auto" }}>
-            {((toolItens.length > 0) && isShowToolbar) && <Toolbar itensLogica={toolItens} />}
+            <Toolbar itensLogica={toolItens} isShow={((toolItens.length > 0) && isShowToolbar)} />
 
             <div key={"CODE_EDITOR"} style={{ flex: 1, overflow: "auto", }}>
-                <svg tabIndex={0} id={"CODE_EDITOR_SVG"} ref={svgRef} onKeyDown={handleKeyPress} onMouseDown={e => onMouseDown(e, true)} style={{
+                <svg ref={svgRef} tabIndex={0} id={"CODE_EDITOR_SVG"} onMouseDown={e => onMouseDown(e, true)} style={{
                     height: state.svgSize.svgHeight,
                     width: state.svgSize.svgWidth,
                     minHeight: "100%",
@@ -387,17 +356,16 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ itens = [], toolItens = [], onC
                 }}>
 
                     {/* Reinderiza a área de seleção na tela. */}
-                    {state.selectionProps.isMouseDown &&
-                        <SelectorArea
-                            onMouseUp={removeSelection}
-                            endTop={state.selectionProps.endTop}
-                            endLeft={state.selectionProps.endLeft}
-                            startTop={state.selectionProps.startTop}
-                            startLeft={state.selectionProps.startLeft}
-                            top={state.selectionProps.runtimeStartTop}
-                            left={state.selectionProps.runtimeStartLeft}
-                        />
-                    }
+                    <SelectorArea
+                        onMouseUp={removeSelection}
+                        endTop={state.selectionProps.endTop}
+                        endLeft={state.selectionProps.endLeft}
+                        startTop={state.selectionProps.startTop}
+                        isShow={state.selectionProps.isMouseDown}
+                        startLeft={state.selectionProps.startLeft}
+                        top={state.selectionProps.runtimeStartTop}
+                        left={state.selectionProps.runtimeStartLeft}
+                    />
 
                     {/* Reinderiza as linhas dos itens arrastáveis da tela. */}
                     {state.flowItens.map((item: FlowItem) => {
