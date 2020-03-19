@@ -3,7 +3,7 @@ import { FlowItem } from "../../models/ItemFluxo";
 /**
  * Propriedades aceitas pelo editor.
  */
-export interface CodeEditorProps {
+export interface ICodeEditorProps {
 
     /** boolean - Usado para exibir ou não a toolbox cons itens de lógica. */
     isShowToolbar: boolean,
@@ -19,7 +19,7 @@ export interface CodeEditorProps {
 }
 
 /** É onde está o estado do editor inteira */
-export interface CodeEditorState {
+export interface ICodeEditorState {
     /** Mantem aqui o estado de todos os componentes contidos no fluxo */
     flowItens: FlowItem[],
 
