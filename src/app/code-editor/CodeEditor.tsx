@@ -9,6 +9,7 @@ import { ItemType, FlowItem } from './models/ItemFluxo';
 import { Toolbar } from './components/tool-bar/ToolBar';
 import { Line } from './components/lines/Line';
 import { Utils } from './shared/Utils';
+import { Lines } from './components/lines/Lines';
 
 
 /**
@@ -371,79 +372,18 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
                     {state.flowItens.map((item: FlowItem) => {
                         const itensSucessores: FlowItem[] = state.flowItens.filter((sucessorItem: FlowItem) => item.sucessor.includes(sucessorItem.id));
 
-                        let isUseNewBranch = false; // Define se será usado uma nova branch para este item de fluxo.
-                        switch (item.itemType) {
-                            case ItemType.IF:
-                                isUseNewBranch = itensSucessores.length < 2; // Só usa nova branch para um if se ele ainda tiver menos de 2 branchs.
-                                break;
+                        // Define se será usado uma nova branch para este item de fluxo.
+                        let isUseNewBranch = Utils.useNewBranch(itensSucessores.length, item.itemType);
 
-                            case ItemType.SWITCH:
-                                isUseNewBranch = true; // Sempre usa uma nova branch para um swicth.
-                                break;
+                        /* Reinderiza todos os branchs de um item de fluxo. */
+                        return <Lines
+                            item={item}
+                            refItemPai={svgRef}
+                            isUseNewBranch={isUseNewBranch}
+                            itensSucessores={itensSucessores}
+                            onSucessorChange={onSucessorChange}
+                        />;
 
-                            case ItemType.END:
-                                isUseNewBranch = false; // Nunca usa uma nova branch para um END.
-                                break;
-
-                            case ItemType.ASSIGN:
-                                isUseNewBranch = itensSucessores.length < 1; // Apenas uma nova branch para um assing.
-                                break;
-
-                            case ItemType.FOREACH:
-                                isUseNewBranch = itensSucessores.length < 2; // Apenas duas branchs para um FOREACH.
-                                break;
-
-                            case ItemType.START:
-                                isUseNewBranch = itensSucessores.length < 1; // Apenas uma branchs para um START.
-                                break;
-
-                            default:
-                                isUseNewBranch = itensSucessores.length < 1;
-                                break;
-
-                        }
-
-                        return <>
-
-                            {/* Reinderiza todos os branchs de um item de fluxo. */}
-                            {itensSucessores.map((sucessorItem: FlowItem, index: number) => {
-
-                                const left2 = sucessorItem ? sucessorItem.left + sucessorItem.width / 2 : item.left + (item.width / 2);
-                                const top2 = sucessorItem ? sucessorItem.top - 25 : item.top + (item.height + 20);
-
-                                if (item.itemType === ItemType.END) return <></>;
-
-                                return <Line
-                                    left1={(item.left || 0) + ((item.width || 0) / 2)}
-                                    top1={(item.top || 0) + (item.height || 0) / 2}
-                                    onSucessorChange={onSucessorChange}
-                                    id={item.id.toString()}
-                                    sucessorIndex={index}
-                                    refItemPai={svgRef}
-                                    key={item.id}
-                                    left2={left2}
-                                    color="gray"
-                                    top2={top2}
-                                />;
-
-                            })}
-
-                            {/* Usado para adicionar uma branch caso o item não tenha sucessores ainda, ou tenha bugado */}
-                            {isUseNewBranch &&
-                                <Line
-                                    left1={(item.left || 0) + ((item.width || 0) / 2)}
-                                    top1={(item.top || 0) + (item.height || 0) / 2}
-                                    left2={item.left + (item.width / 2)}
-                                    top2={item.top + (item.height + 20)}
-                                    onSucessorChange={onSucessorChange}
-                                    id={item.id.toString()}
-                                    refItemPai={svgRef}
-                                    key={item.id}
-                                    color="gray"
-                                />
-                            }
-
-                        </>;
                     })}
 
                     {/* Reinderiza os itens arrastáveis na tela! */}
