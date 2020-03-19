@@ -254,8 +254,8 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
 
         setState({ ...state, selectionProps: state.selectionProps });
 
-        window.onmousemove = null;
-        window.onmouseup = null;
+        document.onmousemove = null;
+        document.onmouseup = null;
 
         onChangeFlow();
     }
@@ -264,7 +264,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
     const exibiSelection = (event: any) => {
         if (event.target.id !== svgRef.current.id) return;
 
-        window.onmousemove = (event: any) => {
+        document.onmousemove = (event: any) => {
             if (state.selectionProps.isMouseDown) {
                 state.selectionProps = {
                     ...state.selectionProps,
@@ -295,7 +295,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
             } else { removeSelection(); }
         }
 
-        window.onmouseup = removeSelection;
+        document.onmouseup = removeSelection;
 
         state.selectionProps = {
             ...state.selectionProps,
