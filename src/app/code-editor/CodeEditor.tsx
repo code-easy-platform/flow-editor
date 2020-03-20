@@ -212,6 +212,22 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
 
         /** Cola os itens de fluxo na área de transferência */
         const pasteSelecteds = () => {
+            const findNewPosition = (num: number, type: 'top' | 'left'): number => {
+                let index: number = 0;
+                if (type === 'left')
+                    index = state.flowItens.findIndex((item: FlowItem) => (
+                        ((item.left >= (num + 60)) && (item.left <= (num + 60)))
+                    ));
+                else if (type === 'top')
+                    index = state.flowItens.findIndex((item: FlowItem) => (
+                        ((item.top >= (num + 60)) && (item.top <= (num + 60)))
+                    ));
+
+                const isUsed = (index !== -1);
+
+                return isUsed ? num : findNewPosition(num + 10, type);
+
+            }
 
             try {
                 const string: string | undefined = document.getSelection()?.toString();
@@ -220,9 +236,9 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
                 components.forEach(item => {
                     const newId: number = Utils.getRandomId();
 
-                    components.forEach(comp => {
-                        if (comp.id !== item.id) {
-                            comp.sucessor.forEach(sucessorId => {
+                    components.forEach(depende => {
+                        if (depende.id !== item.id) {
+                            depende.sucessor.forEach(sucessorId => {
                                 if (sucessorId === item.id) {
                                     sucessorId = newId;
                                 }
@@ -230,14 +246,15 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
                         }
                     });
 
+                    item.left = findNewPosition(item.left + 100, 'left');
+                    item.top = findNewPosition(item.top, 'top');
+
                     item.id = newId;
-                    item.left = item.left + 100;
                     state.flowItens.push(new FlowItem(item))
                 });
 
                 setState({ ...state });
             } catch (e) { }
-
 
         }
 
@@ -391,10 +408,11 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
     return (
         <div style={{ flex: 1, maxHeight: "100%", overflow: "auto" }}>
 
-            <input ref={inputCopyRef} style={{ height: '1px',  width: '1px', top:'-1000px', position: "fixed" }}  />
+            <input ref={inputCopyRef} style={{ height: '1px', width: '1px', top: '-1000px', position: "fixed" }} />
             <Toolbar itensLogica={toolItens} isShow={((toolItens.length > 0) && isShowToolbar)} />
 
             <div key={"CODE_EDITOR"} style={{ flex: 1, overflow: "auto", }}>
+
                 <svg ref={svgRef} tabIndex={0} id={"CODE_EDITOR_SVG"} onMouseDown={e => onMouseDown(e, true)} style={{
                     height: state.svgSize.svgHeight,
                     width: state.svgSize.svgWidth,
