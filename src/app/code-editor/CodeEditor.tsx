@@ -7,9 +7,8 @@ import { SelectorArea } from './components/selector/SelectorArea';
 import { ItemToDrag } from './components/item-drag/ItemDrag';
 import { ItemType, FlowItem } from './models/ItemFluxo';
 import { Toolbar } from './components/tool-bar/ToolBar';
-import { Line } from './components/lines/Line';
-import { Utils } from './shared/Utils';
 import { Lines } from './components/lines/Lines';
+import { Utils } from './shared/Utils';
 
 
 /**
@@ -39,6 +38,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
 
     /** Referencia o svg onde está todos os itens de fluxo. */
     const svgRef = useRef<any>(null);
+    const inputCopyRef = useRef<any>(null);
 
     /** Controla o estado do editor inteiro. */
     const [state, setState] = useState<ICodeEditorState>({
@@ -108,12 +108,6 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
 
     /** Depois que um elemento já está na tela, esta função muda a posição dele! */
     const positionChange = (itemId: number, positionTop: number, positionLeft: number, event?: any) => {
-
-        /* let components: FlowItem[] | any = state.flowItens.find((item: FlowItem) => {
-            return item.isSelecionado
-        });
-        if (components && components.length === 1)
-            component = components[0]; */
 
         // let component = state.flowItens[state.flowItens.findIndex((item: FlowItem) => item.isSelecionado)];
         let component = state.flowItens[state.flowItens.findIndex((item: any) => { if (item.id === itemId) return true; return false; })];
@@ -194,10 +188,57 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
             /** Ctrl + a */
             if (event.ctrlKey && (event.key === 'a')) selectAll();
 
+
+            /** Ctrl + c */ if (event.ctrlKey && (event.key === 'c')) copySelecteds();
+            /** Ctrl + v */ if (event.ctrlKey && (event.key === 'v')) pasteSelecteds();
+
             if (event.key === 'ArrowUp') { positionChangeByKey("ArrowUp"); event.preventDefault(); };
             if (event.key === 'ArrowDown') { positionChangeByKey("ArrowDown"); event.preventDefault(); };
             if (event.key === 'ArrowLeft') { positionChangeByKey("ArrowLeft"); event.preventDefault(); };
             if (event.key === 'ArrowRight') { positionChangeByKey("ArrowRight"); event.preventDefault(); };
+        }
+
+        /** Copia os itens de fluxo selecionados */
+        const copySelecteds = () => {
+            const components = state.flowItens.filter((item: FlowItem) => item.isSelecionado);
+
+            inputCopyRef.current.value = JSON.stringify(components);
+            inputCopyRef.current.focus()
+            inputCopyRef.current.select()
+            document.execCommand('copy');
+            svgRef.current.focus()
+
+        }
+
+        /** Cola os itens de fluxo na área de transferência */
+        const pasteSelecteds = () => {
+
+            try {
+                const string: string | undefined = document.getSelection()?.toString();
+                const components: FlowItem[] = JSON.parse(string || '');
+
+                components.forEach(item => {
+                    const newId: number = Utils.getRandomId();
+
+                    components.forEach(comp => {
+                        if (comp.id !== item.id) {
+                            comp.sucessor.forEach(sucessorId => {
+                                if (sucessorId === item.id) {
+                                    sucessorId = newId;
+                                }
+                            });
+                        }
+                    });
+
+                    item.id = newId;
+                    item.left = item.left + 100;
+                    state.flowItens.push(new FlowItem(item))
+                });
+
+                setState({ ...state });
+            } catch (e) { }
+
+
         }
 
         /** Move o componente pelas setas do teclado. */
@@ -262,10 +303,12 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
 
     /** Ativa a seleção na tela. */
     const exibiSelection = (event: any) => {
+
         if (event.target.id !== svgRef.current.id) return;
 
         document.onmousemove = (event: any) => {
             if (state.selectionProps.isMouseDown) {
+
                 state.selectionProps = {
                     ...state.selectionProps,
                     isMouseDown: true,
@@ -292,6 +335,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
                 setState({ ...state, selectionProps: state.selectionProps });
 
                 onChangeFlow();
+
             } else { removeSelection(); }
         }
 
@@ -317,6 +361,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
             selectionProps: state.selectionProps,
             selectedItem: { itemId: 0 }
         });
+
     }
 
     /** Desabilita qualquer item que esteja selecionado. */
@@ -345,6 +390,8 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
 
     return (
         <div style={{ flex: 1, maxHeight: "100%", overflow: "auto" }}>
+
+            <input ref={inputCopyRef} style={{ height: '1px',  width: '1px', top:'-1000px', position: "fixed" }}  />
             <Toolbar itensLogica={toolItens} isShow={((toolItens.length > 0) && isShowToolbar)} />
 
             <div key={"CODE_EDITOR"} style={{ flex: 1, overflow: "auto", }}>
@@ -408,6 +455,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
 
                 </svg>
             </div>
+
         </div>
     );
 }
