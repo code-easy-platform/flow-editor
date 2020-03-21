@@ -214,18 +214,40 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
         const pasteSelecteds = () => {
             const findNewPosition = (num: number, type: 'top' | 'left'): number => {
                 let index: number = 0;
-                if (type === 'left')
-                    index = state.flowItens.findIndex((item: FlowItem) => (
-                        ((item.left >= (num + 60)) && (item.left <= (num + 60)))
-                    ));
-                else if (type === 'top')
-                    index = state.flowItens.findIndex((item: FlowItem) => (
-                        ((item.top >= (num + 60)) && (item.top <= (num + 60)))
-                    ));
+                if (type === 'left') {
+                    index = state.flowItens.findIndex((item: FlowItem) => {
+
+                        const isEquals = (item.left === num); // Posição exata já é usada?
+                        if (isEquals) return true;
+
+                        const x1IsUsed = (item.left >= (num - 100)); // Posição maior que x1 é usada?
+                        const x2IsUsed = (item.left <= (num + 100)); // Posição menor que x2 é usada?
+
+                        if (x2IsUsed && x1IsUsed) return true;
+
+                        return false;
+
+                    });
+                }
+                else if (type === 'top') {
+                    index = state.flowItens.findIndex((item: FlowItem) => {
+
+                        const isEquals = (item.top === num); // Posição exata já é usada?
+                        if (isEquals) return true;
+
+                        const x1IsUsed = (item.top >= (num - 100)); // Posição maior que x1 é usada?
+                        const x2IsUsed = (item.top <= (num + 100)); // Posição menor que x2 é usada?
+
+                        if (x2IsUsed && x1IsUsed) return true;
+
+                        return false;
+
+                    });
+                }
 
                 const isUsed = (index !== -1);
 
-                return isUsed ? num : findNewPosition(num + 10, type);
+                return isUsed ? findNewPosition(num + 10, type) : num;
 
             }
 
@@ -246,8 +268,13 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
                         }
                     });
 
-                    item.left = findNewPosition(item.left + 100, 'left');
-                    item.top = findNewPosition(item.top, 'top');
+                    const newLeft = findNewPosition(item.left + 100, 'left');
+                    const newTop = findNewPosition(item.left + 100, 'top');
+
+                    if (newLeft < newTop)
+                        item.left = newLeft;
+                    else
+                        item.top = newTop;
 
                     item.id = newId;
                     state.flowItens.push(new FlowItem(item))
