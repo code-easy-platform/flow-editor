@@ -43,8 +43,10 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     const {
         isSelecionado, onChangeSelecionado = () => { },
         allowDrag, refItemPai, itemType,
-        id, outputPosition, title,
+        id, outputPosition,
     } = props;
+
+    let { title } = props;
 
     const { width, height, top, left } = props.style;
 
@@ -135,6 +137,10 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
             {itemType === ItemType.IF && <img id={id} title="IF" style={style} ref={dragRef} src={icons_if} alt="IF" />}
         </div>;
     } else {
+
+        // Ajusta o tamanho do titulo para não ficar muito grande
+        title = title.length < 10 ? title : title.slice(0, 15);
+
         /** Reinderiza um tipo de tag svg na tela, somente dentro do editor de fluxo. */
         return (
             <g
@@ -145,7 +151,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
                 key={id}
                 id={id}
             >
-                <text id={id} x={left} y={(top || 0) - 5} fill="#fff" >{title}</text>
+                <text x={(left || 0) + ((width || 0) / 2)} textAnchor="middle" fill="#fff" y={(top || 0) - 5} id={id}>{title}</text>
                 {itemType === ItemType.FOREACH && <FlowComponent name="Foreach" id={id} top={top} left={left} width={width} height={height} childImage={icons_foreach} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.ASSIGN && <FlowComponent name="ASSIGN" id={id} top={top} left={left} width={width} height={height} childImage={icons_assign} isSelecionado={isSelecionado} />}
                 {itemType === ItemType.SWITCH && <FlowComponent name="SWITCH" id={id} top={top} left={left} width={width} height={height} childImage={icons_switch} isSelecionado={isSelecionado} />}
