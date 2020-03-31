@@ -1,17 +1,15 @@
 import React from 'react';
 
+import icons_action from './../../shared/images/action.png';
+
 export const Action = (props: any) => {
 
-    // Configura o top e left do quadrado.
-    const left2 = props.left + (props.width / 22);
-    const top2 = props.top + (props.height / 22);
-
-    const strokeColor: string = props.isSelecionado ? "#999fff" : "#219653";
+    const strokeColor: string = props.isSelecionado ? "#999fff" : "#21965300";
 
     return (
         <>
             <rect
-                key={"Action_" + props.id}
+                key={"Action" + props.id}
                 strokeLinejoin="round"
                 height={props.height}
                 stroke={strokeColor}
@@ -21,20 +19,15 @@ export const Action = (props: any) => {
                 x={props.left}
                 y={props.top}
                 id={props.id}
-                rx="25"
             />
-            <rect
-                height={props.height / 1.1}
-                width={props.width / 1.1}
-                strokeLinejoin="round"
-                stroke={strokeColor}
-                strokeWidth="1"
-                fill="#1e1e1e"
-                key={props.id}
+            <image
+                key={"ActionImage_" + props.id}
+                xlinkHref={icons_action}
+                height={props.height}
+                width={props.width}
+                x={props.left}
+                y={props.top}
                 id={props.id}
-                x={left2}
-                y={top2}
-                rx="25"
             />
         </>
     );

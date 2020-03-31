@@ -1,39 +1,33 @@
 import React from 'react';
 
+import icons_end from './../../shared/images/end.png';
+
 export const End = (props: any) => {
 
-    // Configura o top e left do quadrado.
-    const left2 = props.left + (props.width / 3);
-    const top2 = props.top + (props.height / 3);
-
-    const strokeColor: string = props.isSelecionado ? "#999fff" : "#219653";
+    const strokeColor: string = props.isSelecionado ? "#999fff" : "#21965300";
 
     return (
         <>
             <rect
-                key={"End_" + props.id}
+                key={"End" + props.id}
                 strokeLinejoin="round"
                 height={props.height}
                 stroke={strokeColor}
                 width={props.width}
-                strokeWidth="2"
+                strokeWidth="1"
                 fill="#1e1e1e"
                 x={props.left}
                 y={props.top}
                 id={props.id}
-                rx="25"
             />
-            <rect
-                height={props.height / 3}
-                width={props.width / 3}
-                strokeLinejoin="round"
-                stroke={strokeColor}
-                strokeWidth="2"
-                fill="#1e1e1e"
-                key={props.id}
+            <image
+                key={"EndImage_" + props.id}
+                xlinkHref={icons_end}
+                height={props.height}
+                width={props.width}
+                x={props.left}
+                y={props.top}
                 id={props.id}
-                x={left2}
-                y={top2}
             />
         </>
     );
