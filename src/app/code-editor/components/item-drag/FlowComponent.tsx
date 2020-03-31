@@ -9,11 +9,11 @@ export const FlowComponent = ({ id, isSelecionado, width, height, left, top, chi
             <rect
                 strokeLinejoin="round"
                 stroke={strokeColor}
-                width={width - 2}
                 key={name + id}
                 height={height}
                 strokeWidth="1"
                 fill="#1e1e1e"
+                width={width}
                 x={left}
                 y={top}
                 id={id}
