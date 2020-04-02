@@ -36,6 +36,12 @@ const App: React.FC = () => {
         toolItens={itensLogica}
         isShowToolbar={true}
         itens={itens}
+        onDropItem={(oldItemId: string, newItemId: string, newItem: FlowItem) => {
+          console.log(oldItemId);
+          console.log(newItemId);
+          console.log(newItem);
+          return true;
+        }}
       />
     </div>
   );
