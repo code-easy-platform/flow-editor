@@ -32,10 +32,11 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <FlowEditor
-        onChangeItens={outItens}
-        toolItens={itensLogica}
-        isShowToolbar={true}
         itens={itens}
+        allowDropTo={[]}
+        isShowToolbar={true}
+        toolItens={itensLogica}
+        onChangeItens={outItens}
         onDropItem={(oldItemId: string, newItemId: string, newItem: FlowItem) => {
           console.log(oldItemId);
           console.log(newItemId);
