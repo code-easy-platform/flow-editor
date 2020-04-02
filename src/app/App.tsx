@@ -38,10 +38,12 @@ const App: React.FC = () => {
         toolItens={itensLogica}
         onChangeItens={outItens}
         onDropItem={(oldItemId: string, newItemId: string, newItem: FlowItem) => {
+
           console.log(oldItemId);
           console.log(newItemId);
           console.log(newItem);
-          return true;
+
+          return newItem;
         }}
       />
     </div>
