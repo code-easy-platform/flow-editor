@@ -37,6 +37,10 @@ const App: React.FC = () => {
         isShowToolbar={true}
         toolItens={itensLogica}
         onChangeItens={outItens}
+        onContextMenu={(data, e) => {
+          console.log(data);
+          console.log(e);
+        }}
         onDropItem={(oldItemId: string, newItemId: string, newItem: FlowItem) => {
 
           console.log(oldItemId);
