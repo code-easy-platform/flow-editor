@@ -34,6 +34,7 @@ const App: React.FC = () => {
       <FlowEditor
         itens={itens}
         allowDropTo={[]}
+        breadcrumbsPath="Routers/authenticate"
         isShowToolbar={true}
         toolItens={itensLogica}
         onChangeItens={outItens}
