@@ -68,7 +68,7 @@ export class FlowItem implements ItemFluxo {
             top?: number,
         }
     ) {
-        this.isSelected = this.props.isSelected = false;
+        this.isSelected = this.props.isSelected || false;
         this.sucessor = this.props.sucessor || [];
         this.height = this.props.height || 0;
         this.itemType = this.props.itemType;
