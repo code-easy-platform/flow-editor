@@ -73,14 +73,15 @@
     --border-size-0: 0px;
     --border-size-1: 1px;
 
-    // Colors
-
+    
+    /************* Colors *************/
     // Main base colors
-    --color-background: #1e1e1e;
     --main-background: #1e1e1e;
     --main-background-bars: #2d2d2d;
     --main-background-panels: #252527;
     --main-background-highlighted: #3c3c3c;
+
+    --main-error-color: rgb(255, 0, 0);
     // ----------------
 
     --color-black: #000000;
@@ -108,7 +109,7 @@
 
     //# Scroll bar style ----------
     // Colors
-    --color-scroll-bar: #3c3c3c20;
+    --color-scroll-bar: var(--main-background-panels);
     --color-scroll-bar-hover: #4d4d4d;
     --color-scroll-bar-active: #5c5c5c;
 
@@ -166,7 +167,7 @@
     // --outline-padrao: 1px solid #f3f3f3;
 
     // Erros
-    --text-underline-error: underline wavy red;
+    --text-underline-error: underline wavy var(--main-error-color);
 
     // Bordas
     --borda-size-0-25: 1px;
@@ -178,4 +179,8 @@
     --borda-size-3: 12px;
     --borda-size-4: 16px;
     --borda-size-5: 20px;
+
+    /*** Input borders ***/
+    --input-border: thin solid var(--main-background-highlighted);
+    --input-border-error: thin solid var(--main-error-color);
 }
