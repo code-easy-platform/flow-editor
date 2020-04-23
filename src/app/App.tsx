@@ -2,7 +2,7 @@ import React from 'react';
 
 import { ItemType, ItemFluxo, FlowItem } from './code-editor/models/ItemFluxo';
 import { FlowEditor } from './code-editor/CodeEditor';
-import './App.scss';
+import './App.css';
 
 
 const itens: FlowItem[] = [
