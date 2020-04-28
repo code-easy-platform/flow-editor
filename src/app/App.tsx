@@ -38,6 +38,7 @@ const App: React.FC = () => {
         toolItens={itensLogica}
         onChangeItens={outItens}
         isDisabledSelection={false}
+        onMouseOver={e => console.log(e)}
         breadcrumbsPath="Routers/authenticate"
         onContextMenu={(data, e) => {
           console.log(data);

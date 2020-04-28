@@ -33,6 +33,7 @@ export interface ItemDragProps {
     hideSourceOnDrag?: boolean;
 
     onMouseUp?(e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
+    onMouseOver?(e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
     onMouseDown?(e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
     onContextMenu?(data?: any, e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
     /** Devolve 'itemId, top, left'. */
@@ -43,8 +44,8 @@ export interface ItemDragProps {
 export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     const {
         isSelected, onContextMenu, hasError, onMouseUp,
+        id, onChangePosition, onMouseDown, onMouseOver,
         width = 0, height = 0, top = 0, left = 0,
-        id, onChangePosition, onMouseDown,
         allowDrag, itemType, icon,
     } = props;
 
@@ -125,12 +126,13 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
         /** Reinderiza um tipo de tag svg na tela, somente dentro do editor de fluxo. */
         return (
             <g
-                onContextMenu={contextMenu}
-                style={{ cursor: 'move' }}
-                onMouseDown={mouseDown}
-                onMouseUp={onMouseUp}
-                key={id}
                 id={id}
+                key={id}
+                onMouseUp={onMouseUp}
+                onMouseDown={mouseDown}
+                onMouseOver={onMouseOver}
+                onContextMenu={contextMenu}
+                style={{ cursor: 'move', zIndex: 2 }}
             >
                 <text x={(left || 0) + ((width || 0) / 2)} textAnchor="middle" fill="var(--color-white)" y={(top || 0) - 5} id={id}>{title}</text>
                 {itemType === ItemType.COMMENT && <FlowComment id={id} top={top} left={left} width={width} height={height} isSelected={isSelected} name="COMMENT" childImage={icons_comment} />}
