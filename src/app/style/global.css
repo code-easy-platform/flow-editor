@@ -37,6 +37,7 @@ body,
 
 div {
   display: flex;
+  background-color: var(--color-transparent);
 }
 
 a {
@@ -56,11 +57,18 @@ label {
   cursor: pointer;
 }
 
-input {
+input,
+textarea {
   background-color: var(--main-background-bars);
   border: var(--input-border);
   color: var(--color-white);
+  padding: var(--size-2);
+  border-radius: var(--size-1);
+  padding-right: var(--size-1);
+  padding-left: var(--size-1);
+  color: var(--color-white);
 }
+/* Remove os botões da input de texto */
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -70,6 +78,10 @@ input::-webkit-inner-spin-button {
 /* Firefox */
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+.no-events {
+  pointer-events: none;
 }
 
 .input-medium {
@@ -133,11 +145,16 @@ input[type="number"] {
   overflow: scroll;
 }
 
+.outline-none {
+  outline: var(--outline-none);
+}
+
 .main-header {
   font-size: var(--font-size-6);
   color: var(--color-gray-5);
   font-weight: 500;
 }
+
 .display-flex {
   display: flex;
 }
@@ -181,6 +198,10 @@ input[type="number"] {
 }
 .btn:focus {
   outline: var(--outline-padrao);
+}
+
+.width-auto {
+  width: auto;
 }
 
 .margin-xs {
@@ -263,4 +284,27 @@ input[type="number"] {
 .mini-scroll-bar::-webkit-scrollbar-thumb {
   background-color: var(--main-background-bars);
   width: var(--size-x-scroll-bar-small);
+}
+
+[aria-label] {
+  position: relative;
+}
+
+[aria-label]::after {
+  background-color: var(var(--main-background-bars));
+  color: var(--color-white);
+  content: attr(aria-label);
+  bottom: var(--size-none);
+  text-decoration: none;
+  pointer-events: none;
+  position: absolute;
+  padding: 8px 10px;
+  font-size: 0.9em;
+  z-index: 5000;
+  display: none;
+  top: 110%;
+}
+
+[aria-label]:hover::after {
+  display: block;
 }

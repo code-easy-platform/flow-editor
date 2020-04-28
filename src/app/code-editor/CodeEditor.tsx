@@ -542,16 +542,19 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ itens = [], toolItens = [], on
                     {/* Reinderiza os itens arrastáveis na tela! */}
                     {state.flowItens.map((item: FlowItem) => {
                         return <ItemToDrag
-                            style={{ top: item.top, left: item.left, width: item.width, height: item.height }}
                             onMouseDown={(e: any) => onMouseDown(e)}
                             onChangePosition={onChangePositionItens}
                             onMouseUp={(e: any) => onChangeFlow()}
-                            parentElementRef={editorPanelRef}
                             onContextMenu={onContextMenu}
                             isSelected={item.isSelected}
                             itemType={item.itemType}
                             hasError={item.hasError}
+                            height={item.height}
+                            width={item.width}
                             title={item.name}
+                            icon={item.icon}
+                            left={item.left}
+                            top={item.top}
                             key={item.id}
                             id={item.id}
                         />;
