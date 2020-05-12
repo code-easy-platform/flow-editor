@@ -34,24 +34,13 @@ const App: React.FC = () => {
       <FlowEditor
         itens={itens}
         allowDropTo={[]}
+        id={"FLOW_EDITOR"}
+        key={"FLOW_EDITOR"}
         isShowToolbar={true}
         toolItens={itensLogica}
+        enabledSelection={true}
         onChangeItens={outItens}
-        isDisabledSelection={false}
-        onMouseOver={e => console.log(e)}
         breadcrumbsPath="Routers/authenticate"
-        onContextMenu={(data, e) => {
-          console.log(data);
-          console.log(e);
-        }}
-        onDropItem={(oldItemId: string, newItemId: string, newItem: FlowItem) => {
-
-          console.log(oldItemId);
-          console.log(newItemId);
-          console.log(newItem);
-
-          return newItem;
-        }}
       />
     </div>
   );
