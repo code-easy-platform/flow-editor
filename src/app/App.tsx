@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ItemType, ItemFluxo, FlowItem } from './code-editor/models/ItemFluxo';
+import { ItemType, FlowItem } from './code-editor/models/ItemFluxo';
 import { FlowEditor } from './code-editor/CodeEditor';
 import './App.css';
 
@@ -26,8 +26,6 @@ const itensLogica: FlowItem[] = [
     new FlowItem({ id: '9', name: "COMMENT", itemType: ItemType.COMMENT }),
 ];
 
-const outItens = (itens: ItemFluxo[]) => console.log(itens);
-
 const App: React.FC = () => {
     return (
         <div className="App">
@@ -39,9 +37,30 @@ const App: React.FC = () => {
                 isShowToolbar={true}
                 toolItens={itensLogica}
                 enabledSelection={true}
-                onChangeItens={outItens}
-                onMouseOver={console.log}
-                breadcrumbsPath="Routers/authenticate"
+                onChangeItens={console.log}
+                // onMouseOver={console.log}
+                breadcrumbs={[
+                    {
+                        label: 'Routes',
+                        onClick: () => console.log('Routes'),
+                    },
+                    {
+                        label: 'hello',
+                        onClick: () => console.log('hello'),
+                    },
+                    {
+                        label: 'hello',
+                        onClick: () => console.log('hello'),
+                    },
+                    {
+                        label: 'hello',
+                        onClick: () => console.log('hello'),
+                    },
+                    {
+                        label: 'hello',
+                        onClick: () => console.log('hello'),
+                    }
+                ]}
             />
         </div>
     );

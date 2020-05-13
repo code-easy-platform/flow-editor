@@ -35,7 +35,7 @@ export const FlowEditor: FC<ICodeEditorProps> = (props: ICodeEditorProps) => {
 let backupFlow: string = "";
 
 /** Editor do fluxo. */
-const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], toolItens = [], onChangeItens = () => { }, onMouseOver, isShowToolbar = false, onDropItem = () => undefined, allowedsInDrop = [], onContextMenu, onKeyDown, breadcrumbsPath, enabledSelection = true }) => {
+const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], toolItens = [], onChangeItens = () => { }, onMouseOver, isShowToolbar = false, onDropItem = () => undefined, allowedsInDrop = [], onContextMenu, onKeyDown, breadcrumbs, enabledSelection = true }) => {
 
     /** Referencia o svg onde está todos os itens de fluxo. */
     const editorPanelRef = useRef<any>(null);
@@ -380,7 +380,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], toolItens = []
             <InputCopy ref={inputCopyRef} />
             <Toolbar itensLogica={toolItens} isShow={((toolItens.length > 0) && isShowToolbar)} />
             <main key={id} className='overflow-auto flex1'>
-                <BreandCamps breadcrumbsPath={breadcrumbsPath} />
+                <BreandCamps breadcrumbs={breadcrumbs} />
 
                 <EditorPanel
                     id={`${id}_SVG`}
@@ -398,10 +398,8 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], toolItens = []
                         parentRef={editorPanelRef}
                         enabled={enabledSelection}
                         onCoordsChange={coords => {
-                            // console.log(coords);
                             flowItens.list.forEach((item: FlowItem) => item.select(coords));
                             setFlowItens({ list: flowItens.list });
-                            onChangeFlow();
                         }}
                     />
 

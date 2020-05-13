@@ -3,6 +3,8 @@ import { FlowItem } from "../../models/ItemFluxo";
 /** Usado para mapear um quadrado de coordenadas */
 export interface Coords { startY: number, startX: number, endY: number, endX: number };
 
+export interface BreadCampButton { label: string; disabled?: boolean; onClick(e: any): void; }
+
 /**
  * Propriedades aceitas pelo editor.
  */
@@ -23,8 +25,8 @@ export interface ICodeEditorProps {
     /** string[] - Usado para definir quais itens adicionais são permitidos no fluxo */
     allowedsInDrop?: string[];
 
-    /** string - Usado para identifica qual o caminho da action que está aberta */
-    breadcrumbsPath?: string;
+    /** BreadCampButton[] - Usado para identifica qual o caminho da action que está aberta */
+    breadcrumbs?: BreadCampButton[];
 
     /** Se "true" desabilita a área de seleção na tela. */
     enabledSelection?: boolean;
