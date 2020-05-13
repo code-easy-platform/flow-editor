@@ -21,7 +21,7 @@ export interface ICodeEditorProps {
     itens: FlowItem[];
 
     /** string[] - Usado para definir quais itens adicionais são permitidos no fluxo */
-    allowDropTo?: string[];
+    allowedsInDrop?: string[];
 
     /** string - Usado para identifica qual o caminho da action que está aberta */
     breadcrumbsPath?: string;

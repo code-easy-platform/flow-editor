@@ -2,7 +2,7 @@ import React from 'react';
 
 export const FlowComponent = ({ id, isSelected, width, height, left, top, icon, name, hasError = false }: any) => {
 
-    const strokeColor: string = isSelected ? "var(--color-botton-bar)" : hasError ? "var(--main-error-color)" :  "var(--main-background)";
+    const strokeColor: string = isSelected ? "var(--color-botton-bar)" : hasError ? "var(--main-error-color)" : "var(--main-background)";
 
     return (
         <>
