@@ -13,8 +13,8 @@ export interface ICodeEditorProps {
     /** Identifier of the component in react and html native elements */
     id: string;
 
-    /** boolean - Usado para exibir ou não a toolbox cons itens de lógica. */
-    isShowToolbar: boolean;
+    /** boolean - Usado para exibir ou não a toolbox com itens de lógica. */
+    showToolbar: boolean;
 
     /** FlowItem[] - Usado para exibir os itens na toolbox do editor. */
     toolItens?: FlowItem[];

@@ -34,7 +34,7 @@ const App: React.FC = () => {
                 id={"FLOW_EDITOR"}
                 allowedsInDrop={[]}
                 key={"FLOW_EDITOR"}
-                isShowToolbar={true}
+                showToolbar={true}
                 toolItens={itensLogica}
                 enabledSelection={true}
                 onChangeItens={console.log}
@@ -42,25 +42,14 @@ const App: React.FC = () => {
                 breadcrumbs={[
                     {
                         label: 'Routes',
-                        onClick: () => console.log('Routes'),
+                        onClick: console.log,
                     },
                     {
-                        label: 'hello',
-                        onClick: () => console.log('hello'),
-                    },
-                    {
-                        label: 'hello',
-                        onClick: () => console.log('hello'),
-                    },
-                    {
-                        label: 'hello',
-                        onClick: () => console.log('hello'),
-                    },
-                    {
-                        label: 'hello',
-                        onClick: () => console.log('hello'),
+                        label: 'authenticate',
+                        onClick: console.log,
                     }
                 ]}
+
             />
         </div>
     );

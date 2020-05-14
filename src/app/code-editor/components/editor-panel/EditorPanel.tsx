@@ -20,6 +20,24 @@ type EditorPanelProps = Omit<{
  */
 export const EditorPanel = React.forwardRef(({ allowedsInDrop, onDropItem, backgroundType = 'dotted', ...props }: EditorPanelProps, ref: any) => {
 
+    /*
+        const [scale, setScale] = React.useState(0);
+        const wheel = (e: React.WheelEvent<SVGSVGElement>) => {
+            e.preventDefault();
+
+            if (e.altKey) {
+                if (e.deltaY > 0) {
+                    console.log('Subindo');
+                    setScale(scale - 2);
+                } else {
+                    console.log('Descendo');
+                    setScale(scale + 2);
+                }
+            }
+
+        }
+    */
+
     // Este bloco serve para configurar o estilo do background do painel
     let background;
     if (backgroundType === 'dotted') {
@@ -46,6 +64,7 @@ export const EditorPanel = React.forwardRef(({ allowedsInDrop, onDropItem, backg
             {...props}
             ref={ref}
             tabIndex={0}
+            //onWheel={wheel}
             preserveAspectRatio="none"
             style={{
                 outline: 'none',
@@ -53,6 +72,7 @@ export const EditorPanel = React.forwardRef(({ allowedsInDrop, onDropItem, backg
                 minHeight: '100%',
                 backgroundSize: '15px 15px',
                 backgroundImage: background,
+                // transform: scale === 0 ? undefined : `scale(${scale / 100},${scale / 100})`,
             }}
         />
     );

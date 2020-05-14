@@ -35,7 +35,7 @@ export const FlowEditor: FC<ICodeEditorProps> = (props: ICodeEditorProps) => {
 let backupFlow: string = "";
 
 /** Editor do fluxo. */
-const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], toolItens = [], onChangeItens = () => { }, onMouseOver, isShowToolbar = false, onDropItem = () => undefined, allowedsInDrop = [], onContextMenu, onKeyDown, breadcrumbs, enabledSelection = true }) => {
+const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], toolItens = [], onChangeItens = () => { }, onMouseOver, showToolbar = false, onDropItem = () => undefined, allowedsInDrop = [], onContextMenu, onKeyDown, breadcrumbs, enabledSelection = true }) => {
 
     /** Referencia o svg onde está todos os itens de fluxo. */
     const editorPanelRef = useRef<any>(null);
@@ -375,10 +375,16 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], toolItens = []
         onChangeFlow();
     }
 
+    const itemNameChange = (text: string, index: number) => {
+        flowItens.list[index].name = text;
+        setFlowItens({ list: flowItens.list });
+        onChangeFlow();
+    }
+
     return (
         <div className="full-width" onMouseOver={(e: any) => onMouseOver && onMouseOver(e)}>
             <InputCopy ref={inputCopyRef} />
-            <Toolbar itensLogica={toolItens} isShow={((toolItens.length > 0) && isShowToolbar)} />
+            <Toolbar itensLogica={toolItens} isShow={((toolItens.length > 0) && showToolbar)} />
             <main key={id} className='overflow-auto flex1'>
                 <BreandCamps breadcrumbs={breadcrumbs} />
 
@@ -430,12 +436,13 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], toolItens = []
                     })}
 
                     {/* Reinderiza os itens arrastáveis na tela! */}
-                    {flowItens.list.map((item: FlowItem) => (
+                    {flowItens.list.map((item: FlowItem, index) => (
                         <ItemToDrag
                             onMouseDown={(e: any) => onMouseDown(e)}
                             onChangePosition={onChangePositionItens}
                             onMouseUp={(e: any) => onChangeFlow()}
                             onContextMenu={onContextMenu}
+                            onNameChange={text => itemNameChange(text, index)}
                             title={item.name}
                             key={item.id}
                             {...item}
