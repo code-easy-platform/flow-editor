@@ -13,7 +13,18 @@ const itens: FlowItem[] = [
     new FlowItem({ id: '5', sucessor: ['6'], top: 500, left: 80, name: "SWITCH", itemType: ItemType.SWITCH }),
     new FlowItem({ id: '6', sucessor: ['7'], top: 600, left: 80, name: "ASSIGN", hasError: true, itemType: ItemType.ASSIGN }),
     new FlowItem({ id: '7', sucessor: ['0'], top: 700, left: 80, name: "END", itemType: ItemType.END }),
-    new FlowItem({ id: '8', sucessor: ['0'], top: 100, left: 200, width: 200, height: 100, name: "COMMENT", itemType: ItemType.COMMENT }),
+    new FlowItem({ id: '8', sucessor: ['0'], top: 100, left: 200, width: 200, height: 100, name: `COMMENT COMMENT COMMENT COMMENT COMMENT
+
+fdsf
+vdfv
+vfdvdf
+vfd
+vdf
+vfd
+
+
+
+    COMMENT`, itemType: ItemType.COMMENT }),
 ];
 const itensLogica: FlowItem[] = [
     new FlowItem({ id: '1', name: "START", itemType: ItemType.START }),
