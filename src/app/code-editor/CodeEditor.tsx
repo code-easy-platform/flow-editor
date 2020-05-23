@@ -395,9 +395,8 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
         <div className="full-width" onMouseOver={(e: any) => onMouseOver && onMouseOver(e)}>
             <InputCopy ref={inputCopyRef} />
             <Toolbar itensLogica={toolItens} isShow={((toolItens.length > 0) && showToolbar)} />
-            <main key={id} className='overflow-auto flex1'>
+            <main key={id} className='overflow-auto flex1 display-flex'>
                 <BreandCamps breadcrumbs={breadcrumbs} />
-
                 <EditorPanel
                     id={`${id}_SVG`}
                     ref={editorPanelRef}
@@ -409,6 +408,17 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
                     backgroundType={enabledSelection ? backgroundType : "custom"}
                     onContextMenu={(e: any) => (onContextMenu && enabledSelection) && onContextMenu(undefined, e)}
                 >
+
+                    {(!enabledSelection && flowItens.list.length === 0)
+                        && <foreignObject
+                            width={"100%"}
+                            height={"100%"}
+                        >
+                            <div className="full-height full-width flex-itens-center flex-content-center opacity-5">
+                                <header>{emptyMessage || "Double-click on an item in the tree to edit it"}</header>
+                            </div>
+                        </foreignObject>
+                    }
 
                     {/* Reinderiza a área de seleção na tela. */}
                     <SelectorArea
@@ -457,12 +467,6 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
                         />
                     ))}
                 </EditorPanel>
-
-                {(!enabledSelection && flowItens.list.length === 0) &&
-                    <div style={{ top: 0 }} className="absolute flex1 full-height full-width">
-                        <header style={{ alignSelf: 'center', opacity: .5 }} className="flex1">{emptyMessage || "Double-click on an item in the tree to edit it"}</header>
-                    </div>
-                }
             </main>
         </div>
     );

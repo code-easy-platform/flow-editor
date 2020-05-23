@@ -47,6 +47,7 @@ const App: React.FC = () => {
                 allowedsInDrop={[]}
                 key={"FLOW_EDITOR"}
                 toolItens={itensLogica}
+                enabledSelection={false}
                 onChangeItens={console.log}
                 // onMouseOver={console.log}
                 emptyMessage={"Drag an item on this panel to start"}

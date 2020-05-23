@@ -1,15 +1,17 @@
+@import "./animations.css";
 @import "./variables.css";
 @import "./paddings.css";
 @import "./margins.css";
+@import "./opacity.css";
 @import "./fonts.css";
 @import "./flexs.css";
 
 * {
   -webkit-user-select: none;
   -moz-user-select: -moz-none;
-  outline: --outline-padrao;
   -ms-user-select: none;
   user-select: none;
+  outline: none;
   padding: 0;
   margin: 0;
 }
@@ -94,6 +96,14 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+.text-ellipsis {
+  text-overflow: ellipsis;
+  display: inline-block;
+  white-space: nowrap;
+  text-align: start;
+  overflow: hidden;
+}
+
 /* Backgrounds base */
 .background {
   background-color: var(--main-background);
@@ -109,8 +119,16 @@ input[type="number"] {
 }
 /*  ---------------- */
 
+.input-border {
+  border: var(--input-border);
+}
+
 .border-radius {
   border-radius: var(--size-1);
+}
+
+.border-default {
+  border: thin solid var(--main-background-highlighted);
 }
 
 .box-shadow-small {
@@ -180,7 +198,6 @@ input[type="number"] {
   color: var(--color-gray-5);
   font-weight: 500;
 }
-
 
 .color-primary {
   background-color: var(--color-primary);
@@ -282,25 +299,28 @@ input[type="number"] {
   width: var(--size-x-scroll-bar-small);
 }
 
-[aria-label] {
+[info-message] {
   position: relative;
 }
 
-[aria-label]::after {
-  background-color: var(var(--main-background-bars));
+[info-message]::before {
+  background-color: var(--main-background-info);
+  box-shadow: var(--box-shadow-context-menu);
+  font-size: var(--font-size-sm);
+  border-radius: var(--size-1);
+  content: attr(info-message);
+  padding: var(--padding-xs);
   color: var(--color-white);
-  content: attr(aria-label);
-  bottom: var(--size-none);
-  text-decoration: none;
+  white-space: break-spaces;
   pointer-events: none;
-  position: absolute;
-  padding: 8px 10px;
-  font-size: 0.9em;
+  text-align: center;
+  max-width: 200px;
+  position: fixed;
   z-index: 5000;
   display: none;
-  top: 110%;
+  height: auto;
 }
 
-[aria-label]:hover::after {
+[info-message]:hover::before {
   display: block;
 }
