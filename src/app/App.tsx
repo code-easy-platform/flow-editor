@@ -49,6 +49,7 @@ const App: React.FC = () => {
                 toolItens={itensLogica}
                 onChangeItens={console.log}
                 // onMouseOver={console.log}
+                emptyMessage={"Drag an item on this panel to start"}
                 breadcrumbs={[
                     {
                         label: 'Routes',
