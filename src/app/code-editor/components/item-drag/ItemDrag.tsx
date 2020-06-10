@@ -65,8 +65,8 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
     /** Quando um item estiver selecionado e for arrastado na tale esta fun vai fazer isso acontecer. */
     const mouseMove = (e: MouseEvent) => {
         e.stopPropagation();
-        const top = e.offsetY - ((height || 0) / 2);
-        const left = e.offsetX - ((width || 0) / 2);
+        const top = e.offsetY - (height / 2);
+        const left = e.offsetX - (width / 2);
 
         if (onChangePosition) {
             onChangePosition(top, left, e as any);

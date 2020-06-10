@@ -111,21 +111,43 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
      * @param event Evento de mouse move
      */
     const onChangePositionItens = (mousePositionTop: number, mousePositionLeft: number, e?: any) => {
+        mousePositionTop = Math.round(mousePositionTop / 15) * 15;
+        mousePositionLeft = Math.round(mousePositionLeft / 15) * 15;
 
-        let components = flowItens.list.filter((item: FlowItem) => item.isSelected);
+        let components = flowItens.list.filter((item: FlowItem) => item.isSelected).sort((a, b) => ((a.top + b.top) - (a.left + b.left)));
 
         if (e && e.ctrlKey) {
             components.forEach(comp => {
+                //      64          64
                 const oldTop = comp.top;
+                //      39          39
                 const oldLeft = comp.left;
-                const distanceTop = oldTop - mousePositionTop;
-                const distanceLeft = oldLeft - mousePositionLeft;
 
-                comp.top = (oldTop + (mousePositionTop - oldTop) - distanceTop);
-                comp.left = (oldLeft + (mousePositionLeft - oldLeft) - distanceLeft);
+                //    64      64              60           64            60      -4    64       64  4        60
+                comp.top = oldTop + (mousePositionTop > oldTop ? mousePositionTop - oldTop : oldTop + mousePositionTop);
+                //    45       39             45              39           45          6    39       39    -6      45
+                comp.left = oldLeft + (mousePositionLeft > oldLeft ? mousePositionLeft - oldLeft : oldLeft - mousePositionLeft);
+
+                //             60      0       60
+                comp.top -= (oldTop - mousePositionTop);
+                //             39      0       45
+                comp.left -= (oldLeft - mousePositionLeft);
+
+
+                console.log("--------------------------------------------------------------------");
+                console.log("oldTop: " + oldTop);
+                console.log("oldLeft: " + oldLeft);
+                console.log("--------");
+                console.log("newTop: " + comp.top);
+                console.log("newLeft: " + comp.left);
+                console.log("--------");
+                //                                        90
+                console.log("mousePositionTop: " + mousePositionTop);
+                //                                        90
+                console.log("mousePositionLeft: " + mousePositionLeft);
+
             });
-        }
-        else {
+        } else {
             components.forEach(comp => {
                 const oldLeft = comp.left;
                 const oldTop = comp.top;
@@ -395,7 +417,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
         <div className="full-width" onMouseOver={(e: any) => onMouseOver && onMouseOver(e)}>
             <InputCopy ref={inputCopyRef} />
             <Toolbar itensLogica={toolItens} isShow={((toolItens.length > 0) && showToolbar)} />
-            <main key={id} className='overflow-auto flex1 display-flex'>
+            <main key={id} className='overflow-auto flex1'>
                 <BreandCamps breadcrumbs={breadcrumbs} />
                 <EditorPanel
                     id={`${id}_SVG`}
@@ -461,6 +483,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
                             onMouseDown={(e: any) => onMouseDown(e)}
                             onChangePosition={onChangePositionItens}
                             onMouseUp={(e: any) => onChangeFlow()}
+                            parentElementRef={editorPanelRef}
                             title={item.name}
                             key={item.id}
                             {...item}
