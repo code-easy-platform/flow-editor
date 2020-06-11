@@ -36,7 +36,7 @@ export const FlowEditor: FC<ICodeEditorProps> = (props: ICodeEditorProps) => {
 let backupFlow: string = "";
 
 /** Editor do fluxo. */
-const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, toolItens = [], onChangeItens = () => { }, onMouseOver, backgroundType, showToolbar = false, onDropItem = () => undefined, allowedsInDrop = [], onContextMenu, onKeyDown, breadcrumbs, enabledSelection = true }) => {
+const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, snapGridWhileDragging = true, toolItens = [], onChangeItens = () => { }, onMouseOver, backgroundType, showToolbar = false, onDropItem = () => undefined, allowedsInDrop = [], onContextMenu, onKeyDown, breadcrumbs, enabledSelection = true }) => {
 
     /** Referencia o svg onde está todos os itens de fluxo. */
     const editorPanelRef = useRef<any>(null);
@@ -71,8 +71,6 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
         const targetOffsetX: number = ((draggedOffSet.x) + (targetSize.left - targetSize.left - targetSize.left) - 25);
 
         let newItem = new FlowItem({
-            height: item.itemProps.itemType === ItemType.COMMENT ? 100 : 50,
-            width: item.itemProps.itemType === ItemType.COMMENT ? 200 : 50,
             id: Utils.getUUID().toString(),
             itemType: item.itemProps.itemType,
             name: item.itemProps.title,
@@ -111,42 +109,27 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
      * @param event Evento de mouse move
      */
     const onChangePositionItens = (mousePositionTop: number, mousePositionLeft: number, e?: any) => {
-        mousePositionTop = Math.round(mousePositionTop / 15) * 15;
-        mousePositionLeft = Math.round(mousePositionLeft / 15) * 15;
+
+        if (snapGridWhileDragging) {
+            mousePositionTop = Math.round(mousePositionTop / 15) * 15;
+            mousePositionLeft = Math.round(mousePositionLeft / 15) * 15;
+        }
 
         let components = flowItens.list.filter((item: FlowItem) => item.isSelected).sort((a, b) => ((a.top + b.top) - (a.left + b.left)));
 
+
         if (e && e.ctrlKey) {
+
             components.forEach(comp => {
-                //      64          64
+
                 const oldTop = comp.top;
-                //      39          39
                 const oldLeft = comp.left;
 
-                //    64      64              60           64            60      -4    64       64  4        60
-                comp.top = oldTop + (mousePositionTop > oldTop ? mousePositionTop - oldTop : oldTop + mousePositionTop);
-                //    45       39             45              39           45          6    39       39    -6      45
-                comp.left = oldLeft + (mousePositionLeft > oldLeft ? mousePositionLeft - oldLeft : oldLeft - mousePositionLeft);
-
-                //             60      0       60
-                comp.top -= (oldTop - mousePositionTop);
-                //             39      0       45
-                comp.left -= (oldLeft - mousePositionLeft);
-
-
-                console.log("--------------------------------------------------------------------");
-                console.log("oldTop: " + oldTop);
-                console.log("oldLeft: " + oldLeft);
-                console.log("--------");
-                console.log("newTop: " + comp.top);
-                console.log("newLeft: " + comp.left);
-                console.log("--------");
-                //                                        90
-                console.log("mousePositionTop: " + mousePositionTop);
-                //                                        90
-                console.log("mousePositionLeft: " + mousePositionLeft);
+                comp.top = mousePositionTop + (mousePositionTop > oldTop ? mousePositionTop - oldTop : oldTop - mousePositionTop);
+                comp.left = mousePositionLeft + (mousePositionLeft > oldLeft ? mousePositionLeft - oldLeft : oldLeft - mousePositionLeft);
 
             });
+
         } else {
             components.forEach(comp => {
                 const oldLeft = comp.left;
