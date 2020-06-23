@@ -9,6 +9,7 @@ interface LineProps {
     left1: number;
     left2?: number;
     color?: string;
+    isCurved?: boolean;
     lineWidth?: number;
     sucessorIndex?: number;
     lineType?: 'dotted' | 'normal';
@@ -17,7 +18,7 @@ interface LineProps {
 
 export const Line: React.FC<LineProps> = ({ id, onSucessorChange, ...props }) => {
 
-    const { lineWidth = 1, color = "var(--main-background-highlighted)", sucessorIndex, lineType = 'normal' } = props;
+    const { isCurved = false, lineWidth = 1, color = "var(--main-background-highlighted)", sucessorIndex, lineType = 'normal' } = props;
 
     let { top1 = 0, left1 = 0, left2 = 0, top2 = 0 } = props;
     if (sucessorIndex === undefined) {
@@ -88,7 +89,8 @@ export const Line: React.FC<LineProps> = ({ id, onSucessorChange, ...props }) =>
 
     return (
         <>
-            <line
+            <path
+                fill="none"
                 id={"line_" + id}
                 key={"line_" + id}
                 y1={basicPosition.top1}
@@ -98,6 +100,7 @@ export const Line: React.FC<LineProps> = ({ id, onSucessorChange, ...props }) =>
                 stroke={color || "var(--main-background-highlighted)"}
                 strokeDasharray={lineType === 'normal' ? undefined : "5,5"}
                 style={{ transform: `rotate(${rotate}deg)`, transformOrigin: `${basicPosition.left1}px ${basicPosition.top1}px` }}
+                d={`M${basicPosition.left1} ${basicPosition.top1} Q ${basicPosition.left1 - (isCurved ? 50 : 0)} ${basicPosition.top1 + (lineDistance / 2)} ${basicPosition.left1} ${basicPosition.top1 + lineDistance}`}
             />
             <path
                 id={"path_" + id}
