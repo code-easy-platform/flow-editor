@@ -17,22 +17,16 @@ interface LineProps {
     onSucessorChange?(itemId: string | undefined, sucessorId: string, branchIndex: number | undefined): void;
 }
 
-export const Line: React.FC<LineProps> = ({ id, onSucessorChange, ...props }) => {
+export const Line: React.FC<LineProps> = ({ id, onSucessorChange, top1 = 0, left1 = 0, left2 = 0, top2 = 0, ...props }) => {
 
     const { isCurved = false, lineText = "", lineWidth = 1, color = "var(--main-background-highlighted)", sucessorIndex, lineType = 'normal' } = props;
 
-    let { top1 = 0, left1 = 0, left2 = 0, top2 = 0 } = props;
     if (sucessorIndex === undefined) {
         top2 = top1 + 85;
         left2 = left1;
     }
 
-    const [basicPosition, setBasicPosition] = useState({
-        top1: top1,
-        top2: top2,
-        left1: left1,
-        left2: left2,
-    });
+    const [basicPosition, setBasicPosition] = useState({ top1: top1, top2: top2, left1: left1, left2: left2 });
     useEffect(() => {
         setBasicPosition({
             top1: top1,
@@ -42,20 +36,17 @@ export const Line: React.FC<LineProps> = ({ id, onSucessorChange, ...props }) =>
         });
     }, [left1, left2, top1, top2]);
 
-
-    const isDragging = ((basicPosition.top2 !== top2) || (basicPosition.left2 !== left2));
-
+    const polygonTop: number = (basicPosition.top2 - 50);
     const polygonLeft: number = (basicPosition.left2 - 5);
     const polygonRight: number = (basicPosition.left2 + 5);
     const polygonBottonCenter: number = basicPosition.left2;
-    const polygonTop: number = (basicPosition.top2 - (isDragging ? 10 : 50));
-    const polygonBotton: number = (basicPosition.top2 - (isDragging ? 0 : 40));
+    const polygonBotton: number = (basicPosition.top2 - 40);
 
     /** Encontra o ângulo para rotação da linha */
     const rotate = Utils.getAngle(basicPosition.left2, basicPosition.top2, basicPosition.left1, basicPosition.top1);
 
     /** Encontra a hipotenusa do triângulo que é formado x1-y1 e x2 e y2 */
-    const lineDistance = (Math.hypot((basicPosition.top2 - basicPosition.top1), (basicPosition.left2 - basicPosition.left1)) - (isDragging ? 0 : 40));
+    const lineDistance = (Math.hypot((basicPosition.top2 - basicPosition.top1), (basicPosition.left2 - basicPosition.left1)) - 40);
 
     const mouseMove = (event: MouseEvent) => {
         setBasicPosition({
@@ -72,12 +63,7 @@ export const Line: React.FC<LineProps> = ({ id, onSucessorChange, ...props }) =>
         window.onmousemove = null;
         document.body.style.cursor = 'unset';
 
-        setBasicPosition({
-            top1: top1,
-            top2: top2,
-            left1: left1,
-            left2: left2,
-        });
+        setBasicPosition({ top1: top1, top2: top2, left1: left1, left2: left2 });
 
         onSucessorChange && onSucessorChange(id, e.target.id, sucessorIndex);
     }

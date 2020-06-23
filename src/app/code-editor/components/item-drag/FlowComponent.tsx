@@ -17,7 +17,7 @@ export const FlowComponent: React.FC<FlowComponentProps> = ({ id, isSelected, wi
     const strokeColor: string = isSelected ? "var(--color-botton-bar)" : hasError ? "var(--main-error-color)" : "transparent";
 
     return (
-        <>
+        <g>
             <rect
                 strokeWidth="var(--main-border-width)"
                 style={{ cursor: 'move', zIndex: 2 }}
@@ -53,6 +53,6 @@ export const FlowComponent: React.FC<FlowComponentProps> = ({ id, isSelected, wi
                 x={left}
                 y={top}
             />
-        </>
+        </g>
     );
 }
