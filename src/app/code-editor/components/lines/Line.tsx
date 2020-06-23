@@ -9,6 +9,7 @@ interface LineProps {
     left1: number;
     left2?: number;
     color?: string;
+    lineText?: string;
     isCurved?: boolean;
     lineWidth?: number;
     sucessorIndex?: number;
@@ -18,7 +19,7 @@ interface LineProps {
 
 export const Line: React.FC<LineProps> = ({ id, onSucessorChange, ...props }) => {
 
-    const { isCurved = false, lineWidth = 1, color = "var(--main-background-highlighted)", sucessorIndex, lineType = 'normal' } = props;
+    const { isCurved = false, lineText = "", lineWidth = 1, color = "var(--main-background-highlighted)", sucessorIndex, lineType = 'normal' } = props;
 
     let { top1 = 0, left1 = 0, left2 = 0, top2 = 0 } = props;
     if (sucessorIndex === undefined) {
@@ -89,6 +90,16 @@ export const Line: React.FC<LineProps> = ({ id, onSucessorChange, ...props }) =>
 
     return (
         <>
+            <g style={{ transform: `rotate(${rotate}deg)`, transformOrigin: `${basicPosition.left1}px ${basicPosition.top1}px` }}>
+                <text
+                    fontSize={"small"}
+                    textAnchor={"middle"}
+                    x={basicPosition.left1}
+                    fill={"var(--color-white)"}
+                    y={basicPosition.top1 + (lineDistance / 2) + (isCurved ? 35 : -5)}
+                    style={{ transform: `rotate(${90}deg)`, transformOrigin: `${basicPosition.left1}px ${basicPosition.top1 + (lineDistance / 2)}px` }}
+                >{lineText}</text>
+            </g>
             <path
                 fill="none"
                 id={"line_" + id}
@@ -100,7 +111,7 @@ export const Line: React.FC<LineProps> = ({ id, onSucessorChange, ...props }) =>
                 stroke={color || "var(--main-background-highlighted)"}
                 strokeDasharray={lineType === 'normal' ? undefined : "5,5"}
                 style={{ transform: `rotate(${rotate}deg)`, transformOrigin: `${basicPosition.left1}px ${basicPosition.top1}px` }}
-                d={`M${basicPosition.left1} ${basicPosition.top1} Q ${basicPosition.left1 - (isCurved ? 50 : 0)} ${basicPosition.top1 + (lineDistance / 2)} ${basicPosition.left1} ${basicPosition.top1 + lineDistance}`}
+                d={`M${basicPosition.left1} ${basicPosition.top1} Q${basicPosition.left1 - (isCurved ? 50 : 0)} ${basicPosition.top1 + (lineDistance / 2)} ${basicPosition.left1} ${basicPosition.top1 + lineDistance}`}
             />
             <path
                 id={"path_" + id}
