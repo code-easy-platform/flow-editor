@@ -79,9 +79,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = (props: ItemDragProps) => {
         const top = e.offsetY - cliquedLocationFlowItem.top;
         const left = e.offsetX - cliquedLocationFlowItem.left;
 
-        if (onChangePosition) {
-            onChangePosition(top, left, e as any);
-        }
+        onChangePosition && onChangePosition(top, left, e as any);
 
     }
 
