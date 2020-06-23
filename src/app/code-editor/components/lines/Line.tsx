@@ -16,133 +16,103 @@ interface LineProps {
 }
 
 export const Line: React.FC<LineProps> = ({ id, onSucessorChange, ...props }) => {
-    let { top1 = 0, left2 = 0, top2 = 0 } = props;
-    const {
-        lineWidth = 1, color = "var(--main-background-highlighted)", left1,
-        sucessorIndex, lineType = 'normal',
-    } = props;
 
+    const { lineWidth = 1, color = "var(--main-background-highlighted)", sucessorIndex, lineType = 'normal' } = props;
+
+    let { top1 = 0, left1 = 0, left2 = 0, top2 = 0 } = props;
     if (sucessorIndex === undefined) {
-        top2 = top1 + 95;
+        top2 = top1 + 85;
         left2 = left1;
     }
 
-
-    const polygonTop: number = (top2 - 50);
-    const polygonLeft: number = (left2 - 5);
-    const polygonRight: number = (left2 + 5);
-    const polygonBottonCenter: number = left2;
-    const polygonBotton: number = (top2 - 40);
-
-
-    const [isSelected, setIsSelected] = useState(false);
-    const [position, setPosition] = useState({
-        polygonTop: polygonTop,
-        polygonLeft: polygonLeft,
-        polygonRight: polygonRight,
-        polygonBotton: polygonBotton,
-        polygonBottonCenter: polygonBottonCenter,
+    const [basicPosition, setBasicPosition] = useState({
+        top1: top1,
+        top2: top2,
+        left1: left1,
+        left2: left2,
     });
     useEffect(() => {
-        setPosition({
-            polygonTop: polygonTop,
-            polygonLeft: polygonLeft,
-            polygonRight: polygonRight,
-            polygonBotton: polygonBotton,
-            polygonBottonCenter: polygonBottonCenter
+        setBasicPosition({
+            top1: top1,
+            top2: top2,
+            left1: left1,
+            left2: left2,
         });
-    }, [polygonTop, polygonLeft, polygonRight, polygonBotton, polygonBottonCenter]);
+    }, [left1, left2, top1, top2]);
 
 
-    // let rotate: number = 0;
-    let rotate: number = Utils.getAngle(isSelected ? position.polygonLeft : left2, isSelected ? position.polygonTop : top2, left1, top1);
+    const isDragging = ((basicPosition.top2 !== top2) || (basicPosition.left2 !== left2));
 
+    const polygonLeft: number = (basicPosition.left2 - 5);
+    const polygonRight: number = (basicPosition.left2 + 5);
+    const polygonBottonCenter: number = basicPosition.left2;
+    const polygonTop: number = (basicPosition.top2 - (isDragging ? 10 : 50));
+    const polygonBotton: number = (basicPosition.top2 - (isDragging ? 0 : 40));
+
+    /** Encontra o ângulo para rotação da linha */
+    const rotate = Utils.getAngle(basicPosition.left2, basicPosition.top2, basicPosition.left1, basicPosition.top1);
+
+    /** Encontra a hipotenusa do triângulo que é formado x1-y1 e x2 e y2 */
+    const lineDistance = (Math.hypot((basicPosition.top2 - basicPosition.top1), (basicPosition.left2 - basicPosition.left1)) - (isDragging ? 0 : 40));
 
     const mouseMove = (event: MouseEvent) => {
-        setPosition({
-            polygonTop: event.offsetY - 10,
-            polygonLeft: event.offsetX - 5,
-            polygonRight: event.offsetX + 5,
-            polygonBotton: event.offsetY,
-            polygonBottonCenter: event.offsetX
+        setBasicPosition({
+            ...basicPosition,
+            top2: event.offsetY,
+            left2: event.offsetX,
         });
     }
 
     const onMouseUp = (e: any) => {
         e.stopPropagation();
-        setIsSelected(false);
 
         window.onmouseup = null;
         window.onmousemove = null;
-
         document.body.style.cursor = 'unset';
 
-        setPosition({
-            polygonTop: polygonTop,
-            polygonLeft: polygonLeft,
-            polygonRight: polygonRight,
-            polygonBotton: polygonBotton,
-            polygonBottonCenter: polygonBottonCenter
+        setBasicPosition({
+            top1: top1,
+            top2: top2,
+            left1: left1,
+            left2: left2,
         });
 
         onSucessorChange && onSucessorChange(id, e.target.id, sucessorIndex);
-
     }
 
     const onMouseDown = () => {
+        document.body.style.cursor = 'crosshair';
         window.onmousemove = mouseMove;
         window.onmouseup = onMouseUp;
-
-        document.body.style.cursor = 'crosshair';
-
-        setIsSelected(true);
     }
 
     return (
         <>
             <line
-                y1={top1}
-                x1={left1}
                 id={"line_" + id}
                 key={"line_" + id}
-                x2={isSelected ? position.polygonLeft + 5 : left2}
+                y1={basicPosition.top1}
+                x1={basicPosition.left1}
+                x2={basicPosition.left1}
+                y2={basicPosition.top1 + lineDistance}
                 stroke={color || "var(--main-background-highlighted)"}
                 strokeDasharray={lineType === 'normal' ? undefined : "5,5"}
-                y2={isSelected ? position.polygonTop + 10 : sucessorIndex === undefined ? top2 - 50 : top2}
+                style={{ transform: `rotate(${rotate}deg)`, transformOrigin: `${basicPosition.left1}px ${basicPosition.top1}px` }}
             />
-            {(sucessorIndex !== undefined && !isSelected) &&
-                <rect
-                    id={id}
-                    rx={50}
-                    ry={50}
-                    width="80"
-                    height="80"
-                    key={"rect_" + id}
-                    y={position.polygonTop + 10}
-                    x={position.polygonLeft - 35}
-                    fill={"var(--main-background)"}
-                />
-            }
             <path
                 id={"path_" + id}
                 key={"path_" + id}
                 onMouseDown={onMouseDown}
                 fill={"var(--main-background)"}
+                d={`M${polygonLeft} ${polygonTop} L${polygonBottonCenter} ${polygonBotton} L${polygonRight} ${polygonTop} Z`}
                 style={{
                     cursor: 'crosshair',
                     strokeWidth: lineWidth,
                     transform: `rotate(${rotate}deg)`,
                     fill: color || "var(--main-background-highlighted)",
                     stroke: color || "var(--main-background-highlighted)",
-                    transformOrigin: `${isSelected ? position.polygonLeft + 5 : left2}px ${isSelected ? position.polygonTop + 10 : top2}px`,
+                    transformOrigin: `${basicPosition.left2}px ${basicPosition.top2}px`,
                 }}
-                d={`
-                    M${isSelected ? position.polygonLeft : polygonLeft}
-                    ${isSelected ? position.polygonTop : polygonTop}
-                    L${isSelected ? position.polygonBottonCenter : polygonBottonCenter}
-                    ${isSelected ? position.polygonBotton : polygonBotton}
-                    L${isSelected ? position.polygonRight : polygonRight}
-                    ${isSelected ? position.polygonTop : polygonTop} Z`}
             />
         </>
     );
