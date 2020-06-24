@@ -32,8 +32,8 @@ export const FlowComponent: React.FC<FlowComponentProps> = ({ id, isSelected, wi
                 id={id}
             />
             <rect
+                style={{ cursor: 'move', zIndex: 2, pointerEvents: 'none' }}
                 strokeWidth="var(--main-border-width)"
-                style={{ cursor: 'move', zIndex: 2 }}
                 fill="var(--main-background)"
                 strokeLinejoin="round"
                 height={height}

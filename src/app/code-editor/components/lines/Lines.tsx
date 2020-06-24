@@ -32,7 +32,6 @@ export const Lines: React.FC<LinesProps> = ({ itensSucessores, item, onSucessorC
                 top1={(item.top || 0) + (item.height || 0) / 2}
                 key={item.id + "_" + sucessorItem.id}
                 onSucessorChange={onSucessorChange}
-                lineText={"true"}
                 sucessorIndex={index}
                 isCurved={isCurved}
                 color={"gray"}

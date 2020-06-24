@@ -28,7 +28,7 @@ export interface ItemDragProps {
     onMouseOver?(e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
     onMouseDown?(e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
     onContextMenu?(data?: any, e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
-    onChangePosition?(top: number, left: number, e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
+    onChangePosition?(top: number, left: number, itemId: string | undefined, e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
 
 /** Usado para representar os itens de lógica no fluxo do editor e na toolbar. */
@@ -68,7 +68,7 @@ export const ItemToDrag: React.FC<ItemDragProps> = ({ title, ...props }: ItemDra
         const top = e.offsetY - cliquedLocationFlowItem.top;
         const left = e.offsetX - cliquedLocationFlowItem.left;
 
-        onChangePosition && onChangePosition(top, left, e as any);
+        onChangePosition && onChangePosition(top, left, id, e as any);
 
     }
 

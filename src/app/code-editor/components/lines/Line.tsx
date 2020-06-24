@@ -90,14 +90,10 @@ export const Line: React.FC<LineProps> = ({ id, onSucessorChange, top1 = 0, left
                 fill="none"
                 id={"line_" + id}
                 key={"line_" + id}
-                y1={basicPosition.top1}
-                x1={basicPosition.left1}
-                x2={basicPosition.left1}
-                y2={basicPosition.top1 + lineDistance}
                 stroke={color || "var(--main-background-highlighted)"}
                 strokeDasharray={lineType === 'normal' ? undefined : "5,5"}
                 style={{ transform: `rotate(${rotate}deg)`, transformOrigin: `${basicPosition.left1}px ${basicPosition.top1}px` }}
-                d={`M${basicPosition.left1} ${basicPosition.top1} Q${basicPosition.left1 - (isCurved ? 50 : 0)} ${basicPosition.top1 + (lineDistance / 2)} ${basicPosition.left1} ${basicPosition.top1 + lineDistance}`}
+                d={`M${basicPosition.left1} ${basicPosition.top1 + 30} Q${basicPosition.left1 - (isCurved ? 50 : 0)} ${basicPosition.top1 + (lineDistance / 2)} ${basicPosition.left1} ${basicPosition.top1 + lineDistance}`}
             />
             <path
                 id={"path_" + id}
