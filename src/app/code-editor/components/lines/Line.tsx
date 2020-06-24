@@ -14,12 +14,13 @@ interface LineProps {
     lineWidth?: number;
     sucessorIndex?: number;
     lineType?: 'dotted' | 'normal';
+    lineOnMouseDown?(e: React.MouseEvent<SVGPathElement, MouseEvent>):void;
     onSucessorChange?(itemId: string | undefined, sucessorId: string, branchIndex: number | undefined): void;
 }
 
 export const Line: React.FC<LineProps> = ({ id, onSucessorChange, top1 = 0, left1 = 0, left2 = 0, top2 = 0, ...props }) => {
 
-    const { isCurved = false, lineText = "", lineWidth = 1, color = "var(--main-background-highlighted)", sucessorIndex, lineType = 'normal' } = props;
+    const { isCurved = false, lineText = "", lineOnMouseDown, lineWidth = 1, color = "var(--main-background-highlighted)", sucessorIndex, lineType = 'normal' } = props;
 
     if (sucessorIndex === undefined) {
         top2 = top1 + 85;
@@ -90,6 +91,7 @@ export const Line: React.FC<LineProps> = ({ id, onSucessorChange, top1 = 0, left
                 fill="none"
                 id={"line_" + id}
                 key={"line_" + id}
+                onMouseDown={lineOnMouseDown}
                 stroke={color || "var(--main-background-highlighted)"}
                 strokeDasharray={lineType === 'normal' ? undefined : "5,5"}
                 style={{ transform: `rotate(${rotate}deg)`, transformOrigin: `${basicPosition.left1}px ${basicPosition.top1}px` }}

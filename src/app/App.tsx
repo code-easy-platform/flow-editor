@@ -6,14 +6,14 @@ import './App.css';
 
 
 const itens: FlowItem[] = [
-    new FlowItem({ id: '1', sucessor: ['2'], top: 105, left: 90, name: "START", itemType: ItemType.START }),
-    new FlowItem({ id: '2', sucessor: ['3', '0'], top: 210, left: 90, name: "IF", itemType: ItemType.IF }),
-    new FlowItem({ id: '3', sucessor: ['4'], top: 315, left: 90, name: "FOREACH", itemType: ItemType.FOREACH }),
-    new FlowItem({ id: '4', sucessor: ['5'], top: 420, left: 90, name: "ACTION", itemType: ItemType.ACTION }),
-    new FlowItem({ id: '5', sucessor: ['6'], top: 525, left: 90, name: "SWITCH", itemType: ItemType.SWITCH }),
-    new FlowItem({ id: '6', sucessor: ['7'], top: 630, left: 90, name: "ASSIGN", itemType: ItemType.ASSIGN }),
-    new FlowItem({ id: '7', sucessor: ['0'], top: 735, left: 90, name: "END", itemType: ItemType.END }),
-    new FlowItem({ id: '8', sucessor: ['0'], top: 105, left: 200, name: `COMMENT`, itemType: ItemType.COMMENT }),
+    new FlowItem({ id: '1', connections: [{ conectionId: '2' }], top: 105, left: 90, name: "START", itemType: ItemType.START }),
+    new FlowItem({ id: '2', connections: [{ conectionId: '3', connectionLabel: 'True' }, { conectionId: '0' }], top: 210, left: 90, name: "IF", itemType: ItemType.IF }),
+    new FlowItem({ id: '3', connections: [{ conectionId: '4', connectionLabel: 'Circle' }, { conectionId: '5' }], top: 370, left: 90, name: "FOREACH", itemType: ItemType.FOREACH }),
+    new FlowItem({ id: '4', connections: [{ conectionId: '3' }], top: 370, left: 280, name: "ACTION", itemType: ItemType.ACTION }),
+    new FlowItem({ id: '5', connections: [{ conectionId: '6' }], top: 525, left: 90, name: "SWITCH", itemType: ItemType.SWITCH }),
+    new FlowItem({ id: '6', connections: [{ conectionId: '7' }], top: 630, left: 90, name: "ASSIGN", itemType: ItemType.ASSIGN }),
+    new FlowItem({ id: '7', connections: [{ conectionId: '0' }], top: 735, left: 90, name: "END", itemType: ItemType.END }),
+    new FlowItem({ id: '8', connections: [{ conectionId: '0' }], top: 105, left: 200, name: `COMMENT`, itemType: ItemType.COMMENT }),
 ];
 const itensLogica: FlowItem[] = [
     new FlowItem({ id: '1', name: "START", itemType: ItemType.START }),

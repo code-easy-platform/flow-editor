@@ -1,10 +1,16 @@
 import { Coords } from "../shared/Interfaces/CodeEditorInterfaces";
 
+export interface IConnections {
+    connectionLabel?: string;
+    isSelected?: boolean;
+    conectionId: string;
+}
+
 export interface ItemFluxo {
+    connections: IConnections[];
     id: string | undefined;
     isSelected: boolean;
     hasError?: boolean;
-    sucessor: string[];
     itemType: ItemType;
     height: number;
     width: number;
@@ -32,9 +38,9 @@ export class FlowItem implements ItemFluxo {
 
     public itemType: ItemType = ItemType.START;
     public id: string | undefined = undefined;
+    public connections: IConnections[] = [];
     public isSelected: boolean = false;
     public hasError?: boolean = false;
-    public sucessor: string[] = [];
     public height: number = 50;
     public width: number = 50;
     public name: string = "";
@@ -44,9 +50,9 @@ export class FlowItem implements ItemFluxo {
 
     constructor(
         private props: {
+            connections?: IConnections[],
             id: string | undefined,
             isSelected?: boolean,
-            sucessor?: string[],
             hasError?: boolean,
             itemType: ItemType,
             height?: number,
@@ -58,7 +64,7 @@ export class FlowItem implements ItemFluxo {
         }
     ) {
         this.isSelected = this.props.isSelected || false;
-        this.sucessor = this.props.sucessor || [];
+        this.connections = this.props.connections || [];
         this.height = this.props.height || 50;
         this.itemType = this.props.itemType;
         this.hasError = this.props.hasError;
@@ -88,5 +94,17 @@ export class FlowItem implements ItemFluxo {
             )
         );
     };
+
+    public connectionSelect(conectionId: string | undefined) {
+
+        if (!conectionId) return;
+
+        this.connections.forEach(connection => {
+            if (connection.conectionId === conectionId) {
+                connection.isSelected = true;
+            }
+        });
+
+    }
 
 }
