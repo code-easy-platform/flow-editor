@@ -5,11 +5,12 @@ import { Line } from './Line';
 
 interface LinesProps {
     item: FlowItem;
+    disableOpacity: number;
     isUseNewBranch: boolean;
     itemsConnections: FlowItem[];
     onSucessorChange(itemId: string | undefined, sucessorId: string, branchIndex: number | undefined): void;
 };
-export const Lines: React.FC<LinesProps> = ({ itemsConnections, item, onSucessorChange, isUseNewBranch }) => {
+export const Lines: React.FC<LinesProps> = ({ itemsConnections, item, onSucessorChange, isUseNewBranch, disableOpacity }) => {
     return <>
         {itemsConnections.map((itemConnection: FlowItem, index: number) => {
 
@@ -24,10 +25,10 @@ export const Lines: React.FC<LinesProps> = ({ itemsConnections, item, onSucessor
             const top2 = itemConnection ? itemConnection.top + (itemConnection.height / 2) : item.top + (item.height / 2);
 
             /** Valida se a linha deve estar curvada para facilitar a visualização */
-            const isCurved = itemConnection.connections.some(connection => connection.conectionId === item.id);
+            const isCurved = itemConnection.connections.some(connection => connection.connectionId === item.id);
 
             /** Busca a connection que está criando esta linha */
-            const connection = item.connections.find(connection => connection.conectionId === itemConnection.id);
+            const connection = item.connections.find(connection => connection.connectionId === itemConnection.id);
 
             return <Line
                 lineOnMouseDown={() => itemConnection.connectionSelect(itemConnection.id)}
@@ -38,6 +39,8 @@ export const Lines: React.FC<LinesProps> = ({ itemsConnections, item, onSucessor
                 key={item.id + "_" + itemConnection.id}
                 lineText={connection?.connectionLabel}
                 onSucessorChange={onSucessorChange}
+                disableOpacity={disableOpacity}
+                isDisabled={item.isDisabled}
                 sucessorIndex={index}
                 isCurved={isCurved}
                 left2={left2}
@@ -52,10 +55,11 @@ export const Lines: React.FC<LinesProps> = ({ itemsConnections, item, onSucessor
             <Line
                 left1={(item.left || 0) + ((item.width || 0) / 2)}
                 top1={(item.top || 0) + (item.height || 0) / 2}
-                color={"gray"}
                 left2={item.left + (item.width / 2)}
                 top2={item.top + (item.height + 20)}
                 onSucessorChange={onSucessorChange}
+                disableOpacity={disableOpacity}
+                color={"gray"}
                 key={item.id}
                 id={item.id}
             />

@@ -3,12 +3,14 @@ import { Coords } from "../shared/Interfaces/CodeEditorInterfaces";
 export interface IConnections {
     connectionLabel?: string;
     isSelected?: boolean;
-    conectionId: string;
+    connectionId: string;
 }
 
 export interface ItemFluxo {
     connections: IConnections[];
+    select(coords: Coords): any;
     id: string | undefined;
+    isDisabled?: boolean;
     isSelected: boolean;
     hasError?: boolean;
     itemType: ItemType;
@@ -18,7 +20,6 @@ export interface ItemFluxo {
     left: number;
     top: number;
     icon: any;
-    select(coords: Coords): any;
 }
 
 /** Tipos de itens existentes na toolbar. */
@@ -39,6 +40,7 @@ export class FlowItem implements ItemFluxo {
     public itemType: ItemType = ItemType.START;
     public id: string | undefined = undefined;
     public connections: IConnections[] = [];
+    public isDisabled?: boolean = false;
     public isSelected: boolean = false;
     public hasError?: boolean = false;
     public height: number = 50;
@@ -53,6 +55,7 @@ export class FlowItem implements ItemFluxo {
             connections?: IConnections[],
             id: string | undefined,
             isSelected?: boolean,
+            isDisabled?: boolean,
             hasError?: boolean,
             itemType: ItemType,
             height?: number,
@@ -65,6 +68,7 @@ export class FlowItem implements ItemFluxo {
     ) {
         this.isSelected = this.props.isSelected || false;
         this.connections = this.props.connections || [];
+        this.isDisabled = this.props.isDisabled;
         this.height = this.props.height || 50;
         this.itemType = this.props.itemType;
         this.hasError = this.props.hasError;
@@ -95,12 +99,12 @@ export class FlowItem implements ItemFluxo {
         );
     };
 
-    public connectionSelect(conectionId: string | undefined) {
+    public connectionSelect(connectionId: string | undefined) {
 
-        if (!conectionId) return;
+        if (!connectionId) return;
 
         this.connections.forEach(connection => {
-            if (connection.conectionId === conectionId) {
+            if (connection.connectionId === connectionId) {
                 connection.isSelected = true;
             }
         });

@@ -36,7 +36,7 @@ export const FlowEditor: FC<ICodeEditorProps> = (props: ICodeEditorProps) => {
 let backupFlow: string = "";
 
 /** Editor do fluxo. */
-const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, snapGridWhileDragging = true, toolItens = [], onChangeItens = () => { }, onMouseOver, backgroundType, showToolbar = false, onDropItem = () => undefined, allowedsInDrop = [], onContextMenu, onKeyDown, breadcrumbs, enabledSelection = true }) => {
+const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], disableOpacity = 0.3, emptyMessage, snapGridWhileDragging = true, toolItens = [], onChangeItens = () => { }, onMouseOver, backgroundType, showToolbar = false, onDropItem = () => undefined, allowedsInDrop = [], onContextMenu, onKeyDown, breadcrumbs, enabledSelection = true }) => {
 
     /** Referencia o svg onde está todos os itens de fluxo. */
     const editorPanelRef = useRef<any>(null);
@@ -191,13 +191,13 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
 
         // No caso de vim undefined significa que é um novo branch.
         // Caso se o item já esteja na lista como sucessor, remove e adiciona novamente.
-        if (branchIndex === undefined && !itemCurrent.connections.some(connection => id === connection.conectionId)) {
-            itemCurrent.connections.push({ conectionId: sucessorId });
+        if (branchIndex === undefined && !itemCurrent.connections.some(connection => id === connection.connectionId)) {
+            itemCurrent.connections.push({ connectionId: sucessorId });
         } else {
             /* const indexToRemove = itemCurrent.sucessor.findIndex(id => id === sucessorId); */
 
             if (branchIndex !== undefined) {
-                itemCurrent.connections[branchIndex].conectionId = sucessorId;
+                itemCurrent.connections[branchIndex].connectionId = sucessorId;
             }
         }
 
@@ -295,8 +295,8 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
                     components.forEach((depende, dependeIndex) => {
                         if (depende.id !== item.id) {
                             depende.connections.forEach((connection, index) => {
-                                if (connection.conectionId === item.id) {
-                                    components2[dependeIndex].connections[index].conectionId = newId;
+                                if (connection.connectionId === item.id) {
+                                    components2[dependeIndex].connections[index].connectionId = newId;
                                     // sucessorIndex = index;
                                 }
                             });
@@ -357,11 +357,14 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
 
         /** Remove o item que estiver selecionado no fluxo. */
         const onRemoveItem = () => {
+
+            /** Index do item selecionado que está sendo removido */
             const itemCurrentIndex = flowItens.list.findIndex((item: FlowItem) => item.isSelected);
             if (itemCurrentIndex === -1) return;
 
-            const itemAntecessorIndex = flowItens.list.findIndex((item: FlowItem) => item.connections[0].conectionId === flowItens.list[itemCurrentIndex].id);
-            if (itemAntecessorIndex !== -1) { flowItens.list[itemAntecessorIndex].connections[0].conectionId = '0'; }
+            /** Index do item antecessor ao item que será removido */
+            const itemAntecessorIndex = flowItens.list.findIndex((item: FlowItem) => item.connections.some(connection => connection.connectionId === flowItens.list[itemCurrentIndex].id));
+            if (itemAntecessorIndex !== -1) { flowItens.list[itemAntecessorIndex].connections[0].connectionId = '0'; }
 
             flowItens.list.splice(itemCurrentIndex, 1);
 
@@ -450,7 +453,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
 
                         const itemsConnections: FlowItem[] = flowItens
                             .list.filter((sucessorItem: FlowItem) => (sucessorItem.id !== undefined)
-                                ? item.connections.some(connection => sucessorItem.id === connection.conectionId)
+                                ? item.connections.some(connection => sucessorItem.id === connection.connectionId)
                                 : false
                             );
 
@@ -458,6 +461,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
                         return <Lines
                             key={index}
                             item={item}
+                            disableOpacity={disableOpacity}
                             onSucessorChange={changeSucessor}
                             itemsConnections={itemsConnections}
                             isUseNewBranch={InternalUtils.useNewBranch(itemsConnections.length, item.itemType)}
@@ -473,6 +477,8 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, itens = [], emptyMessage, 
                             onChangePosition={onChangePositionItens}
                             parentElementRef={editorPanelRef}
                             onMouseUp={() => onChangeFlow()}
+                            disableOpacity={disableOpacity}
+                            isDisabled={item.isDisabled}
                             onMouseDown={onMouseDown}
                             title={item.name}
                             key={item.id}
