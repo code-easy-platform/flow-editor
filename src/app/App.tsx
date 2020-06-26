@@ -5,7 +5,7 @@ import { FlowEditor } from './code-editor/CodeEditor';
 import './App.css';
 
 
-const itens: FlowItem[] = [
+const items: FlowItem[] = [
     new FlowItem({ id: '1', connections: [{ connectionId: '2' }], isDisabled:true, top: 105, left: 90, name: "START", itemType: ItemType.START }),
     new FlowItem({ id: '2', connections: [{ connectionId: '3', connectionLabel: 'True' }, { connectionId: '0' }], top: 210, left: 90, name: "IF", itemType: ItemType.IF }),
     new FlowItem({ id: '3', connections: [{ connectionId: '4', connectionLabel: 'Circle' }, { connectionId: '5' }], top: 370, left: 90, name: "FOREACH", itemType: ItemType.FOREACH }),
@@ -15,7 +15,7 @@ const itens: FlowItem[] = [
     new FlowItem({ id: '7', connections: [{ connectionId: '0' }], top: 735, left: 90, name: "END", itemType: ItemType.END }),
     new FlowItem({ id: '8', connections: [{ connectionId: '0' }], top: 105, left: 200, name: `COMMENT`, itemType: ItemType.COMMENT }),
 ];
-const itensLogica: FlowItem[] = [
+const itemsLogica: FlowItem[] = [
     new FlowItem({ id: '1', name: "START", itemType: ItemType.START }),
     new FlowItem({ id: '2', name: "ACTION", itemType: ItemType.ACTION }),
     new FlowItem({ id: '3', name: "IF", itemType: ItemType.IF }),
@@ -31,14 +31,14 @@ const App: React.FC = () => {
     return (
         <div className="App">
             <FlowEditor
-                itens={itens}
+                items={items}
                 id={"FLOW_EDITOR"}
                 showToolbar={true}
                 allowedsInDrop={[]}
                 key={"FLOW_EDITOR"}
-                toolItens={itensLogica}
-                //enabledSelection={false}
-                onChangeItens={console.log}
+                toolItems={itemsLogica}
+                // enabledSelection={false}
+                onChangeItems={console.log}
                 // onMouseOver={console.log}
                 emptyMessage={"Drag an item on this panel to start"}
                 breadcrumbs={[
