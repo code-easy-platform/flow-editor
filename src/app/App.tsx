@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { ItemType, FlowItem } from './code-editor/models/ItemFluxo';
+import { ItemType } from './code-editor/shared/enums/ItemType';
+import { FlowItem } from './code-editor/models/ItemFluxo';
 import { FlowEditor } from './code-editor/CodeEditor';
 import './App.css';
-
 
 const items: FlowItem[] = [
     new FlowItem({ id: '1', connections: [{ connectionId: '2' }], isDisabled:true, top: 105, left: 90, name: "START", itemType: ItemType.START }),
@@ -27,7 +27,6 @@ const itemsLogica: FlowItem[] = [
 ];
 
 const App: React.FC = () => {
-
     return (
         <div className="App">
             <FlowEditor
@@ -42,14 +41,8 @@ const App: React.FC = () => {
                 // onMouseOver={console.log}
                 emptyMessage={"Drag an item on this panel to start"}
                 breadcrumbs={[
-                    {
-                        label: 'Routes',
-                        onClick: console.log,
-                    },
-                    {
-                        label: 'authenticate',
-                        onClick: console.log,
-                    }
+                    { label: 'Routes', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
                 ]}
             />
         </div>

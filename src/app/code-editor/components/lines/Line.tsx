@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Utils } from 'code-easy-components';
 
 /** Propriedades aceitas pela linha. */
-interface LineProps {
+interface ILineProps {
     id: string;
     top1: number;
     top2?: number;
@@ -20,7 +20,7 @@ interface LineProps {
     onSucessorChange?(itemId: string | undefined, sucessorId: string, branchIndex: number | undefined): void;
 }
 
-export const Line: React.FC<LineProps> = ({ id, onSucessorChange, top1 = 0, left1 = 0, left2 = 0, top2 = 0, ...props }) => {
+export const Line: React.FC<ILineProps> = ({ id, onSucessorChange, top1 = 0, left1 = 0, left2 = 0, top2 = 0, ...props }) => {
 
     const { isCurved = false, lineText = "", disableOpacity, isDisabled = false, lineOnMouseDown, lineWidth = 1, color = "var(--main-background-highlighted)", sucessorIndex, lineType = 'normal' } = props;
 
@@ -34,7 +34,7 @@ export const Line: React.FC<LineProps> = ({ id, onSucessorChange, top1 = 0, left
         top2: top2,
         left1: left1,
         left2: left2,
-        isLeftToRight: (left2 > left1),
+        isLeftToRight: (left2 >= left1),
         rotate: Utils.getAngle(left2, top2, left1, top1),
         lineDistance: (Math.hypot((top2 - top1), (left2 - left1)) - 40),
     });
@@ -44,7 +44,7 @@ export const Line: React.FC<LineProps> = ({ id, onSucessorChange, top1 = 0, left
             top2: top2,
             left1: left1,
             left2: left2,
-            isLeftToRight: (left2 > left1),
+            isLeftToRight: (left2 >= left1),
             rotate: Utils.getAngle(left2, top2, left1, top1),
             lineDistance: (Math.hypot((top2 - top1), (left2 - left1)) - 40),
         });
@@ -61,9 +61,9 @@ export const Line: React.FC<LineProps> = ({ id, onSucessorChange, top1 = 0, left
             ...basicPosition,
             top2: event.offsetY,
             left2: event.offsetX,
-            isLeftToRight: (left2 > left1),
-            rotate: Utils.getAngle(left2, top2, left1, top1),
-            lineDistance: (Math.hypot((top2 - top1), (left2 - left1)) - 40),
+            isLeftToRight: (left2 >= left1),
+            rotate: Utils.getAngle(event.offsetX, event.offsetY, left1, top1),
+            lineDistance: (Math.hypot((event.offsetY - top1), (event.offsetX - left1)) - 40),
         });
     }
 
@@ -79,7 +79,7 @@ export const Line: React.FC<LineProps> = ({ id, onSucessorChange, top1 = 0, left
             top2: top2,
             left1: left1,
             left2: left2,
-            isLeftToRight: (left2 > left1),
+            isLeftToRight: (left2 >= left1),
             rotate: Utils.getAngle(left2, top2, left1, top1),
             lineDistance: (Math.hypot((top2 - top1), (left2 - left1)) - 40),
         });
