@@ -43,6 +43,19 @@ const App: React.FC = () => {
                 breadcrumbs={[
                     { label: 'Routes', onClick: console.log },
                     { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
                 ]}
             />
         </div>
