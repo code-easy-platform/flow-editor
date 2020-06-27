@@ -193,7 +193,10 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, items = [], disableOpacity
         // No caso de vim undefined significa que é um novo branch.
         // Caso se o item já esteja na lista como sucessor, remove e adiciona novamente.
         if (branchIndex === undefined && !itemCurrent.connections.some(connection => id === connection.connectionId)) {
-            itemCurrent.connections.push({ connectionId: sucessorId });
+            itemCurrent.connections.push({
+                connectionId: sucessorId,
+                id: Utils.getUUID(),
+            });
         } else {
             /* const indexToRemove = itemCurrent.sucessor.findIndex(id => id === sucessorId); */
 
