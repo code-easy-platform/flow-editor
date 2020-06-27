@@ -190,19 +190,17 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, items = [], disableOpacity
             }
         }
 
-        // No caso de vim undefined significa que é um novo branch.
-        // Caso se o item já esteja na lista como sucessor, remove e adiciona novamente.
-        if (branchIndex === undefined && !itemCurrent.connections.some(connection => id === connection.connectionId)) {
+        // No caso do branchIndex estar undefined significa que é um novo branch.
+        // Caso se o item já esteja na lista como sucessor, substitui o id.
+        if (branchIndex === undefined && !itemCurrent.connections.some(connection => sucessorId === connection.connectionId)) {
             itemCurrent.connections.push({
                 connectionId: sucessorId,
                 id: Utils.getUUID(),
             });
-        } else {
-            /* const indexToRemove = itemCurrent.sucessor.findIndex(id => id === sucessorId); */
+        } else if (branchIndex !== undefined) {
 
-            if (branchIndex !== undefined) {
-                itemCurrent.connections[branchIndex].connectionId = sucessorId;
-            }
+            itemCurrent.connections[branchIndex].connectionId = sucessorId;
+
         }
 
         setFlowItems({ list: flowItems.list });
