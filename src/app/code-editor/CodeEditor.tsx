@@ -76,11 +76,11 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, items = [], disableOpacity
         const targetOffsetX: number = ((draggedOffSet.x) + (targetSize.left - targetSize.left - targetSize.left) - 25);
 
         let newItem = new FlowItem({
-            id: Utils.getUUID().toString(),
-            itemType: item.itemProps.itemType,
-            name: item.itemProps.title,
             left: Math.round(targetOffsetX / 15) * 15,
             top: Math.round(targetOffsetY / 15) * 15,
+            itemType: item.itemProps.itemType,
+            id: Utils.getUUID().toString(),
+            name: item.itemProps.title,
             isSelected: true,
             connections: [],
         });
@@ -483,7 +483,6 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, items = [], disableOpacity
                             parentElementRef={editorPanelRef}
                             onMouseUp={() => onChangeFlow()}
                             disableOpacity={disableOpacity}
-                            isDisabled={item.isDisabled}
                             onMouseDown={onMouseDown}
                             title={item.name}
                             key={item.id}

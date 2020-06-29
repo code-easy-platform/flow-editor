@@ -20,6 +20,7 @@ export interface IItemDragProps {
     allowDrag?: boolean;
     isSelected: boolean;
     itemType?: ItemType;
+    hasWarning?: boolean;
     isDisabled?: boolean;
     parentElementRef?: any;
     disableOpacity?: number;
@@ -32,14 +33,13 @@ export interface IItemDragProps {
     onContextMenu?(data?: any, e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
     onChangePosition?(top: number, left: number, itemId: string | undefined, e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-
 /** Usado para representar os items de lógica no fluxo do editor e na toolbar. */
 export const ItemToDrag: React.FC<IItemDragProps> = memo(({ title, ...props }: IItemDragProps) => {
 
     const {
-        onChangePosition, onMouseDown, onMouseOver, width = 0, disableOpacity,
         isSelected, isDisabled, onContextMenu, hasError, onMouseUp, id,
-        height = 0, top = 0, left = 0, allowDrag, itemType, icon,
+        onChangePosition, onMouseDown, onMouseOver, width = 0, disableOpacity,
+        height = 0, top = 0, left = 0, allowDrag, itemType, icon, hasWarning = false,
     } = props;
 
     /** Permite que uym elemento seja arrastado e adicionado dentro do editor de fluxo. */
@@ -170,6 +170,7 @@ export const ItemToDrag: React.FC<IItemDragProps> = memo(({ title, ...props }: I
                     width={width}
                     height={height}
                     hasError={hasError}
+                    hasWarning={hasWarning}
                     isDisabled={isDisabled}
                     isSelected={isSelected}
                     icon={icon || getIcon(itemType)}
