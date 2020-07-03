@@ -13,7 +13,7 @@ const items: FlowItem[] = [
     new FlowItem({ hasWarning: false, id: '5', connections: [{ id: '4', connectionId: '6' }], top: 525, left: 90, name: "SWITCH", itemType: ItemType.SWITCH }),
     new FlowItem({ hasWarning: true, id: '6', connections: [{ id: '5', connectionId: '7' }], top: 630, left: 90, name: "ASSIGN", itemType: ItemType.ASSIGN }),
     new FlowItem({ hasWarning: false, id: '7', connections: [{ id: '6', connectionId: '0' }], top: 735, left: 90, name: "END", itemType: ItemType.END, hasError: true }),
-    new FlowItem({ hasWarning: false, id: '8', connections: [{ id: '7', connectionId: '0' }], top: 105, left: 200, name: `COMMENT`, itemType: ItemType.COMMENT }),
+    new FlowItem({ hasWarning: false, id: '8', connections: [{ id: '7', connectionId: '0' }], top: 105, left: 200, name: "COMMENT COMMENTCOMMENT \n xcvb cvb xc zxc zx cvxcv", itemType: ItemType.COMMENT }),
 ];
 const itemsLogica: FlowItem[] = [
     new FlowItem({ hasWarning: false, id: '1', name: "START", itemType: ItemType.START }),
