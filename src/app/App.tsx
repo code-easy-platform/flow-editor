@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { ItemType } from './code-editor/shared/enums/ItemType';
-import { FlowItem } from './code-editor/models/ItemFluxo';
+import { FlowItem } from './code-editor/models/FlowItem';
 import { FlowEditor } from './code-editor/CodeEditor';
 import './App.css';
 
