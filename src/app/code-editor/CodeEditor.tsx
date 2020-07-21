@@ -1,4 +1,4 @@
-import React, { useState, useRef, FC, useEffect, useCallback } from 'react';
+import React, { useState, useRef, FC, useEffect, useCallback, memo } from 'react';
 import { DropTargetMonitor, DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { Utils } from 'code-easy-components';
@@ -25,19 +25,19 @@ import { FlowItem } from './models/FlowItem';
  * @param onDropItem Function - Usada para emitir através do output o item que foi dropado no fluxo.
  * @param isShowToolbar boolean - Usado para exibir ou não a toolbox cons items de lógica.
  */
-export const FlowEditor: FC<ICodeEditorProps> = (props: ICodeEditorProps) => {
+export const FlowEditor: FC<ICodeEditorProps> = memo((props: ICodeEditorProps) => {
     return (
         <DndProvider backend={HTML5Backend}>
             <CodeEditor {...props} />
         </DndProvider>
     );
-}
+});
 
 /** Usada para validar houve mudanças no estados dos items e impedir a realização outputs desnecessários. */
 let backupFlow: string = "";
 
 /** Editor do fluxo. */
-const CodeEditor: React.FC<ICodeEditorProps> = ({ id, items = [], disableOpacity = 0.3, emptyMessage, snapGridWhileDragging = true, toolItems = [], onChangeItems = () => { }, onMouseOver, backgroundType, showToolbar = false, onDropItem = () => undefined, allowedsInDrop = [], onContextMenu, onKeyDown, breadcrumbs, enabledSelection = true }) => {
+const CodeEditor: React.FC<ICodeEditorProps> = memo(({ id, items = [], disableOpacity = 0.3, emptyMessage, snapGridWhileDragging = true, toolItems = [], onChangeItems = () => { }, onMouseOver, backgroundType, showToolbar = false, onDropItem = () => undefined, allowedsInDrop = [], onContextMenu, onKeyDown, breadcrumbs, enabledSelection = true }) => {
 
     items.forEach(item => {
         if (item.itemType !== ItemType.COMMENT) return;
@@ -560,4 +560,4 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({ id, items = [], disableOpacity
         </div>
     );
 
-}
+});
