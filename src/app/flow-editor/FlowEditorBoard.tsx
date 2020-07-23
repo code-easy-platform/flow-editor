@@ -4,13 +4,13 @@ import { EditorPanel } from '../code-editor/components/editor-panel/EditorPanel'
 import { useConfigs } from './contexts/Configurations';
 import { useFlowItems } from './contexts/FlowItems';
 import { SelectorArea } from '../code-editor/components/selector/SelectorArea';
+import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => {
-    const { backgroundType, disableSelection, disableOpacity, snapGridWhileDragging } = useConfigs();
-    const { boardSize, items } = useFlowItems();
-
-    const { onMouseEnter, onMouseLeave } = props;
+    const { backgroundType, disableSelection, snapGridWhileDragging } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit" } = props;
+    const { onMouseEnter, onMouseLeave } = props;
+    const { boardSize, items } = useFlowItems();
 
     return (
         <div className="full-height full-width" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
@@ -26,13 +26,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => 
                     isDisabled={disableSelection}
                 />
 
-                {items.length === 0
-                    && <foreignObject width={"100%"} height={"100%"}>
-                        <div className="full-height full-width flex-items-center flex-content-center opacity-5">
-                            {childrenWhenItemsEmpty}
-                        </div>
-                    </foreignObject>
-                }
+                <EmptyFeedback show={items.length === 0} children={childrenWhenItemsEmpty} />
             </EditorPanel>
         </div>
     );

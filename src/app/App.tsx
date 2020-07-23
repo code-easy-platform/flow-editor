@@ -32,6 +32,8 @@ const App: React.FC = () => {
         <div className="App">
             <FlowEditor
                 items={items}
+                // onMouseEnter={console.log}
+                // onMouseLeave={console.log}
                 configs={{
                     // disableSelection: true,
                     backgroundType: "dotted",
@@ -39,8 +41,6 @@ const App: React.FC = () => {
                 childrenWhenItemsEmpty={<>
                     <h1>Drag and drop something here to start</h1>
                 </>}
-            // onMouseEnter={console.log}
-            // onMouseLeave={console.log}
             />
 
             {/* <FlowEditor
