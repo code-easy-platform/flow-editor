@@ -459,14 +459,6 @@ const CodeEditor: React.FC<ICodeEditorProps> = memo(({ id, items = [], disableOp
                     onContextMenu={(e: any) => (onContextMenu && enabledSelection) && onContextMenu(undefined, e)}
                 >
 
-                    {(!enabledSelection && flowItems.list.length === 0)
-                        && <foreignObject width={"100%"} height={"100%"}>
-                            <div className="full-height full-width flex-items-center flex-content-center opacity-5">
-                                <header>{emptyMessage || "Double-click on an item in the tree to edit it"}</header>
-                            </div>
-                        </foreignObject>
-                    }
-
                     {/* Reinderiza as linhas dos items arrastáveis da tela. */}
                     {flowItems.list.map((item: FlowItem, index) => {
 

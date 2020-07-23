@@ -6,11 +6,11 @@ import { useFlowItems } from './contexts/FlowItems';
 import { SelectorArea } from '../code-editor/components/selector/SelectorArea';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => {
-    const { backgroundType, enabledSelection, disableOpacity, snapGridWhileDragging } = useConfigs();
-    const { boardSize } = useFlowItems();
+    const { backgroundType, disableSelection, disableOpacity, snapGridWhileDragging } = useConfigs();
+    const { boardSize, items } = useFlowItems();
 
     const { onMouseEnter, onMouseLeave } = props;
-    const { id } = props;
+    const { id, childrenWhenItemsEmpty = "Nothing here to edit" } = props;
 
     return (
         <div className="full-height full-width" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
@@ -19,10 +19,20 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => 
                 allowedsInDrop={[]}
                 width={boardSize.width}
                 height={boardSize.height}
-                backgroundType={enabledSelection ? backgroundType : "custom"}
+                backgroundType={backgroundType || "custom"}
             >
 
-                <SelectorArea  />
+                <SelectorArea
+                    isDisabled={disableSelection}
+                />
+
+                {items.length === 0
+                    && <foreignObject width={"100%"} height={"100%"}>
+                        <div className="full-height full-width flex-items-center flex-content-center opacity-5">
+                            {childrenWhenItemsEmpty}
+                        </div>
+                    </foreignObject>
+                }
             </EditorPanel>
         </div>
     );

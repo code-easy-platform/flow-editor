@@ -5,7 +5,7 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { IFlowEditorProps } from './shared/interfaces/FlowEditorInterfaces';
 import { ConfigurationProvider } from './contexts/Configurations';
 import { FlowItemsProvider } from './contexts/FlowItems';
-import { FlowEditorBoard } from './FlowEditor';
+import { FlowEditorBoard } from './FlowEditorBoard';
 
 export const FlowEditor: React.FC<IFlowEditorProps> = ({ configs, items, ...rest }) => {
     return (

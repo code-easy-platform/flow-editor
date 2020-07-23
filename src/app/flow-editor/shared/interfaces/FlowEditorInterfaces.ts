@@ -5,11 +5,11 @@ export interface IFlowEditorConfigs {
     /** Usado para custumizar o background do painel */
     backgroundType?: 'dotted' | 'checkered' | 'custom';
 
-    /** Se "true" desabilita a área de seleção na tela. */
-    enabledSelection?: boolean;
-
     /** Ajustar à grade enquanto arrasta */
     snapGridWhileDragging?: boolean;
+
+    /** Se "true" desabilita a área de seleção na tela. */
+    disableSelection?: boolean;
 
     /** Used when a flow item is disabled */
     disableOpacity?: number;
@@ -23,6 +23,9 @@ export interface IFlowEditorBoardEvents {
 
 export interface IFlowEditorBoardProps extends IFlowEditorBoardEvents {
     id?: string;
+
+    /** The component is showed when the items props is empty  */
+    childrenWhenItemsEmpty?: React.ReactNode
 }
 
 export interface IFlowEditorProps extends IFlowEditorBoardProps {

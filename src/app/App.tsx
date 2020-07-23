@@ -2,8 +2,8 @@ import React from 'react';
 
 import { ItemType } from './code-editor/shared/enums/ItemType';
 import { FlowItem } from './code-editor/models/FlowItem';
-import { FlowEditor } from './code-editor/CodeEditor';
-// import { FlowEditor } from './flow-editor';
+// import { FlowEditor } from './code-editor/CodeEditor';
+import { FlowEditor } from './flow-editor';
 import './App.css';
 
 const items: FlowItem[] = [
@@ -30,14 +30,20 @@ const itemsLogica: FlowItem[] = [
 const App: React.FC = () => {
     return (
         <div className="App">
-            {/* <FlowEditor
-                items={items}
-                configs={{}}
-                onMouseEnter={console.log}
-                onMouseLeave={console.log}
-            /> */}
-
             <FlowEditor
+                items={items}
+                configs={{
+                    // disableSelection: true,
+                    backgroundType: "dotted",
+                }}
+                childrenWhenItemsEmpty={<>
+                    <h1>Drag and drop something here to start</h1>
+                </>}
+            // onMouseEnter={console.log}
+            // onMouseLeave={console.log}
+            />
+
+            {/* <FlowEditor
                 items={items}
                 id={"FLOW_EDITOR"}
                 showToolbar={true}
@@ -65,7 +71,7 @@ const App: React.FC = () => {
                     { label: 'authenticate13', onClick: console.log },
                     { label: 'authenticate14', onClick: console.log },
                 ]}
-            />
+            /> */}
 
         </div>
     );
