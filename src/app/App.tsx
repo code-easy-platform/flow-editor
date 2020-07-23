@@ -3,6 +3,7 @@ import React from 'react';
 import { ItemType } from './code-editor/shared/enums/ItemType';
 import { FlowItem } from './code-editor/models/FlowItem';
 import { FlowEditor } from './code-editor/CodeEditor';
+// import { FlowEditor } from './flow-editor';
 import './App.css';
 
 const items: FlowItem[] = [
@@ -29,6 +30,13 @@ const itemsLogica: FlowItem[] = [
 const App: React.FC = () => {
     return (
         <div className="App">
+            {/* <FlowEditor
+                items={items}
+                configs={{}}
+                onMouseEnter={console.log}
+                onMouseLeave={console.log}
+            /> */}
+
             <FlowEditor
                 items={items}
                 id={"FLOW_EDITOR"}
@@ -58,6 +66,7 @@ const App: React.FC = () => {
                     { label: 'authenticate14', onClick: console.log },
                 ]}
             />
+
         </div>
     );
 }

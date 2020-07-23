@@ -67,6 +67,9 @@ const CodeEditor: React.FC<ICodeEditorProps> = memo(({ id, items = [], disableOp
 
     });
 
+    /** Define quais items são aceitos no drop do start. */
+    allowedsInDrop = [...allowedsInDrop, ItemType.START, ItemType.ACTION, ItemType.IF, ItemType.FOREACH, ItemType.SWITCH, ItemType.ASSIGN, ItemType.END, ItemType.COMMENT];
+
     /** Referencia o svg onde está todos os items de fluxo. */
     const editorPanelRef = useRef<any>(null);
     const inputCopyRef = useRef<any>(null);
@@ -238,184 +241,157 @@ const CodeEditor: React.FC<ICodeEditorProps> = memo(({ id, items = [], disableOp
         setFlowItems({ list: flowItems.list });
         onChangeFlow();
 
-    }, [flowItems.list, onChangeFlow])
+    }, [flowItems.list, onChangeFlow]);
 
-    /** CONFIG TECLAS: Valida se existe um elemento no current e define os eventos das teclas para aquele elemento */
-    if (editorPanelRef.current) {
+    /** Move o componente pelas setas do teclado. */
+    const positionChangeByKey = (direction: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight') => {
+        let filteredList: FlowItem[] = flowItems.list.filter((item: FlowItem) => item.isSelected === true);
+        if (filteredList.length === 0) return;
 
-        /** Identifica teclas que foram acionadas enquando o editor está focado. */
-        editorPanelRef.current.onkeydown = (event: React.KeyboardEvent<SVGSVGElement>) => {
-
-            // Direciona o evento para fora do componente.
-            if (onKeyDown) onKeyDown(event);
-
-            if (event.key === 'Delete') onRemoveItem();
-
-            /** Ctrl + a */
-            if (event.ctrlKey && (event.key === 'a')) selectAll();
-
-
-            /** Ctrl + c */ if (event.ctrlKey && (event.key === 'c')) copySelecteds();
-            /** Ctrl + v */ if (event.ctrlKey && (event.key === 'v')) pasteSelecteds();
-            /** Ctrl + d */ if (event.ctrlKey && (event.key === 'd')) { duplicateSelecteds(); event.preventDefault(); }
-
-            if (event.key === 'ArrowUp') { positionChangeByKey("ArrowUp"); event.preventDefault(); };
-            if (event.key === 'ArrowDown') { positionChangeByKey("ArrowDown"); event.preventDefault(); };
-            if (event.key === 'ArrowLeft') { positionChangeByKey("ArrowLeft"); event.preventDefault(); };
-            if (event.key === 'ArrowRight') { positionChangeByKey("ArrowRight"); event.preventDefault(); };
+        if (direction === 'ArrowUp') {
+            filteredList.forEach((item: FlowItem) => { if (item.top > 0) item.top = item.top - 5; });
+        } else if (direction === 'ArrowDown') {
+            filteredList.forEach((item: FlowItem) => { item.top = item.top + 5; });
+        } else if (direction === 'ArrowLeft') {
+            filteredList.forEach((item: FlowItem) => { if (item.left > 0) item.left = item.left - 5; });
+        } else if (direction === 'ArrowRight') {
+            filteredList.forEach((item: FlowItem) => { item.left = item.left + 5; });
         }
 
-        /** */
-        const duplicateSelecteds = () => {
-            copySelecteds();
-            pasteSelecteds();
-        }
+        setFlowItems({ list: flowItems.list });
+        onChangeFlow();
+    }
 
-        /** Copia os items de fluxo selecionados */
-        const copySelecteds = () => {
-            const components = flowItems.list.filter((item: FlowItem) => item.isSelected);
+    /** Duplica elementos do fluxos */
+    const duplicateSelecteds = () => {
+        copySelecteds();
+        pasteSelecteds();
+    }
 
-            inputCopyRef.current.value = JSON.stringify(components);
-            inputCopyRef.current.focus()
-            inputCopyRef.current.select()
-            document.execCommand('copy');
-            editorPanelRef.current.focus()
+    /** Seleciona todos os items da tela */
+    const selectAll = () => {
+        flowItems.list.forEach((item: FlowItem) => {
+            item.isSelected = true;
+        });
 
-        }
+        setFlowItems({ list: flowItems.list });
+        onChangeFlow();
+    }
 
-        /** Cola os items de fluxo na área de transferência */
-        const pasteSelecteds = () => {
+    /** Remove o item que estiver selecionado no fluxo. */
+    const removeItems = () => {
 
-            const findNewPosition = (num: number, type: 'top' | 'left'): number => {
+        /** Index do item selecionado que está sendo removido */
+        const itemCurrentIndex = flowItems.list.findIndex((item: FlowItem) => item.isSelected);
+        if (itemCurrentIndex === -1) return;
 
-                let index: number = 0;
-                if (type === 'left') {
-                    index = flowItems.list.findIndex((item: FlowItem) => {
+        /** Index do item antecessor ao item que será removido */
+        const itemAntecessorIndex = flowItems.list.findIndex((item: FlowItem) => item.connections.some(connection => connection.connectionId === flowItems.list[itemCurrentIndex].id));
+        if (itemAntecessorIndex !== -1) { flowItems.list[itemAntecessorIndex].connections[0].connectionId = '0'; }
 
-                        const isEquals = (item.left === num); // Posição exata já é usada?
-                        if (isEquals) return true;
+        flowItems.list.splice(itemCurrentIndex, 1);
 
-                        const x1IsUsed = (item.left >= (num - 100)); // Posição maior que x1 é usada?
-                        const x2IsUsed = (item.left <= (num + 100)); // Posição menor que x2 é usada?
+        setFlowItems({ list: flowItems.list });
 
-                        if (x2IsUsed && x1IsUsed) return true;
+        removeItems(); // Remove mais items se estiverem selecionado.
 
-                        return false;
+        onChangeFlow();
+    }
 
-                    });
-                }
-                else if (type === 'top') {
-                    index = flowItems.list.findIndex((item: FlowItem) => {
+    /** Copia os items de fluxo selecionados */
+    const copySelecteds = () => {
+        const components = flowItems.list.filter((item: FlowItem) => item.isSelected);
 
-                        const isEquals = (item.top === num); // Posição exata já é usada?
-                        if (isEquals) return true;
+        inputCopyRef.current.value = JSON.stringify(components);
+        inputCopyRef.current.focus()
+        inputCopyRef.current.select()
+        document.execCommand('copy');
+        editorPanelRef.current.focus()
 
-                        const x1IsUsed = (item.top >= (num - 100)); // Posição maior que x1 é usada?
-                        const x2IsUsed = (item.top <= (num + 100)); // Posição menor que x2 é usada?
+    }
 
-                        if (x2IsUsed && x1IsUsed) return true;
+    /** Cola os items de fluxo na área de transferência */
+    const pasteSelecteds = () => {
 
-                        return false;
+        const findNewPosition = (num: number, type: 'top' | 'left'): number => {
 
-                    });
-                }
+            let index: number = 0;
+            if (type === 'left') {
+                index = flowItems.list.findIndex((item: FlowItem) => {
 
-                return (index !== -1) ? findNewPosition(num + 10, type) : num;
-            }
+                    const isEquals = (item.left === num); // Posição exata já é usada?
+                    if (isEquals) return true;
 
-            try {
+                    const x1IsUsed = (item.left >= (num - 100)); // Posição maior que x1 é usada?
+                    const x2IsUsed = (item.left <= (num + 100)); // Posição menor que x2 é usada?
 
-                const selection = document.getSelection() || new Selection();
-                const string: string = selection.toString();
-                const components: FlowItem[] = JSON.parse(string || '');
-                const components2: FlowItem[] = JSON.parse(string || '');
+                    if (x2IsUsed && x1IsUsed) return true;
 
-                components.forEach(item => {
-
-                    const newId: string | undefined = Utils.getUUID();
-
-                    components.forEach((depende, dependeIndex) => {
-                        if (depende.id !== item.id) {
-                            depende.connections.forEach((connection, index) => {
-                                if (connection.connectionId === item.id) {
-                                    components2[dependeIndex].connections[index].connectionId = newId;
-                                    // sucessorIndex = index;
-                                }
-                            });
-                        } else {
-                            components2[dependeIndex].id = newId;
-                        }
-                    });
+                    return false;
 
                 });
+            }
+            else if (type === 'top') {
+                index = flowItems.list.findIndex((item: FlowItem) => {
 
-                components2.forEach(item => {
+                    const isEquals = (item.top === num); // Posição exata já é usada?
+                    if (isEquals) return true;
 
-                    /* --- Atualiza o top e left de todos os elementos */
-                    const newLeft = findNewPosition(item.left + 100, 'left');
-                    const newTop = findNewPosition(item.top, 'top');
-                    if (newLeft <= newTop) item.left = newLeft;
-                    else item.top = newTop;
-                    /* --- */
+                    const x1IsUsed = (item.top >= (num - 100)); // Posição maior que x1 é usada?
+                    const x2IsUsed = (item.top <= (num + 100)); // Posição menor que x2 é usada?
 
-                    flowItems.list.push(new FlowItem(item));
+                    if (x2IsUsed && x1IsUsed) return true;
+
+                    return false;
 
                 });
-
-                setFlowItems({ list: flowItems.list });
-                onChangeFlow();
-            } catch (e) { }
-
-        }
-
-        /** Move o componente pelas setas do teclado. */
-        const positionChangeByKey = (direction: string) => {
-            let filteredList: FlowItem[] = flowItems.list.filter((item: FlowItem) => item.isSelected === true);
-            if (filteredList.length === 0) return;
-
-            if (direction === 'ArrowUp') {
-                filteredList.forEach((item: FlowItem) => { if (item.top > 0) item.top = item.top - 5; });
-            } else if (direction === 'ArrowDown') {
-                filteredList.forEach((item: FlowItem) => { item.top = item.top + 5; });
-            } else if (direction === 'ArrowLeft') {
-                filteredList.forEach((item: FlowItem) => { if (item.left > 0) item.left = item.left - 5; });
-            } else if (direction === 'ArrowRight') {
-                filteredList.forEach((item: FlowItem) => { item.left = item.left + 5; });
             }
 
-            setFlowItems({ list: flowItems.list });
-            onChangeFlow();
+            return (index !== -1) ? findNewPosition(num + 10, type) : num;
         }
 
-        /** Seleciona todos os items da tela */
-        const selectAll = () => {
-            flowItems.list.forEach((item: FlowItem) => {
-                item.isSelected = true;
+        try {
+
+            const selection = document.getSelection() || new Selection();
+            const string: string = selection.toString();
+            const components: FlowItem[] = JSON.parse(string || '');
+            const components2: FlowItem[] = JSON.parse(string || '');
+
+            components.forEach(item => {
+
+                const newId: string | undefined = Utils.getUUID();
+
+                components.forEach((depende, dependeIndex) => {
+                    if (depende.id !== item.id) {
+                        depende.connections.forEach((connection, index) => {
+                            if (connection.connectionId === item.id) {
+                                components2[dependeIndex].connections[index].connectionId = newId;
+                                // sucessorIndex = index;
+                            }
+                        });
+                    } else {
+                        components2[dependeIndex].id = newId;
+                    }
+                });
+
+            });
+
+            components2.forEach(item => {
+
+                /* --- Atualiza o top e left de todos os elementos */
+                const newLeft = findNewPosition(item.left + 100, 'left');
+                const newTop = findNewPosition(item.top, 'top');
+                if (newLeft <= newTop) item.left = newLeft;
+                else item.top = newTop;
+                /* --- */
+
+                flowItems.list.push(new FlowItem(item));
+
             });
 
             setFlowItems({ list: flowItems.list });
             onChangeFlow();
-        }
-
-        /** Remove o item que estiver selecionado no fluxo. */
-        const onRemoveItem = () => {
-
-            /** Index do item selecionado que está sendo removido */
-            const itemCurrentIndex = flowItems.list.findIndex((item: FlowItem) => item.isSelected);
-            if (itemCurrentIndex === -1) return;
-
-            /** Index do item antecessor ao item que será removido */
-            const itemAntecessorIndex = flowItems.list.findIndex((item: FlowItem) => item.connections.some(connection => connection.connectionId === flowItems.list[itemCurrentIndex].id));
-            if (itemAntecessorIndex !== -1) { flowItems.list[itemAntecessorIndex].connections[0].connectionId = '0'; }
-
-            flowItems.list.splice(itemCurrentIndex, 1);
-
-            setFlowItems({ list: flowItems.list });
-
-            onRemoveItem(); // Remove mais items se estiverem selecionado.
-
-            onChangeFlow();
-        }
+        } catch (e) { }
 
     }
 
@@ -466,6 +442,12 @@ const CodeEditor: React.FC<ICodeEditorProps> = memo(({ id, items = [], disableOp
             <main key={id} className='overflow-auto flex1'>
                 <BreandCamps breadcrumbs={breadcrumbs} />
                 <EditorPanel
+                    onKeyDownCtrlA={selectAll}
+                    onKeyDownDelete={removeItems}
+                    onKeyDownCtrlC={copySelecteds}
+                    onKeyDownCtrlV={pasteSelecteds}
+                    onKeyDownCtrlD={duplicateSelecteds}
+                    onArrowKeyDown={positionChangeByKey}
                     id={`${id}_SVG`}
                     ref={editorPanelRef}
                     width={svgSize.svgWidth}
@@ -524,26 +506,20 @@ const CodeEditor: React.FC<ICodeEditorProps> = memo(({ id, items = [], disableOp
 
                     {/* Render the selection area in the screen. */}
                     <SelectorArea
-                        parentRef={editorPanelRef}
                         onSelectionEnd={onChangeFlow}
                         isDisabled={!enabledSelection}
                         onCoordsChange={coords => {
                             let hasChange = false;
-
                             flowItems.list.forEach((item: FlowItem) => {
                                 const olsIsSelected = item.isSelected;
                                 item.select(coords);
-
                                 // Valida se houve mudanças nos items
                                 if (item.isSelected !== olsIsSelected) {
                                     hasChange = true;
                                 }
                             });
-
                             // Atualiza o state apenas se houve mudanças
-                            if (hasChange) {
-                                setFlowItems({ list: flowItems.list });
-                            }
+                            if (hasChange) setFlowItems({ list: flowItems.list });
                         }}
                     />
 

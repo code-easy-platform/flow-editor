@@ -1,14 +1,19 @@
 import React, { memo } from 'react';
 import { useDrop, DropTargetMonitor } from 'react-dnd';
 
-import { ItemType } from '../../shared/enums/ItemType';
-
 
 type EditorPanelProps = Omit<{
     allowedsInDrop?: string[];
     onChangeZoom?(zoom: number): void;
     backgroundType?: 'dotted' | 'checkered' | 'custom';
     onDropItem?(item: any, monitor: DropTargetMonitor): void;
+    onAnyKeyDown?(event: React.KeyboardEvent<SVGSVGElement>): void;
+    onKeyDownCtrlC?(event: React.KeyboardEvent<SVGSVGElement>): void;
+    onKeyDownCtrlD?(event: React.KeyboardEvent<SVGSVGElement>): void;
+    onKeyDownCtrlV?(event: React.KeyboardEvent<SVGSVGElement>): void;
+    onKeyDownDelete?(event: React.KeyboardEvent<SVGSVGElement>): void;
+    onKeyDownCtrlA?(event: React.KeyboardEvent<SVGSVGElement>): void;
+    onArrowKeyDown?(direction: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight', event: React.KeyboardEvent<SVGSVGElement>): void;
 }, keyof React.SVGProps<SVGSVGElement>> & React.SVGProps<SVGSVGElement>;
 
 /**
@@ -19,7 +24,7 @@ type EditorPanelProps = Omit<{
  * @param onDropItem - **Function** - Função executada quando um elemento for dropado no painel
  * @param backgroundType - **'dotted'** | **'checkered'** | **'custom'** - Parâmetro que controla o estilo do background do painel
  */
-export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, onChangeZoom, backgroundType = 'dotted', ...props }: EditorPanelProps, ref: any) => {
+export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, onChangeZoom, backgroundType = 'dotted', onArrowKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV, onKeyDownCtrlA, onKeyDownDelete, onAnyKeyDown, ...props }: EditorPanelProps, ref: any) => {
 
     const [zoom, setZoom] = React.useState(1);
     const wheel = (e: React.WheelEvent<SVGSVGElement>) => {
@@ -33,6 +38,25 @@ export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, 
         }
     }
 
+    if (ref?.current) {
+
+        /** Identifica teclas que foram acionadas enquando o editor está focado. */
+        ref.current.onkeydown = (event: React.KeyboardEvent<SVGSVGElement>) => {
+
+            /** Delete   */ if (event.key === 'Delete') onKeyDownDelete && onKeyDownDelete(event);
+            /** Ctrl + a */ if (event.ctrlKey && (event.key === 'a')) onKeyDownCtrlA && onKeyDownCtrlA(event);
+            /** Ctrl + c */ if (event.ctrlKey && (event.key === 'c')) onKeyDownCtrlC && onKeyDownCtrlC(event);
+            /** Ctrl + v */ if (event.ctrlKey && (event.key === 'v')) onKeyDownCtrlV && onKeyDownCtrlV(event);
+            /** Ctrl + d */ if (event.ctrlKey && (event.key === 'd')) onKeyDownCtrlD && onKeyDownCtrlD(event);
+
+            if (event.key === 'ArrowUp') { onArrowKeyDown && onArrowKeyDown("ArrowUp", event); event.preventDefault(); };
+            if (event.key === 'ArrowDown') { onArrowKeyDown && onArrowKeyDown("ArrowDown", event); event.preventDefault(); };
+            if (event.key === 'ArrowLeft') { onArrowKeyDown && onArrowKeyDown("ArrowLeft", event); event.preventDefault(); };
+            if (event.key === 'ArrowRight') { onArrowKeyDown && onArrowKeyDown("ArrowRight", event); event.preventDefault(); };
+
+            onAnyKeyDown && onAnyKeyDown(event);
+        }
+    }
 
     // Este bloco serve para configurar o estilo do background do painel
     let background;
@@ -44,14 +68,12 @@ export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, 
         background = props.style?.backgroundImage;
     }
 
-    /** Define quais items são aceitos no drop do start. */
-    const acceptedInDrop: ItemType[] = [ItemType.START, ItemType.ACTION, ItemType.IF, ItemType.FOREACH, ItemType.SWITCH, ItemType.ASSIGN, ItemType.END, ItemType.COMMENT];
-
     /** Usado para que seja possível o drop de items no editor. */
     const [, dropRef] = useDrop({
-        accept: [...acceptedInDrop, ...allowedsInDrop || []], // Especifica quem pode ser dropado na editor
+        accept: [...allowedsInDrop || []], // Especifica quem pode ser dropado na editor
         drop: onDropItem,
     });
+
     /** Agrupa as referências do drop com as da ref. */
     dropRef(ref);
 
