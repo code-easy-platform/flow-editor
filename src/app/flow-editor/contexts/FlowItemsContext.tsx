@@ -17,6 +17,8 @@ interface IFlowItemsContextData {
     setItemById(id: string | undefined, item: IFlowItem): void;
     setItems(items: IFlowItem[]): void;
     removeSelection(): void;
+    /** Select all items from the board */
+    selectAll(): void;
     items: IFlowItem[];
     boardSize: {
         width: number,
@@ -141,12 +143,20 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
         });
     }, [snapGridWhileDragging, getBoardSize]);
 
+    const selectAll = useCallback(() => {
+        setState(oldState => {
+            oldState.items.forEach(item => item.isSelected = true);
+            return { ...oldState, items: oldState.items };
+        });
+    }, []);
+
     const [state, setState] = useState<IFlowItemsContextData>({
         boardSize: getBoardSize(items),
         removeSelection,
         changePosition,
         selectItemById,
         setItemById,
+        selectAll,
         setItems,
         items,
     });

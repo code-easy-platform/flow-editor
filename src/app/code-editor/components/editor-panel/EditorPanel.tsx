@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useRef } from 'react';
 import { useDrop, DropTargetMonitor } from 'react-dnd';
 
 
@@ -38,6 +38,8 @@ export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, 
             onChangeZoom && onChangeZoom(zoom);
         }
     }
+
+    ref = useRef(null);
 
     if (ref?.current) {
 

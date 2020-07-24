@@ -12,8 +12,8 @@ import { useFlowItems } from './contexts/FlowItemsContext';
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => {
     const { backgroundType, disableSelection, typesAllowedToDrop = [], dottedSize } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit" } = props;
+    const { boardSize, items, removeSelection, selectAll } = useFlowItems();
     const { onMouseEnter, onMouseLeave } = props;
-    const { boardSize, items, removeSelection } = useFlowItems();
 
     return (
         <div className="full-height full-width" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
@@ -22,6 +22,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => 
                 width={boardSize.width}
                 dottedSize={dottedSize}
                 height={boardSize.height}
+                onKeyDownCtrlA={selectAll}
                 onMouseDown={removeSelection}
                 allowedsInDrop={typesAllowedToDrop}
                 backgroundType={backgroundType || "custom"}

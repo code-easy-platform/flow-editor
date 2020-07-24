@@ -1,11 +1,9 @@
 import React from 'react';
 
-import { ItemType } from './code-editor/shared/enums/ItemType';
-import { FlowItem } from './code-editor/models/FlowItem';
+import { newItemsLogical, items, itemsLogica } from './Mock';
 // import { FlowEditor } from './code-editor/CodeEditor';
 import { FlowEditor } from './flow-editor';
 import './App.css';
-import { newItemsLogical } from './Mock';
 
 const App: React.FC = () => {
     return (
