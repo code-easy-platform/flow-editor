@@ -13,9 +13,10 @@ export interface IFlowItem {
     width?: number;
     height?: number;
     hasError?: boolean;
+    isDisabled?: boolean;
     isSelected?: boolean;
     hasWarning?: boolean;
     description?: string;
     flowItemType: EFlowItemType;
-    onContextMenu?(data?: any, e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
+    isDisabledNewConnetions?: boolean;
 }

@@ -10,7 +10,35 @@ const ConfigurationContext = createContext<IConfigurationContextData>({} as ICon
 
 export const ConfigurationProvider: React.FC<{ configs: IFlowEditorConfigs }> = memo(({ children, configs }) => {
 
-    const [state] = useState<IConfigurationContextData>({ configs });
+    /** Default values from configs */
+    const {
+        flowItemWarningColor = 'yellow',
+        flowItemSelectedColor = 'blue',
+        snapGridWhileDragging = true,
+        flowItemTextColor = 'white',
+        flowItemErrorColor = 'red',
+        backgroundType = 'dotted',
+        disableSelection = false,
+        typesAllowedToDrop = [],
+        disableOpacity = 0.5,
+        dottedSize = 15,
+    } = configs;
+
+    const [state] = useState<IConfigurationContextData>({
+        configs: {
+            ...configs,
+            flowItemWarningColor,
+            flowItemSelectedColor,
+            snapGridWhileDragging,
+            typesAllowedToDrop,
+            flowItemErrorColor,
+            flowItemTextColor,
+            disableSelection,
+            backgroundType,
+            disableOpacity,
+            dottedSize,
+        }
+    });
 
     return (
         <ConfigurationContext.Provider value={state} >

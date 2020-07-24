@@ -10,7 +10,7 @@ import { useConfigs } from './contexts/Configurations';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => {
     const { boardSize, items, removeSelection, selectAll, selectionAreaChange, removeSelectedItems } = useFlowItems();
-    const { backgroundType, disableSelection, typesAllowedToDrop = [], dottedSize } = useConfigs();
+    const { backgroundType, disableSelection, typesAllowedToDrop, dottedSize } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit" } = props;
     const { onMouseEnter, onMouseLeave } = props;
 

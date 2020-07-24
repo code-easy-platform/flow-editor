@@ -15,6 +15,9 @@ const App: React.FC = () => {
                 // onMouseLeave={console.log}
                 configs={{
                     // disableSelection: true,
+                    flowItemWarningColor: 'var(--main-warning-color)',
+                    flowItemSelectedColor: 'var(--color-botton-bar)',
+                    flowItemErrorColor: 'var(--main-error-color)',
                     snapGridWhileDragging: true,
                     backgroundType: "dotted",
                     dottedSize: 15,

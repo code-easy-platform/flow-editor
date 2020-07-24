@@ -2,14 +2,12 @@ import React, { memo, useCallback, useRef } from 'react';
 
 import { EFlowItemType, IFlowItem } from '../../shared/interfaces/FlowItemInterfaces';
 import { useFlowItems } from '../../contexts/FlowItemsContext';
-import { useConfigs } from '../../contexts/Configurations';
 import { Acorn } from './Acorn';
 
 interface FlowProps {
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
 export const FlowItem: React.FC<IFlowItem & FlowProps> = memo(({ onContextMenu, ...rest }) => {
-    const { flowItemTextColor = 'white' } = useConfigs();
     const { changePosition } = useFlowItems();
 
     /**
@@ -59,7 +57,6 @@ export const FlowItem: React.FC<IFlowItem & FlowProps> = memo(({ onContextMenu, 
                 <Acorn
                     item={rest}
                     onMouseDown={mouseDown}
-                    textColor={flowItemTextColor}
                     onContextMenu={onContextMenu}
                 />
             );

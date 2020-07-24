@@ -24,9 +24,9 @@ export const itemsLogica: FlowItem[] = [
     new FlowItem({ hasWarning: false, id: '9', name: "COMMENT", itemType: ItemType.COMMENT }),
 ];
 export const newItemsLogical: NewFlowItem[] = [
-    { id: '1', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 80, top: 100, height: 40, width: 40 },
-    { id: '2', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 80, top: 200, height: 40, width: 40 },
-    { id: '3', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 80, top: 300, height: 40, width: 40 },
-    { id: '4', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 80, top: 400, height: 40, width: 40 },
-    { id: '5', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 80, top: 500, height: 40, width: 40 },
+    { id: '1', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 100, height: 40, width: 40 },
+    { id: '2', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 200, height: 40, width: 40 },
+    { id: '3', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 300, height: 40, width: 40 },
+    { id: '4', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 400, height: 40, width: 40 },
+    { id: '5', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 500, height: 40, width: 40 },
 ]
