@@ -1,4 +1,5 @@
 import React from 'react';
+import { Utils } from 'code-easy-components'
 
 import { newItemsLogical, items, itemsLogica } from './Mock';
 // import { FlowEditor } from './code-editor/CodeEditor';
@@ -9,7 +10,7 @@ const App: React.FC = () => {
     return (
         <div className="App">
             <FlowEditor
-                items={newItemsLogical}
+                items={newItemsLogical.map(item => ({ ...item/* , id: Utils.getUUID() */ }))}
                 // onMouseEnter={console.log}
                 // onMouseLeave={console.log}
                 configs={{

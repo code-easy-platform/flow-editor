@@ -12,7 +12,7 @@ import { useFlowItems } from './contexts/FlowItemsContext';
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => {
     const { backgroundType, disableSelection, typesAllowedToDrop = [], dottedSize } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit" } = props;
-    const { boardSize, items, removeSelection, selectAll } = useFlowItems();
+    const { boardSize, items, removeSelection, selectAll, selectionAreaChange } = useFlowItems();
     const { onMouseEnter, onMouseLeave } = props;
 
     return (
@@ -36,7 +36,10 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => 
                 ))}
 
                 <SelectorArea
+                    onSelectionEnd={console.log}
                     isDisabled={disableSelection}
+                    onSelectionStart={console.log}
+                    onCoordsChange={selectionAreaChange}
                 />
 
                 <EmptyFeedback show={items.length === 0} children={childrenWhenItemsEmpty} />

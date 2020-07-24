@@ -8,10 +8,11 @@ interface SelectorAreaProps {
     borderWidth?: number;
     backgroundColor?: string;
     onSelectionEnd?(e: MouseEvent): void;
+    onSelectionStart?(e: MouseEvent): void;
     onCoordsChange?(coords: ICoords): void;
 }
 /** Reinderiza a área de seleção na tela, para que seja possível selecionar diversos items de uma vez. */
-export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd, backgroundColor = "#ffffff11", borderColor = "#999fff", borderWidth = 1, isDisabled = false, onCoordsChange }) => {
+export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd, onSelectionStart, backgroundColor = "#ffffff11", borderColor = "#999fff", borderWidth = 1, isDisabled = false, onCoordsChange }) => {
 
     const selectorAreaRef = useRef<any>(null);
 
@@ -77,6 +78,8 @@ export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd,
                             position.endTop = e.offsetY;
 
                             setPosition(position);
+
+                            onSelectionStart && onSelectionStart(e);
                         }
                     }
                 };
@@ -85,7 +88,7 @@ export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd,
             }
 
         }
-    }, [isDisabled, onSelectionEnd, onCoordsChange, position]);
+    }, [isDisabled, onSelectionEnd, onSelectionStart, onCoordsChange, position]);
 
     // Se não pode exibir retorna null
     if (isDisabled) return null;

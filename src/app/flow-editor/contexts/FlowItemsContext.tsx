@@ -2,6 +2,7 @@ import React, { createContext, useState, useCallback, useContext, memo } from 'r
 
 import { IFlowItem } from './../shared/interfaces/FlowItemInterfaces';
 import { useConfigs } from './Configurations';
+import { ICoords } from '../../code-editor/shared/Interfaces';
 
 interface IFlowItemsContextData {
 
@@ -15,6 +16,7 @@ interface IFlowItemsContextData {
     /** Toggle isSelected prop from a element by their id */
     selectItemById(id: string | undefined, keepSelecteds?: boolean): void;
     setItemById(id: string | undefined, item: IFlowItem): void;
+    selectionAreaChange(coords: ICoords): void;
     setItems(items: IFlowItem[]): void;
     removeSelection(): void;
     /** Select all items from the board */
@@ -150,8 +152,70 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
         });
     }, []);
 
+    const selectItem = useCallback((item: IFlowItem, coords: ICoords) => {
+        const top2 = item.top + (item.height || 0);
+        const left2 = item.left + (item.width || 0);
+
+        const yGreaterThan0 = ((coords.endY - coords.startY) > 0);
+        const xGreaterThan0 = ((coords.endX - coords.startX) > 0);
+
+        const lessThan0Selected = (_param1: number, _param2: number, _coordStart: number, _coordEnd: number) => {
+            return (
+                (
+                    (_param1 <= _coordStart) || (_param2 <= _coordStart)
+                ) && (
+                    (_param1 >= _coordEnd) || (_param2 >= _coordEnd)
+                )
+            );
+        }
+
+        const greaterThan0Selected = (_param1: number, _param2: number, _coordStart: number, _coordEnd: number) => {
+            return (
+                (
+                    (_param1 >= _coordStart) || (_param2 >= _coordStart)
+                ) && (
+                    (_param1 <= _coordEnd) || (_param2 <= _coordEnd)
+                )
+            );
+        }
+
+        return (
+            (
+                yGreaterThan0
+                    ? greaterThan0Selected(item.top, top2, coords.startY, coords.endY)
+                    : lessThan0Selected(item.top, top2, coords.startY, coords.endY)
+            )
+            &&
+            (
+                xGreaterThan0
+                    ? greaterThan0Selected(item.left, left2, coords.startX, coords.endX)
+                    : lessThan0Selected(item.left, left2, coords.startX, coords.endX)
+            )
+        );
+    }, []);
+
+    const selectionAreaChange = useCallback((coords: ICoords) => {
+        setState(oldState => {
+            let hasChange = false;
+            oldState.items.forEach(item => {
+                const olsIsSelected = item.isSelected;
+                item.isSelected = selectItem(item, coords);
+                // Valida se houve mudanças nos items
+                if (item.isSelected !== olsIsSelected) {
+                    hasChange = true;
+                }
+            });
+
+            // Atualiza o state apenas se houve mudanças
+            if (hasChange) return oldState;
+
+            return { ...oldState };
+        });
+    }, [selectItem])
+
     const [state, setState] = useState<IFlowItemsContextData>({
         boardSize: getBoardSize(items),
+        selectionAreaChange,
         removeSelection,
         changePosition,
         selectItemById,
