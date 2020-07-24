@@ -15,6 +15,7 @@ interface SelectorAreaProps {
 export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd, onSelectionStart, backgroundColor = "#ffffff11", borderColor = "#999fff", borderWidth = 1, isDisabled = false, onCoordsChange }) => {
 
     const selectorAreaRef = useRef<any>(null);
+    const selectionStarted = useRef(false);
 
     const [position, setPosition] = useState({
         startLeft: 0,
@@ -30,6 +31,10 @@ export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd,
             if (selectorAreaRef.current?.parentElement) {
 
                 const mouseMove = (e: MouseEvent) => {
+                    if (!selectionStarted.current) {
+                        selectionStarted.current = true;
+                        onSelectionStart && onSelectionStart(e);
+                    }
 
                     setPosition({
                         ...position,
@@ -57,8 +62,10 @@ export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd,
                         endTop: 0,
                     });
 
-                    onSelectionEnd && onSelectionEnd(e);
-
+                    if (selectionStarted.current) {
+                        selectionStarted.current = false;
+                        onSelectionEnd && onSelectionEnd(e);
+                    }
                 };
 
                 const mouseDown = (e: MouseEvent | any) => {
@@ -78,8 +85,6 @@ export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd,
                             position.endTop = e.offsetY;
 
                             setPosition(position);
-
-                            onSelectionStart && onSelectionStart(e);
                         }
                     }
                 };

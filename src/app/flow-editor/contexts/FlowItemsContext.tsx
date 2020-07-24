@@ -1,8 +1,8 @@
 import React, { createContext, useState, useCallback, useContext, memo } from 'react';
 
 import { IFlowItem } from './../shared/interfaces/FlowItemInterfaces';
-import { useConfigs } from './Configurations';
 import { ICoords } from '../../code-editor/shared/Interfaces';
+import { useConfigs } from './Configurations';
 
 interface IFlowItemsContextData {
 
@@ -18,6 +18,9 @@ interface IFlowItemsContextData {
     setItemById(id: string | undefined, item: IFlowItem): void;
     selectionAreaChange(coords: ICoords): void;
     setItems(items: IFlowItem[]): void;
+    /** Delete selected items from the flow */
+    removeSelectedItems(): void;
+    /** Deselects all previously selected items */
     removeSelection(): void;
     /** Select all items from the board */
     selectAll(): void;
@@ -213,9 +216,24 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
         });
     }, [selectItem])
 
+    const removeSelectedItems = useCallback(() => {
+        setState(oldState => {
+
+            /** Index do item selecionado que está sendo removido */
+            let itemCurrentIndex = oldState.items.findIndex(item => item.isSelected);
+            while (itemCurrentIndex > -1) {
+                oldState.items.splice(itemCurrentIndex, 1);
+                itemCurrentIndex = oldState.items.findIndex(item => item.isSelected);
+            }
+
+            return { ...oldState, items: oldState.items };
+        });
+    }, [])
+
     const [state, setState] = useState<IFlowItemsContextData>({
         boardSize: getBoardSize(items),
         selectionAreaChange,
+        removeSelectedItems,
         removeSelection,
         changePosition,
         selectItemById,
@@ -226,7 +244,7 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
     });
 
     return (
-        <FlowItemsContext.Provider value={state} >
+        <FlowItemsContext.Provider value={state}>
             {children}
         </FlowItemsContext.Provider>
     );

@@ -17,7 +17,5 @@ export interface IFlowItem {
     hasWarning?: boolean;
     description?: string;
     flowItemType: EFlowItemType;
-    onMouseUp?(e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
-    onMouseDown?(e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
     onContextMenu?(data?: any, e?: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }

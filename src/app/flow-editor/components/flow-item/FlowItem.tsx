@@ -1,13 +1,16 @@
 import React, { memo, useCallback, useRef } from 'react';
-import { useConfigs } from '../../contexts/Configurations';
-import { Acorn } from './Acorn';
+
 import { EFlowItemType, IFlowItem } from '../../shared/interfaces/FlowItemInterfaces';
 import { useFlowItems } from '../../contexts/FlowItemsContext';
+import { useConfigs } from '../../contexts/Configurations';
+import { Acorn } from './Acorn';
 
-export const FlowItem: React.FC<IFlowItem> = memo(({ onContextMenu, onMouseDown, onMouseUp, ...rest }) => {
+interface FlowProps {
+    onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
+}
+export const FlowItem: React.FC<IFlowItem & FlowProps> = memo(({ onContextMenu, ...rest }) => {
     const { flowItemTextColor = 'white' } = useConfigs();
     const { changePosition } = useFlowItems();
-
 
     /**
      * Ajuda a evitar que bugs aconteçam por estar uma fun declarada
@@ -48,8 +51,6 @@ export const FlowItem: React.FC<IFlowItem> = memo(({ onContextMenu, onMouseDown,
         window.onmouseup = mouseUp;
     }, [rest.left, rest.top, mouseMove, mouseUp]);
 
-
-
     switch (rest.flowItemType) {
         case EFlowItemType.line:
             return (<></>);
@@ -57,7 +58,6 @@ export const FlowItem: React.FC<IFlowItem> = memo(({ onContextMenu, onMouseDown,
             return (
                 <Acorn
                     item={rest}
-                    onMouseUp={onMouseUp}
                     onMouseDown={mouseDown}
                     textColor={flowItemTextColor}
                     onContextMenu={onContextMenu}
