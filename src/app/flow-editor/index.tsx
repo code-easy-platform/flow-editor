@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
 import { IFlowEditorProps } from './shared/interfaces/FlowEditorInterfaces';
 import { ConfigurationProvider } from './contexts/Configurations';
-import { FlowItemsProvider } from './contexts/FlowItems';
+import { FlowItemsProvider } from './contexts/FlowItemsContext';
 import { FlowEditorBoard } from './FlowEditorBoard';
 
-export const FlowEditor: React.FC<IFlowEditorProps> = ({ configs, items, ...rest }) => {
+export const FlowEditor: React.FC<IFlowEditorProps> = memo(({ configs, items, ...rest }) => {
     return (
         <ConfigurationProvider configs={configs}>
             <DndProvider backend={HTML5Backend}>
@@ -17,4 +17,6 @@ export const FlowEditor: React.FC<IFlowEditorProps> = ({ configs, items, ...rest
             </DndProvider>
         </ConfigurationProvider>
     );
-}
+});
+
+export * from './shared/interfaces/FlowEditorInterfaces';

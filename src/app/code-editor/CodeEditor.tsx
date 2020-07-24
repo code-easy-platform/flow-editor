@@ -144,7 +144,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = memo(({ id, items = [], disableOp
      * @param mousePositionLeft Posição do mouse com relação a esquerda(left) do quadro do editor
      * @param event Evento de mouse move
      */
-    const onChangePositionItems = useCallback((mousePositionTop: number, mousePositionLeft: number, itemId: string | undefined, e?: any) => {
+    const onChangePositionItems = useCallback((mousePositionTop: number, mousePositionLeft: number, itemId: string | undefined) => {
 
         let selectedItems = flowItems.list.filter((item: FlowItem) => item.isSelected).sort((a, b) => ((a.top + b.top) - (a.left + b.left)));
         const targetItem = selectedItems.find(selectedItem => selectedItem.id === itemId);

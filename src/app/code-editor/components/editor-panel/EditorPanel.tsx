@@ -3,6 +3,7 @@ import { useDrop, DropTargetMonitor } from 'react-dnd';
 
 
 type EditorPanelProps = Omit<{
+    dottedSize?: number;
     allowedsInDrop?: string[];
     onChangeZoom?(zoom: number): void;
     backgroundType?: 'dotted' | 'checkered' | 'custom';
@@ -24,7 +25,7 @@ type EditorPanelProps = Omit<{
  * @param onDropItem - **Function** - Função executada quando um elemento for dropado no painel
  * @param backgroundType - **'dotted'** | **'checkered'** | **'custom'** - Parâmetro que controla o estilo do background do painel
  */
-export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, onChangeZoom, backgroundType = 'dotted', onArrowKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV, onKeyDownCtrlA, onKeyDownDelete, onAnyKeyDown, ...props }: EditorPanelProps, ref: any) => {
+export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, onChangeZoom, dottedSize = 15, backgroundType = 'dotted', onArrowKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV, onKeyDownCtrlA, onKeyDownDelete, onAnyKeyDown, ...props }: EditorPanelProps, ref: any) => {
 
     const [zoom, setZoom] = React.useState(1);
     const wheel = (e: React.WheelEvent<SVGSVGElement>) => {
@@ -88,8 +89,8 @@ export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, 
                 outline: 'none',
                 minWidth: '100%',
                 minHeight: '100%',
-                backgroundSize: '15px 15px',
                 backgroundImage: background,
+                backgroundSize: `${dottedSize}px ${dottedSize}px`,
             }}
         />
     );

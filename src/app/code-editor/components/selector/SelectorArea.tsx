@@ -15,7 +15,6 @@ export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd,
 
     const selectorAreaRef = useRef<any>(null);
 
-    const [show, setShow] = useState(false);
     const [position, setPosition] = useState({
         startLeft: 0,
         startTop: 0,
@@ -30,7 +29,6 @@ export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd,
             if (selectorAreaRef.current?.parentElement) {
 
                 const mouseMove = (e: MouseEvent) => {
-                    setShow(true);
 
                     setPosition({
                         ...position,
@@ -58,7 +56,6 @@ export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd,
                         endTop: 0,
                     });
 
-                    setShow(false);
                     onSelectionEnd && onSelectionEnd(e);
 
                 };
@@ -86,11 +83,12 @@ export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd,
 
                 selectorAreaRef.current.parentElement.onmousedown = mouseDown;
             }
+
         }
     }, [isDisabled, onSelectionEnd, onCoordsChange, position]);
 
     // Se não pode exibir retorna null
-    if (!show && isDisabled) return null;
+    if (isDisabled) return null;
 
     return (
         <rect

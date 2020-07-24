@@ -38,8 +38,8 @@ export interface IItemDragProps {
 export const ItemToDrag: React.FC<IItemDragProps> = memo(({ title, width = 0, height = 0, ...props }: IItemDragProps) => {
 
     const {
-        isSelected, isDisabled, onContextMenu, hasError, onMouseUp, id,
-        onChangePosition, onMouseDown, onMouseOver, disableOpacity,
+        isSelected, isDisabled, onContextMenu, hasError, onMouseUp,
+        onChangePosition, onMouseDown, onMouseOver, disableOpacity, id,
         top = 0, left = 0, allowDrag, itemType, icon, hasWarning = false,
     } = props;
 
