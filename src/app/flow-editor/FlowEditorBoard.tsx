@@ -4,7 +4,6 @@ import { IFlowEditorBoardProps } from './shared/interfaces/FlowEditorInterfaces'
 import { EditorPanel } from '../code-editor/components/editor-panel/EditorPanel';
 import { SelectorArea } from '../code-editor/components/selector/SelectorArea';
 import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
-import { EFlowItemType } from './shared/interfaces/FlowItemInterfaces';
 import { FlowItem } from './components/flow-item/FlowItem';
 import { useFlowItems } from './contexts/FlowItemsContext';
 import { useConfigs } from './contexts/Configurations';
@@ -33,15 +32,12 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => 
                         <FlowItem
                             {...item}
                             key={item.id}
-                            flowItemType={EFlowItemType.acorn}
                         />
                     ))}
-
                     <SelectorArea
                         isDisabled={disableSelection}
                         onCoordsChange={selectionAreaChange}
                     />
-
                     <EmptyFeedback show={items.length === 0} children={childrenWhenItemsEmpty} />
                 </EditorPanel>
             </main>
