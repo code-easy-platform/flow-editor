@@ -4,10 +4,10 @@ import { EFlowItemType, IFlowItem } from '../../shared/interfaces/FlowItemInterf
 import { useFlowItems } from '../../contexts/FlowItemsContext';
 import { Acorn } from './Acorn';
 
-interface FlowProps {
+interface FlowProps extends IFlowItem {
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const FlowItem: React.FC<IFlowItem & FlowProps> = memo(({ onContextMenu, ...rest }) => {
+export const FlowItem: React.FC<FlowProps> = memo(({ onContextMenu, ...rest }) => {
     const { changePosition } = useFlowItems();
 
     /**
@@ -50,8 +50,6 @@ export const FlowItem: React.FC<IFlowItem & FlowProps> = memo(({ onContextMenu, 
     }, [rest.left, rest.top, mouseMove, mouseUp]);
 
     switch (rest.flowItemType) {
-        case EFlowItemType.line:
-            return (<></>);
         case EFlowItemType.acorn:
             return (
                 <Acorn
@@ -61,6 +59,8 @@ export const FlowItem: React.FC<IFlowItem & FlowProps> = memo(({ onContextMenu, 
                 />
             );
         case EFlowItemType.comment:
+            return (<></>);
+        case EFlowItemType.line:
             return (<></>);
     }
 });

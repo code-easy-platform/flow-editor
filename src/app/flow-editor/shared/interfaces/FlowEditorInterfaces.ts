@@ -42,6 +42,14 @@ export interface IFlowEditorConfigs {
      * Color used to represent an error in some flow item
      */
     flowItemErrorColor?: string;
+    /**
+     * Color used in lines in the flow
+     */
+    linesColor?: string;
+    /**
+     * Stroke width used in lines in the flow
+     */
+    lineWidth?: number;
 
 }
 
@@ -61,13 +69,12 @@ export interface IFlowEditorBoardProps extends IFlowEditorBoardEvents {
 
 /** Set of all properties used in FlowEditor component */
 export interface IFlowEditorProps extends IFlowEditorBoardProps {
-
-    /** FlowItem[] - Usado para exibir os items na tela do editor */
+    /**
+     * FlowItem[] - Usado para exibir os items na tela do editor
+     */
     items: IFlowItem[];
-
     /**
      * Configurations for the Flow editor component
      */
     configs: IFlowEditorConfigs
-
 }

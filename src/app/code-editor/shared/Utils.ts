@@ -2,7 +2,7 @@ import { ItemType } from "./enums/ItemType";
 
 export class Utils {
 
-    public static useNewBranch = (currentBranchsLength: number, itemType: ItemType) => {
+    public static useNewBranch = (currentBranchsLength: number, itemType: string) => {
         switch (itemType) {
             case ItemType.IF:
                 return currentBranchsLength < 2; // Só usa nova branch para um if se ele ainda tiver menos de 2 branchs.

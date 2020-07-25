@@ -24,9 +24,9 @@ export const itemsLogica: FlowItem[] = [
     new FlowItem({ hasWarning: false, id: '9', name: "COMMENT", itemType: ItemType.COMMENT }),
 ];
 export const newItemsLogical: NewFlowItem[] = [
-    { id: '1', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 100, height: 40, width: 40 },
-    { id: '2', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 200, height: 40, width: 40 },
-    { id: '3', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 300, height: 40, width: 40 },
-    { id: '4', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 400, height: 40, width: 40 },
-    { id: '5', icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 500, height: 40, width: 40 },
+    { id: '1', itemType: ItemType.SWITCH, connections: [{ id: '0', connectionId: '2', connectionLabel: 'Linha 01', connectionDescription: 'Descrição da linha 01' }], icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 100, height: 40, width: 40 },
+    { id: '2', itemType: ItemType.SWITCH, connections: [{ id: '1', connectionId: '3' }], icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 250, height: 40, width: 40 },
+    { id: '3', itemType: ItemType.SWITCH, connections: [{ id: '2', connectionId: '4' }], icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 400, height: 40, width: 40 },
+    { id: '4', itemType: ItemType.SWITCH, connections: [{ id: '3', connectionId: '5' }], icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 550, height: 40, width: 40 },
+    { id: '5', itemType: ItemType.SWITCH, connections: [{ id: '3', connectionId: '4', connectionLabel: 'Linha 05', connectionDescription: 'Descrição da linha 01' }], icon: IconFlowStart, title: 'Start', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 700, height: 40, width: 40 },
 ]

@@ -22,6 +22,7 @@ export const ConfigurationProvider: React.FC<{ configs: IFlowEditorConfigs }> = 
         typesAllowedToDrop = [],
         disableOpacity = 0.5,
         dottedSize = 15,
+        lineWidth = 1,
     } = configs;
 
     const [state] = useState<IConfigurationContextData>({
@@ -37,6 +38,7 @@ export const ConfigurationProvider: React.FC<{ configs: IFlowEditorConfigs }> = 
             backgroundType,
             disableOpacity,
             dottedSize,
+            lineWidth,
         }
     });
 

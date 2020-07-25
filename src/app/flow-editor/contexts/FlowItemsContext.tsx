@@ -214,7 +214,7 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
 
             return { ...oldState };
         });
-    }, [selectItem])
+    }, [selectItem]);
 
     const removeSelectedItems = useCallback(() => {
         setState(oldState => {
@@ -228,7 +228,7 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
 
             return { ...oldState, items: oldState.items };
         });
-    }, [])
+    }, []);
 
     const [state, setState] = useState<IFlowItemsContextData>({
         boardSize: getBoardSize(items),

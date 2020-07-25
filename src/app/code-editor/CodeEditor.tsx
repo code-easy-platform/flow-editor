@@ -463,10 +463,11 @@ const CodeEditor: React.FC<ICodeEditorProps> = memo(({ id, items = [], disableOp
                     {flowItems.list.map((item: FlowItem, index) => {
 
                         const itemsConnections: FlowItem[] = flowItems
-                            .list.filter((sucessorItem: FlowItem) => (sucessorItem.id !== undefined)
-                                ? item.connections.some(connection => sucessorItem.id === connection.connectionId)
-                                : false
-                            );
+                            .list.filter((sucessorItem: FlowItem) => (
+                                (sucessorItem.id !== undefined)
+                                    ? item.connections.some(connection => sucessorItem.id === connection.connectionId)
+                                    : false
+                            ));
 
                         /* Reinderiza todos os branchs de um item de fluxo. */
                         return <Lines
