@@ -50,6 +50,7 @@ export interface ILine {
     isCurved?: boolean;
     description?: string;
     isDisabled?: boolean;
+    isSelected?: boolean;
     id: string | undefined;
     lineType?: 'dotted' | 'normal';
 }

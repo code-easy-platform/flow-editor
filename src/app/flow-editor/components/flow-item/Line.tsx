@@ -2,8 +2,9 @@ import React, { memo, useEffect, useState, useCallback } from 'react';
 import { ILine } from '../../shared/interfaces/FlowItemInterfaces';
 import { useConfigs } from '../../contexts/Configurations';
 import { Utils } from 'code-easy-components';
+import { useFlowItems } from '../../contexts/FlowItemsContext';
 
-interface LineProps {
+interface LineProps extends ILine {
     /**
      * Used in parent component to move this element in the screen
      */
@@ -13,10 +14,15 @@ interface LineProps {
      */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const Line: React.FC<LineProps & ILine> = memo(({ id, left1, top1, description, radius = 40, isCurved, isDisabled, label, left2 = 0, lineType, onContextMenu, onMouseDown, top2 = 0 }) => {
-    const { disableOpacity, linesColor, lineWidth } = useConfigs();
+export const Line: React.FC<LineProps> = memo(({ id, left1, top1, description, radius = 40, isCurved, isDisabled, isSelected, label, left2 = 0, lineType, onContextMenu, onMouseDown, top2 = 0 }) => {
+    const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor } = useConfigs();
+    const { selectItemById } = useFlowItems();
+
+    // Sets the color of the line when selected
+    const strokeColor: string = isSelected ? `${flowItemSelectedColor}` : `${linesColor}`;
 
     const [basicPosition, setBasicPosition] = useState({
+        isCurved,
         top1: top1,
         top2: top2,
         left1: left1,
@@ -29,6 +35,7 @@ export const Line: React.FC<LineProps & ILine> = memo(({ id, left1, top1, descri
     useEffect(() => {
         setBasicPosition(oldState => ({
             ...oldState,
+            isCurved,
             top1: top1,
             top2: top2,
             left1: left1,
@@ -37,7 +44,7 @@ export const Line: React.FC<LineProps & ILine> = memo(({ id, left1, top1, descri
             rotate: Utils.getAngle(left2, top2, left1, top1),
             lineDistance: Math.hypot((top2 - top1), (left2 - left1)) - (radius + 5),
         }));
-    }, [left1, left2, top1, top2, radius]);
+    }, [left1, left2, top1, top2, radius, isCurved]);
 
     const polygonTop: number = (basicPosition.top2 - (radius + 15));
     const polygonLeft: number = (basicPosition.left2 - 5);
@@ -48,6 +55,7 @@ export const Line: React.FC<LineProps & ILine> = memo(({ id, left1, top1, descri
     const mouseMove = useCallback((event: MouseEvent) => {
         setBasicPosition(oldBasicPosition => ({
             ...oldBasicPosition,
+            isCurved: false,
             showNewLine: true,
             top2: event.offsetY,
             left2: event.offsetX,
@@ -65,6 +73,7 @@ export const Line: React.FC<LineProps & ILine> = memo(({ id, left1, top1, descri
         document.body.style.cursor = 'unset';
 
         setBasicPosition({
+            isCurved,
             top1: top1,
             top2: top2,
             left1: left1,
@@ -75,13 +84,21 @@ export const Line: React.FC<LineProps & ILine> = memo(({ id, left1, top1, descri
             lineDistance: (Math.hypot((top2 - top1), (left2 - left1)) - 40),
         });
 
-    }, [left1, left2, top1, top2]);
+    }, [left1, left2, top1, top2, isCurved]);
 
-    const mouseDown = useCallback(() => {
+    const mouseDown = useCallback((e: any) => {
+        e.stopPropagation();
+
         document.body.style.cursor = 'crosshair';
         window.onmousemove = mouseMove;
         window.onmouseup = onMouseUp;
-    }, [mouseMove, onMouseUp])
+        selectItemById(id, e.ctrlKey);
+    }, [mouseMove, onMouseUp, selectItemById, id]);
+
+    const handleSelectLine = (e: any) => {
+        e.stopPropagation();
+        selectItemById(id, e.ctrlKey);
+    }
 
     return (
         <g style={{ opacity: isDisabled ? disableOpacity : 1 }}>
@@ -91,7 +108,8 @@ export const Line: React.FC<LineProps & ILine> = memo(({ id, left1, top1, descri
                     textAnchor={"middle"}
                     x={basicPosition.left1}
                     fill={"var(--color-white)"}
-                    y={basicPosition.top1 + (basicPosition.lineDistance / 2) + (isCurved ? (basicPosition.isLeftToRight ? 35 : -35) : -5)}
+                    onMouseDown={handleSelectLine}
+                    y={basicPosition.top1 + (basicPosition.lineDistance / 2) + (basicPosition.isCurved ? (basicPosition.isLeftToRight ? 35 : -35) : -5)}
                     style={{ transform: `rotate(${basicPosition.isLeftToRight ? 90 : -90}deg)`, transformOrigin: `${basicPosition.left1}px ${basicPosition.top1 + (basicPosition.lineDistance / 2)}px` }}
                 >{label}</text>
             </g>
@@ -99,15 +117,15 @@ export const Line: React.FC<LineProps & ILine> = memo(({ id, left1, top1, descri
                 fill={"none"}
                 id={"line_" + id}
                 key={"line_" + id}
-                // onMouseDown={lineOnMouseDown}
-                stroke={linesColor || "gray"}
+                stroke={strokeColor || "gray"}
+                onMouseDown={handleSelectLine}
                 strokeDasharray={lineType === 'normal' ? undefined : "5,5"}
                 style={{
                     transform: `rotate(${basicPosition.rotate}deg)`,
                     transformOrigin: `${basicPosition.left1}px ${basicPosition.top1}px`,
                     display: (!basicPosition.showNewLine && id === undefined) ? 'none' : 'unset',
                 }}
-                d={`M${basicPosition.left1} ${basicPosition.top1 + 30} Q${basicPosition.left1 - (isCurved ? 50 : 0)} ${basicPosition.top1 + (basicPosition.lineDistance / 2)} ${basicPosition.left1} ${basicPosition.top1 + basicPosition.lineDistance}`}
+                d={`M${basicPosition.left1} ${basicPosition.top1 + 30} Q${basicPosition.left1 - (basicPosition.isCurved ? 50 : 0)} ${basicPosition.top1 + (basicPosition.lineDistance / 2)} ${basicPosition.left1} ${basicPosition.top1 + basicPosition.lineDistance}`}
             />
             <path
                 id={"path_" + id}
@@ -118,8 +136,8 @@ export const Line: React.FC<LineProps & ILine> = memo(({ id, left1, top1, descri
                 style={{
                     cursor: 'crosshair',
                     strokeWidth: lineWidth,
-                    fill: linesColor || "gray",
-                    stroke: linesColor || "gray",
+                    fill: strokeColor || "gray",
+                    stroke: strokeColor || "gray",
                     transform: `rotate(${basicPosition.rotate}deg)`,
                     transformOrigin: `${basicPosition.left2}px ${basicPosition.top2}px`,
                     display: (!basicPosition.showNewLine && id === undefined) ? 'none' : 'unset',

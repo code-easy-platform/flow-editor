@@ -47,6 +47,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => 
                     description: connection?.connectionDescription,
                     left1: item.left + ((item.width || 0) / 2),
                     top1: item.top + ((item.height || 0) / 2),
+                    isSelected: connection?.isSelected,
                     label: connection?.connectionLabel,
                     id: connection?.id,
                     lineType: "normal",
@@ -57,7 +58,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => 
                 });
             });
 
-            if (InternalUtils.useNewBranch(itemConnections.length, `${item.itemType}`)) {   
+            if (InternalUtils.useNewBranch(itemConnections.length, `${item.itemType}`)) {
                 lines.push({
                     radius: (item.width || 0) - ((item.width || 0) / 4),
                     left1: item.left + ((item.width || 0) / 2),
@@ -68,7 +69,8 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => 
                     isDisabled: false,
                     id: undefined,
                 });
-            }
+            };
+
         });
 
         return lines;
@@ -88,7 +90,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => 
                     onKeyDownDelete={removeSelectedItems}
                     backgroundType={backgroundType || "custom"}
                 >
-                    {getLines().map(line => <Line {...line} />)}
+                    {getLines().map((line, index) => <Line key={index} {...line} />)}
 
                     {items.map(item => (
                         <FlowItem

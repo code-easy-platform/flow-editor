@@ -21,6 +21,7 @@ export const ConfigurationProvider: React.FC<{ configs: IFlowEditorConfigs }> = 
         disableSelection = false,
         typesAllowedToDrop = [],
         disableOpacity = 0.5,
+        linesColor = 'gray',
         dottedSize = 15,
         lineWidth = 1,
     } = configs;
@@ -37,6 +38,7 @@ export const ConfigurationProvider: React.FC<{ configs: IFlowEditorConfigs }> = 
             disableSelection,
             backgroundType,
             disableOpacity,
+            linesColor,
             dottedSize,
             lineWidth,
         }

@@ -4,8 +4,10 @@ import { IFlowItem } from './../shared/interfaces/FlowItemInterfaces';
 import { ICoords } from '../../code-editor/shared/Interfaces';
 import { useConfigs } from './Configurations';
 
+/**
+ * 
+ */
 interface IFlowItemsContextData {
-
     /**
      * Depois que um elemento já está na tela, esta função muda a posição dele!
      * @param targetId Source element that is triggering the event
@@ -13,24 +15,50 @@ interface IFlowItemsContextData {
      * @param mousePositionLeft Posição do mouse com relação a esquerda(left) do quadro do editor
      */
     changePosition(targetId: string | undefined, top: number, left: number): void;
-    /** Toggle isSelected prop from a element by their id */
+    /**
+     * Toggle isSelected prop from a element by their id, toggle acorns, lines and comments
+     */
     selectItemById(id: string | undefined, keepSelecteds?: boolean): void;
+    /**
+     * 
+     */
     setItemById(id: string | undefined, item: IFlowItem): void;
+    /**
+     * 
+     */
     selectionAreaChange(coords: ICoords): void;
+    /**
+     * 
+     */
     setItems(items: IFlowItem[]): void;
-    /** Delete selected items from the flow */
+    /**
+     * Delete selected items from the flow
+     */
     removeSelectedItems(): void;
-    /** Deselects all previously selected items */
+    /**
+     * Deselects all previously selected items
+     */
     removeSelection(): void;
-    /** Select all items from the board */
+    /**
+     * Select all items from the board
+     */
     selectAll(): void;
+    /**
+     * 
+     */
     items: IFlowItem[];
+    /**
+     * 
+     */
     boardSize: {
         width: number,
         height: number,
     }
 }
 
+/**
+ * 
+ */
 const FlowItemsContext = createContext<IFlowItemsContextData>({} as IFlowItemsContextData);
 
 export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ children, items }) => {
@@ -70,18 +98,34 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
                 oldState.items.forEach(_item => {
                     if (_item.id === id) {
                         _item.isSelected = !_item.isSelected;
+                    } else {
+                        (_item.connections || []).forEach(conection => {
+                            if (conection.id === id) {
+                                conection.isSelected = !conection.isSelected;
+                            }
+                        });
                     }
                 });
             } else {
                 const flowItemSelecteds = oldState.items.filter(item => item.isSelected);
-                const keepMultiselect = flowItemSelecteds.length > 1 && flowItemSelecteds.some(item => item.id === id);
+                const keepMULTselect = flowItemSelecteds.length > 1 && flowItemSelecteds.some(item => item.id === id);
 
-                if (!keepMultiselect) {
+                if (!keepMULTselect) {
                     oldState.items.forEach(item => {
                         if (item.id === id) {
                             item.isSelected = true;
+                            (item.connections || []).forEach(conection => {
+                                conection.isSelected = false;
+                            });
                         } else {
                             item.isSelected = false;
+                            (item.connections || []).forEach(conection => {
+                                if (conection.id === id) {
+                                    conection.isSelected = true;
+                                } else {
+                                    conection.isSelected = false;
+                                }
+                            });
                         }
                     });
                 }
@@ -92,7 +136,10 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
 
     const removeSelection = useCallback(() => {
         setState(oldState => {
-            oldState.items.forEach(_item => _item.isSelected = false);
+            oldState.items.forEach(_item => {
+                _item.isSelected = false;
+                (_item.connections || []).forEach(connection => connection.isSelected = false);
+            });
             return { ...oldState };
         });
     }, []);
@@ -219,12 +266,13 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
     const removeSelectedItems = useCallback(() => {
         setState(oldState => {
 
-            /** Index do item selecionado que está sendo removido */
-            let itemCurrentIndex = oldState.items.findIndex(item => item.isSelected);
-            while (itemCurrentIndex > -1) {
-                oldState.items.splice(itemCurrentIndex, 1);
-                itemCurrentIndex = oldState.items.findIndex(item => item.isSelected);
-            }
+            /** Filters for items that are not selected, making deletion much simpler */
+            oldState.items = oldState.items.filter(item => !item.isSelected);
+
+            /** Remove connections */
+            oldState.items.forEach(item => {
+                item.connections = (item.connections || []).filter(connection => !connection.isSelected);
+            });
 
             return { ...oldState, items: oldState.items };
         });

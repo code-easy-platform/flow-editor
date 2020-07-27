@@ -30,13 +30,6 @@ export const Acorn: React.FC<FlowComponentProps> = memo(({ item, onContextMenu, 
         onMouseDown && onMouseDown(e);
     }
 
-    /* const mouseDownNewConnection = (e: React.MouseEvent<SVGGElement, MouseEvent>) => {
-        e.stopPropagation();
-        item.isSelected = true;
-        selectItemById(item.id, e.ctrlKey);
-        // onMouseDown && onMouseDown(e);
-    } */
-
     const contextMenu = useCallback((e: React.MouseEvent<SVGGElement, MouseEvent>) => {
         e.stopPropagation();
         e.preventDefault();
@@ -81,19 +74,6 @@ export const Acorn: React.FC<FlowComponentProps> = memo(({ item, onContextMenu, 
                 id={item.id}
                 y={item.top}
             />
-            {/* <rect // Allow create a new connection
-                onMouseDown={item.isDisabledNewConnetions ? mouseDownMove : mouseDownNewConnection}
-                style={{ cursor: item.isDisabledNewConnetions ? 'move' : 'crosshair' }}
-                strokeWidth={"var(--main-border-width)"}
-                height={(item.height || 0) + 20}
-                width={(item.width || 0) + 20}
-                fill={"transparent"}
-                x={item.left - 10}
-                y={item.top - 10}
-                id={item.id}
-                rx={50}
-                ry={50}
-            /> */}
             <rect // Move element
                 height={(item.height || 0) + (item.isDisabledNewConnetions ? ((item.height || 0) / 3) : 0)}
                 strokeWidth={"var(--main-border-width)"}
