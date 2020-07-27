@@ -52,6 +52,7 @@ export interface ILine {
     isDisabled?: boolean;
     isSelected?: boolean;
     id: string | undefined;
+    originId: string | undefined;
     lineType?: 'dotted' | 'normal';
 }
 export interface IFlowItem {
@@ -72,7 +73,10 @@ export interface IFlowItem {
     isSelected?: boolean;
     hasWarning?: boolean;
     description?: string;
-    connections?: IConnection[]
+    connections?: IConnection[];
     flowItemType: EFlowItemType;
-    isDisabledNewConnetions?: boolean;
+    /**
+     * Used to validate that this item can be connected with another item
+     */
+    isEnabledNewConnetion?: boolean;
 }

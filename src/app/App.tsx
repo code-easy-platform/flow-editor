@@ -10,6 +10,7 @@ const App: React.FC = () => {
     return (
         <div className="App">
             <FlowEditor
+                id="FlowEditor"
                 items={newItemsLogical.map(item => ({ ...item/* , id: Utils.getUUID() */ }))}
                 // onMouseEnter={console.log}
                 // onMouseLeave={console.log}

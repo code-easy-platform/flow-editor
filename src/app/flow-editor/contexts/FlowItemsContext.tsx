@@ -2,7 +2,8 @@ import React, { createContext, useState, useCallback, useContext, memo } from 'r
 
 import { IFlowItem } from './../shared/interfaces/FlowItemInterfaces';
 import { ICoords } from '../../code-editor/shared/Interfaces';
-import { useConfigs } from './Configurations';
+import { useConfigs } from './ConfigurationsContext';
+import { Utils } from 'code-easy-components';
 
 /**
  * 
@@ -19,6 +20,13 @@ interface IFlowItemsContextData {
      * Toggle isSelected prop from a element by their id, toggle acorns, lines and comments
      */
     selectItemById(id: string | undefined, keepSelecteds?: boolean): void;
+    /**
+     * Function used to create or update connections
+     * @param connectionId string | undefined - Current connection id, used to update the connection. If it is null, then a new connection is created.
+     * @param originItemId string | undefined - Line source item, used to identify who will connect with the target element
+     * @param targetItemId string | undefined - Destination element identifier, used to identify who will be connected
+     */
+    createOrUpdateConnection(connectionId: string | undefined, originItemId: string | undefined, targetItemId: string | undefined): void;
     /**
      * 
      */
@@ -278,8 +286,48 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
         });
     }, []);
 
+    const createOrUpdateConnection = useCallback((connectionId: string | undefined, originItemId: string | undefined, targetItemId: string | undefined) => {
+
+        /**
+         *
+         * If the "connectionId" is null it means that a new connection is being created
+         * 
+         */
+
+        // Validate that you are connecting to yourself
+        if (originItemId === targetItemId) return;
+
+        setState(oldState => {
+
+            /** Item on which changes to successors are being made */
+            const itemCurrent = oldState.items.find(item => item.id === originItemId);
+            if (!itemCurrent) return { ...oldState };
+
+            /** Validates that the target item does exist */
+            if (!oldState.items.some(item => item.id === targetItemId)) return { ...oldState };
+
+            // Validates whether you are creating a new connection or just editing an existing one
+            if (connectionId) {
+                // 
+                (itemCurrent.connections || []).forEach(connection => {
+                    if (connection.id === connectionId) {
+                        connection.connectionId = `${targetItemId}`;
+                    }
+                });
+            } else {
+                itemCurrent.connections?.push({
+                    id: Utils.getUUID(),
+                    connectionId: `${targetItemId}`,
+                });
+            }
+
+            return { ...oldState };
+        });
+    }, []);
+
     const [state, setState] = useState<IFlowItemsContextData>({
         boardSize: getBoardSize(items),
+        createOrUpdateConnection,
         selectionAreaChange,
         removeSelectedItems,
         removeSelection,

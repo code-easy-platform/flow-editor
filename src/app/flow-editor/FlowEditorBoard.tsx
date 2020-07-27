@@ -4,11 +4,10 @@ import { IFlowEditorBoardProps } from './shared/interfaces/FlowEditorInterfaces'
 import { EditorPanel } from '../code-editor/components/editor-panel/EditorPanel';
 import { SelectorArea } from '../code-editor/components/selector/SelectorArea';
 import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
-import { Utils as InternalUtils } from '../code-editor/shared/Utils';
 import { ILine } from './shared/interfaces/FlowItemInterfaces';
+import { useConfigs } from './contexts/ConfigurationsContext';
 import { FlowItem } from './components/flow-item/FlowItem';
 import { useFlowItems } from './contexts/FlowItemsContext';
-import { useConfigs } from './contexts/Configurations';
 import { Line } from './components/flow-item/Line';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => {
@@ -52,13 +51,14 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => 
                     id: connection?.id,
                     lineType: "normal",
                     isDisabled: false,
+                    originId: item.id,
                     isCurved,
                     left2,
                     top2,
                 });
             });
 
-            if (InternalUtils.useNewBranch(itemConnections.length, `${item.itemType}`)) {
+            if (item.isEnabledNewConnetion === undefined || item.isEnabledNewConnetion) {
                 lines.push({
                     radius: (item.width || 0) - ((item.width || 0) / 4),
                     left1: item.left + ((item.width || 0) / 2),
@@ -66,6 +66,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = memo((props) => 
                     left2: item.left + ((item.width || 0) / 2),
                     top2: item.top + ((item.height || 0) / 2),
                     lineType: "normal",
+                    originId: item.id,
                     isDisabled: false,
                     id: undefined,
                 });

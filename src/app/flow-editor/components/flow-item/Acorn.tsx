@@ -1,7 +1,7 @@
 import React, { memo, useCallback } from 'react';
 import { useFlowItems } from '../../contexts/FlowItemsContext';
 import { IFlowItem } from '../../shared/interfaces/FlowItemInterfaces';
-import { useConfigs } from '../../contexts/Configurations';
+import { useConfigs } from '../../contexts/ConfigurationsContext';
 
 interface FlowComponentProps {
     item: IFlowItem;
@@ -75,7 +75,7 @@ export const Acorn: React.FC<FlowComponentProps> = memo(({ item, onContextMenu, 
                 y={item.top}
             />
             <rect // Move element
-                height={(item.height || 0) + (item.isDisabledNewConnetions ? ((item.height || 0) / 3) : 0)}
+                height={(item.height || 0) + (item.isEnabledNewConnetion ? ((item.height || 0) / 3) : 0)}
                 strokeWidth={"var(--main-border-width)"}
                 y={item.top - ((item.height || 0) / 3)}
                 style={{ cursor: 'move', zIndex: 2 }}
@@ -86,7 +86,7 @@ export const Acorn: React.FC<FlowComponentProps> = memo(({ item, onContextMenu, 
                 id={item.id}
             ><title>{item.description}</title></rect>
             <image // Render icon
-                style={{ pointerEvents: 'none' }}
+                style={{ pointerEvents: 'none', zIndex: 0 }}
                 xlinkTitle={item.description}
                 xlinkHref={item.icon}
                 stroke={strokeColor}

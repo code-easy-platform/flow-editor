@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useState, useCallback } from 'react';
 import { ILine } from '../../shared/interfaces/FlowItemInterfaces';
-import { useConfigs } from '../../contexts/Configurations';
+import { useConfigs } from '../../contexts/ConfigurationsContext';
 import { Utils } from 'code-easy-components';
 import { useFlowItems } from '../../contexts/FlowItemsContext';
 
@@ -14,9 +14,9 @@ interface LineProps extends ILine {
      */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const Line: React.FC<LineProps> = memo(({ id, left1, top1, description, radius = 40, isCurved, isDisabled, isSelected, label, left2 = 0, lineType, onContextMenu, onMouseDown, top2 = 0 }) => {
+export const Line: React.FC<LineProps> = memo(({ id, originId, left1, top1, description, radius = 40, isCurved, isDisabled, isSelected, label, left2 = 0, lineType, onContextMenu, onMouseDown, top2 = 0 }) => {
     const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor } = useConfigs();
-    const { selectItemById } = useFlowItems();
+    const { selectItemById, createOrUpdateConnection } = useFlowItems();
 
     // Sets the color of the line when selected
     const strokeColor: string = isSelected ? `${flowItemSelectedColor}` : `${linesColor}`;
@@ -68,6 +68,8 @@ export const Line: React.FC<LineProps> = memo(({ id, left1, top1, description, r
     const onMouseUp = useCallback((e: any) => {
         e.stopPropagation();
 
+        createOrUpdateConnection(id, originId, e.target.id);
+
         window.onmouseup = null;
         window.onmousemove = null;
         document.body.style.cursor = 'unset';
@@ -84,7 +86,7 @@ export const Line: React.FC<LineProps> = memo(({ id, left1, top1, description, r
             lineDistance: (Math.hypot((top2 - top1), (left2 - left1)) - 40),
         });
 
-    }, [left1, left2, top1, top2, isCurved]);
+    }, [left1, left2, top1, top2, isCurved, id, originId, createOrUpdateConnection]);
 
     const mouseDown = useCallback((e: any) => {
         e.stopPropagation();

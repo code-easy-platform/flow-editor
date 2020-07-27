@@ -50,7 +50,6 @@ export interface IFlowEditorConfigs {
      * Stroke width used in lines in the flow
      */
     lineWidth?: number;
-
 }
 
 /** Set of events used by FlowEditorBoard */
@@ -61,7 +60,7 @@ export interface IFlowEditorBoardEvents {
 
 /** Set of properties used by FlowEditorBoard */
 export interface IFlowEditorBoardProps extends IFlowEditorBoardEvents {
-    id?: string;
+    id: string;
 
     /** The component is showed when the items props is empty  */
     childrenWhenItemsEmpty?: React.ReactNode
