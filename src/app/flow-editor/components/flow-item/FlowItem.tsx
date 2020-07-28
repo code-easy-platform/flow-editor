@@ -2,12 +2,15 @@ import React, { memo, useCallback, useRef } from 'react';
 
 import { EFlowItemType, IFlowItem } from '../../shared/interfaces/FlowItemInterfaces';
 import { useFlowItems } from '../../contexts/FlowItemsContext';
+import { Comment } from './Comment';
 import { Acorn } from './Acorn';
 
-interface FlowProps extends IFlowItem {
+interface FlowProps {
+    item?: IFlowItem;
+    flowItemType: EFlowItemType;
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const FlowItem: React.FC<FlowProps> = memo(({ onContextMenu, ...rest }) => {
+export const FlowItem: React.FC<FlowProps> = memo(({ onContextMenu, flowItemType, item }) => {
     const { changePosition } = useFlowItems();
 
     /**
@@ -22,45 +25,53 @@ export const FlowItem: React.FC<FlowProps> = memo(({ onContextMenu, ...rest }) =
         window.onmouseup = null;
     }, []);
 
-    /** Armazena a posição onde o iten item do fluxo foi clicado. */
+    /** Stores the position where the flow item item was clicked. */
     let cliquedLocationFlowItem = useRef({ top: 0, left: 0 });
 
-    /** Quando um item estiver selecionado e for arrastado na tale esta fun vai fazer isso acontecer. */
+    /** When an item is selected and dragged on the tale this fun will make it happen. */
     const mouseMove = useCallback((e: MouseEvent) => {
         e.stopPropagation();
 
         const top = e.offsetY - cliquedLocationFlowItem.current.top;
         const left = e.offsetX - cliquedLocationFlowItem.current.left;
 
-        changePosition(rest.id, top, left);
+        changePosition(item?.id, top, left);
 
-    }, [rest.id, changePosition]);
+    }, [item, changePosition]);
 
     /** Declara a fun no ref da svg para que o item atual possa ser arrastado na tela. */
     const mouseDown = useCallback((e: React.MouseEvent<SVGGElement, MouseEvent>) => {
         e.stopPropagation();
 
         cliquedLocationFlowItem.current = {
-            top: e.nativeEvent.offsetY - rest.top,
-            left: e.nativeEvent.offsetX - rest.left,
+            top: e.nativeEvent.offsetY - (item?.top || 0),
+            left: e.nativeEvent.offsetX - (item?.left || 0),
         };
 
         window.onmousemove = mouseMove;
         window.onmouseup = mouseUp;
-    }, [rest.left, rest.top, mouseMove, mouseUp]);
+    }, [item, mouseMove, mouseUp]);
 
-    switch (rest.flowItemType) {
+    switch (flowItemType) {
         case EFlowItemType.acorn:
+            if (!item) return null;
             return (
                 <Acorn
-                    item={rest}
+                    item={item}
                     onMouseDown={mouseDown}
                     onContextMenu={onContextMenu}
                 />
             );
         case EFlowItemType.comment:
-            return (<></>);
-        case EFlowItemType.line:
-            return (<></>);
+            if (!item) return null;
+            return (
+                <Comment
+                    item={item}
+                    onMouseDown={mouseDown}
+                    onContextMenu={onContextMenu}
+                />
+            );
+        default:
+            return null;
     }
 });

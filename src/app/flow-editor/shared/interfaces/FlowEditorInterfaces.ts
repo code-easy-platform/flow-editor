@@ -43,6 +43,10 @@ export interface IFlowEditorConfigs {
      */
     flowItemErrorColor?: string;
     /**
+     * Color used in comments in the flow
+     */
+    commentColor?: string;
+    /**
      * Color used in lines in the flow
      */
     linesColor?: string;
@@ -56,13 +60,15 @@ export interface IFlowEditorConfigs {
 export interface IFlowEditorBoardEvents {
     onMouseEnter?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
     onMouseLeave?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
+    onContextMenu?(event: React.MouseEvent<any, MouseEvent>): void;
 }
 
 /** Set of properties used by FlowEditorBoard */
 export interface IFlowEditorBoardProps extends IFlowEditorBoardEvents {
     id: string;
-
-    /** The component is showed when the items props is empty  */
+    /**
+     * The component is showed when the items props is empty
+     */
     childrenWhenItemsEmpty?: React.ReactNode
 }
 

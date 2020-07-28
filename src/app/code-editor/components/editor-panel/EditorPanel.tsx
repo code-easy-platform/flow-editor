@@ -39,7 +39,7 @@ export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, 
         }
     }
 
-    ref = useRef(null);
+    if (!ref.current) ref = useRef(null);
 
     if (ref?.current) {
 

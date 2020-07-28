@@ -1,7 +1,6 @@
 import React from 'react';
-import { Utils } from 'code-easy-components'
 
-import { newItemsLogical, items, itemsLogica } from './Mock';
+import { newItemsLogical } from './Mock';
 // import { FlowEditor } from './code-editor/CodeEditor';
 import { FlowEditor } from './flow-editor';
 import './App.css';

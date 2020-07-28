@@ -1,7 +1,8 @@
 import React, { memo, useEffect, useState, useCallback } from 'react';
+import { Utils } from 'code-easy-components';
+
 import { ILine } from '../../shared/interfaces/FlowItemInterfaces';
 import { useConfigs } from '../../contexts/ConfigurationsContext';
-import { Utils } from 'code-easy-components';
 import { useFlowItems } from '../../contexts/FlowItemsContext';
 
 interface LineProps extends ILine {
@@ -14,7 +15,7 @@ interface LineProps extends ILine {
      */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const Line: React.FC<LineProps> = memo(({ id, originId, left1, top1, description, radius = 40, isCurved, isDisabled, isSelected, label, left2 = 0, lineType, onContextMenu, onMouseDown, top2 = 0 }) => {
+export const Line: React.FC<LineProps> = memo(({ id, originId, left, top, description, radius = 40, isCurved, isDisabled, isSelected, label, left2 = 0, lineType, onContextMenu, onMouseDown, top2 = 0 }) => {
     const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor } = useConfigs();
     const { selectItemById, createOrUpdateConnection } = useFlowItems();
 
@@ -23,28 +24,28 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, left1, top1, desc
 
     const [basicPosition, setBasicPosition] = useState({
         isCurved,
-        top1: top1,
+        top1: top,
         top2: top2,
-        left1: left1,
+        left1: left,
         left2: left2,
         showNewLine: false,
-        isLeftToRight: (left2 >= left1),
-        rotate: Utils.getAngle(left2, top2, left1, top1),
-        lineDistance: Math.hypot((top2 - top1), (left2 - left1)) - (radius + 5),
+        isLeftToRight: (left2 >= left),
+        rotate: Utils.getAngle(left2, top2, left, top),
+        lineDistance: Math.hypot((top2 - top), (left2 - left)) - (radius + 5),
     });
     useEffect(() => {
         setBasicPosition(oldState => ({
             ...oldState,
             isCurved,
-            top1: top1,
+            top1: top,
             top2: top2,
-            left1: left1,
+            left1: left,
             left2: left2,
-            isLeftToRight: (left2 >= left1),
-            rotate: Utils.getAngle(left2, top2, left1, top1),
-            lineDistance: Math.hypot((top2 - top1), (left2 - left1)) - (radius + 5),
+            isLeftToRight: (left2 >= left),
+            rotate: Utils.getAngle(left2, top2, left, top),
+            lineDistance: Math.hypot((top2 - top), (left2 - left)) - (radius + 5),
         }));
-    }, [left1, left2, top1, top2, radius, isCurved]);
+    }, [left, left2, top, top2, radius, isCurved]);
 
     const polygonTop: number = (basicPosition.top2 - (radius + 15));
     const polygonLeft: number = (basicPosition.left2 - 5);
@@ -59,11 +60,11 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, left1, top1, desc
             showNewLine: true,
             top2: event.offsetY,
             left2: event.offsetX,
-            isLeftToRight: (event.offsetX >= left1),
-            rotate: Utils.getAngle(event.offsetX, event.offsetY, left1, top1),
-            lineDistance: (Math.hypot((event.offsetY - top1), (event.offsetX - left1)) - 40),
+            isLeftToRight: (event.offsetX >= left),
+            rotate: Utils.getAngle(event.offsetX, event.offsetY, left, top),
+            lineDistance: (Math.hypot((event.offsetY - top), (event.offsetX - left)) - 40),
         }));
-    }, [left1, top1]);
+    }, [left, top]);
 
     const onMouseUp = useCallback((e: any) => {
         e.stopPropagation();
@@ -76,17 +77,17 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, left1, top1, desc
 
         setBasicPosition({
             isCurved,
-            top1: top1,
+            top1: top,
             top2: top2,
-            left1: left1,
+            left1: left,
             left2: left2,
             showNewLine: false,
-            isLeftToRight: (left2 >= left1),
-            rotate: Utils.getAngle(left2, top2, left1, top1),
-            lineDistance: (Math.hypot((top2 - top1), (left2 - left1)) - 40),
+            isLeftToRight: (left2 >= left),
+            rotate: Utils.getAngle(left2, top2, left, top),
+            lineDistance: (Math.hypot((top2 - top), (left2 - left)) - 40),
         });
 
-    }, [left1, left2, top1, top2, isCurved, id, originId, createOrUpdateConnection]);
+    }, [left, left2, top, top2, isCurved, id, originId, createOrUpdateConnection]);
 
     const mouseDown = useCallback((e: any) => {
         e.stopPropagation();

@@ -301,13 +301,11 @@ const CodeEditor: React.FC<ICodeEditorProps> = memo(({ id, items = [], disableOp
     /** Copia os items de fluxo selecionados */
     const copySelecteds = () => {
         const components = flowItems.list.filter((item: FlowItem) => item.isSelected);
-
         inputCopyRef.current.value = JSON.stringify(components);
         inputCopyRef.current.focus()
         inputCopyRef.current.select()
         document.execCommand('copy');
         editorPanelRef.current.focus()
-
     }
 
     /** Cola os items de fluxo na área de transferência */

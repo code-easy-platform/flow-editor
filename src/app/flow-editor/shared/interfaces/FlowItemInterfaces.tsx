@@ -37,44 +37,39 @@ export interface IConnection {
      */
     connectionId: string;
 }
+export interface BasicFlowItem {
+    label?: string;
+    top: number | 0;
+    left: number | 0;
+    isSelected?: boolean;
+    description?: string;
+    isDisabled?: boolean;
+    id: string | undefined;
+    flowItemType: EFlowItemType;
+}
 /**
  * 
  */
-export interface ILine {
-    top1: number;
+export interface ILine extends BasicFlowItem {
     top2?: number;
-    left1: number;
-    label?: string;
     left2?: number;
     radius?: number;
+    originId?: string;
     isCurved?: boolean;
-    description?: string;
-    isDisabled?: boolean;
-    isSelected?: boolean;
-    id: string | undefined;
-    originId: string | undefined;
     lineType?: 'dotted' | 'normal';
 }
-export interface IFlowItem {
+export interface IFlowItem extends BasicFlowItem {
     icon?: any;
-    id?: string;
-    title?: string;
     width?: number;
     height?: number;
-    top: number | 0;
-    left: number | 0;
     /**
      * Used to define a type of the item.
      * Ex: start, assign, foreach, etc...
      */
     itemType?: string;
     hasError?: boolean;
-    isDisabled?: boolean;
-    isSelected?: boolean;
     hasWarning?: boolean;
-    description?: string;
     connections?: IConnection[];
-    flowItemType: EFlowItemType;
     /**
      * Used to validate that this item can be connected with another item
      */

@@ -1,7 +1,8 @@
 import React, { memo, useCallback } from 'react';
-import { useFlowItems } from '../../contexts/FlowItemsContext';
+
 import { IFlowItem } from '../../shared/interfaces/FlowItemInterfaces';
 import { useConfigs } from '../../contexts/ConfigurationsContext';
+import { useFlowItems } from '../../contexts/FlowItemsContext';
 
 interface FlowComponentProps {
     item: IFlowItem;
@@ -49,7 +50,7 @@ export const Acorn: React.FC<FlowComponentProps> = memo(({ item, onContextMenu, 
                 textAnchor={"middle"}
                 fontSize={"small"}
                 y={item.top - 5}
-            >{item.title}</text>
+            >{item.label}</text>
             <rect // Ajuda no backbround
                 strokeWidth={"var(--main-border-width)"}
                 fill="var(--main-background)"

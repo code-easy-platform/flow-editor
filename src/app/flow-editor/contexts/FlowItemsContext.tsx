@@ -1,9 +1,10 @@
-import React, { createContext, useState, useCallback, useContext, memo } from 'react';
+import React, { createContext, useState, useCallback, useContext, memo, useRef } from 'react';
+import { Utils } from 'code-easy-components';
 
 import { IFlowItem } from './../shared/interfaces/FlowItemInterfaces';
 import { ICoords } from '../../code-editor/shared/Interfaces';
 import { useConfigs } from './ConfigurationsContext';
-import { Utils } from 'code-easy-components';
+import { InputCopy } from '../../code-editor/components/input-copy/InputCopy';
 
 /**
  * 
@@ -30,6 +31,10 @@ interface IFlowItemsContextData {
     /**
      * 
      */
+    getSizeByText(text: string): { width: number, height: number };
+    /**
+     * 
+     */
     setItemById(id: string | undefined, item: IFlowItem): void;
     /**
      * 
@@ -47,6 +52,14 @@ interface IFlowItemsContextData {
      * Deselects all previously selected items
      */
     removeSelection(): void;
+    /**
+     * Paste all items in the board
+     */
+    pasteSelecteds(): void;
+    /**
+     * Copy all items from the board
+     */
+    copySelecteds(): Promise<void>;
     /**
      * Select all items from the board
      */
@@ -71,6 +84,7 @@ const FlowItemsContext = createContext<IFlowItemsContextData>({} as IFlowItemsCo
 
 export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ children, items }) => {
     const { snapGridWhileDragging } = useConfigs();
+    const inputCopyRef = useRef<any>(null);
 
     const getBoardSize = useCallback((flowItems: IFlowItem[]) => {
         return {
@@ -325,6 +339,56 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
         });
     }, []);
 
+    const getSizeByText = useCallback((text: string) => {
+        var span = document.createElement("span");
+        document.body.appendChild(span);
+        span.style.whiteSpace = 'pre-line';
+        span.style.position = 'absolute';
+        span.style.textAlign = 'start';
+        span.style.fontSize = 'small';
+        span.style.height = 'auto';
+        span.style.width = 'auto';
+        span.innerText = text;
+        var formattedWidth = Math.ceil(span.clientWidth);
+        var formattedHeight = Math.ceil(span.clientHeight);
+        document.body.removeChild(span);
+        return {
+            width: (formattedWidth < 100 ? 100 : formattedWidth) + 10,
+            height: (formattedHeight < 70 ? 70 : formattedHeight) + 10,
+        };
+    }, []);
+
+    /** Copy selected flow items */
+    const copySelecteds = useCallback(async () => {
+        navigator.clipboard.writeText(inputCopyRef.current.value)
+    }, []);
+
+    /** Paste selected flow items */
+    const pasteSelecteds = useCallback(() => {
+        try {
+            navigator.clipboard.readText().then(text => {
+                // const components: IFlowItem[] = JSON.parse(text || '[]');
+                const components2: IFlowItem[] = JSON.parse(text || '[]');
+
+                setState(oldState => {
+                    components2.forEach(item => {
+                        item.id = Utils.getUUID();
+                        item.left += 100;
+
+                        (item.connections || []).forEach(connection => {
+                            connection.id = Utils.getUUID();
+                        });
+
+                        oldState.items.push(item);
+                    });
+
+                    return { ...oldState };
+                });
+            })
+
+        } catch (e) { console.log(e) }
+    }, []);
+
     const [state, setState] = useState<IFlowItemsContextData>({
         boardSize: getBoardSize(items),
         createOrUpdateConnection,
@@ -333,6 +397,9 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
         removeSelection,
         changePosition,
         selectItemById,
+        pasteSelecteds,
+        copySelecteds,
+        getSizeByText,
         setItemById,
         selectAll,
         setItems,
@@ -340,7 +407,8 @@ export const FlowItemsProvider: React.FC<{ items: IFlowItem[] }> = memo(({ child
     });
 
     return (
-        <FlowItemsContext.Provider value={state}>
+        <FlowItemsContext.Provider value={{ ...state }}>
+            <InputCopy ref={inputCopyRef} value={JSON.stringify(state.items.filter(item => item.isSelected))} />
             {children}
         </FlowItemsContext.Provider>
     );
