@@ -1,4 +1,4 @@
-import { IFlowItem } from "./../interfaces/FlowItemInterfaces";
+import { IFlowItem } from "./FlowItemInterfaces";
 
 /** Specific set of settings used in the flow editor */
 export interface IFlowEditorConfigs {
