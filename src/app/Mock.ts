@@ -1,6 +1,6 @@
 import { IconFlowStart, IconFlowIf, IconFlowForeach, IconFlowAction, IconFlowAssign } from 'code-easy-components';
 
-import { IFlowItem, EFlowItemType } from "./flow-editor/shared/interface/FlowItemInterfaces";
+import { IFlowItem, EFlowItemType } from "./flow-editor/shared/interfaces/FlowItemInterfaces";
 import { ItemType } from './flow-editor/shared/enums/ItemType';
 
 export const ItemsLogical: IFlowItem[] = [

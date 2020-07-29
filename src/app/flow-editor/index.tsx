@@ -3,9 +3,9 @@ import { RecoilRoot, MutableSnapshot } from 'recoil';
 import { DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 
-import { IFlowEditorProps } from './shared/interface/FlowEditorInterfaces';
+import { IFlowEditorProps } from './shared/interfaces/FlowEditorInterfaces';
 import { FlowEditorBoard } from './FlowEditorBoard';
-import { FlowItemsStore, FlowItemStore } from './shared/stores';
+import { FlowItemsStore, FlowItemStore, ConfigurationsStore } from './shared/stores';
 
 export const FlowEditor = ({ configs, items, ...rest }: IFlowEditorProps) => {
     const handleInitializaState = ({ set }: MutableSnapshot) => {
@@ -18,6 +18,9 @@ export const FlowEditor = ({ configs, items, ...rest }: IFlowEditorProps) => {
             if (item.id)
                 set(FlowItemStore(item.id), item);
         });
+
+        // Set configurations
+        set(ConfigurationsStore, configs);
     }
 
     return (

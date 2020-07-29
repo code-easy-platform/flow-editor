@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { IFlowEditorConfigs } from "../interface/FlowEditorInterfaces";
+import { IFlowEditorConfigs } from "../interfaces/FlowEditorInterfaces";
 
 export const ConfigurationsStore = atom<IFlowEditorConfigs>({
     key: '',
