@@ -29,13 +29,17 @@ export interface IConnection {
      */
     id: string | undefined;
     /**
-     * Used to identify when the usre click over the line
+     * Used to identify when the user click over the line
      */
     isSelected?: boolean;
     /**
      * Identifier of the element that is connected by the line 
      */
-    connectionId: string;
+    originId: string;
+    /**
+     * Identifier of the element that is connected by the line 
+     */
+    targetId: string;
 }
 export interface BasicFlowItem {
     label?: string;

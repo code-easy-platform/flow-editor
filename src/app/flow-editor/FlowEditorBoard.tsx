@@ -6,15 +6,14 @@ import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
 import { EditorPanel } from './components/editor-panel/EditorPanel';
 import { SelectorArea } from './components/selector/SelectorArea';
 import { FlowItem } from './components/flow-item/FlowItem';
-import { useFlowItems, useConfigs, useBoardSize } from './shared/hooks';
+import { useFlowItems, useConfigs } from './shared/hooks';
 import { ICoords, IFlowItem } from './shared/interfaces';
 import { FlowItemStore } from './shared/stores';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const { dottedSize, typesAllowedToDrop, backgroundType, disableSelection } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit" } = props;
-    const { onMouseEnter, onMouseLeave, /* onContextMenu */ } = props;
-    const boardSize = useBoardSize();
+    const { onMouseEnter, onMouseLeave, onContextMenu } = props;
     const items = useFlowItems();
 
     const selectItem = useCallback((item: IFlowItem, coords: ICoords) => {
@@ -59,22 +58,17 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         );
     }, [])
 
-    const setSelectedFlowItem = useRecoilCallback(({ set }) => {
-        return (id: string, coords: ICoords) => {
+    const setSelectedFlowItem = useRecoilCallback(({ set, snapshot }) => (coords: ICoords) => {
+        items.forEach(async id => {
 
-            // const item = get(FlowItemStore(id));
+            const item = await snapshot.getPromise(FlowItemStore(id));
+            const isSelected = selectItem(item, coords);
 
-            set(FlowItemStore(id), oldState => {
-                const isSelected = selectItem(oldState, coords);
-                if (isSelected !== oldState.isSelected) {
-                    return {
-                        ...oldState,
-                        isSelected
-                    };
-                } else
-                    return oldState;
-            });
-        }
+            if (item.isSelected !== isSelected) {
+                set(FlowItemStore(id), { ...item, isSelected });
+            }
+
+        });
     });
 
     return (
@@ -83,9 +77,8 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                 <EditorPanel
                     id={`${id}_SVG`}
                     // ref={editorPanelRef}
-                    width={boardSize.width}
                     dottedSize={dottedSize}
-                    height={boardSize.height}
+                    onContextMenu={onContextMenu}
                     // onKeyDownCtrlA={selectAll}
                     // onKeyDownCtrlC={handleCtrlC}
                     // onKeyDownCtrlV={handleCtrlV}
@@ -100,16 +93,12 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                         <FlowItem
                             id={id}
                             key={id}
-                        // onContextMenu={onContextMenu}
+                            onContextMenu={onContextMenu}
                         />
                     ))}
                     <SelectorArea
                         isDisabled={disableSelection}
-                        onCoordsChange={coords => {
-                            items.forEach(id => {
-                                setSelectedFlowItem(id, coords);
-                            });
-                        }}
+                        onCoordsChange={setSelectedFlowItem}
                     />
                     <EmptyFeedback show={items.length === 0} children={childrenWhenItemsEmpty} />
                 </EditorPanel>

@@ -31,17 +31,18 @@ export const GetBoardSize = selector<{ width: number, height: number }>({
     get: ({ get }) => {
         const flowItems = get(GetFlowItemsSelector);
 
-        console.log(flowItems)
-        try {
+        // console.log(flowItems/* .sort((a, b) => b.top - a.top) */)
 
+        try {
             const maiorTop = flowItems.sort((a, b) => b.top - a.top).shift();
             const maiorLeft = flowItems.sort((a, b) => b.left - a.left).shift();
- 
+            
             return {
                 width: maiorLeft ? maiorLeft.left + 200 : 0,
                 height: maiorTop ? maiorTop.top + 300 : 0,
             }
         } catch (e) {
+            //console.log(e)
             return {
                 width: 0,
                 height: 0,

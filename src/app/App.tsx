@@ -12,12 +12,14 @@ const App: React.FC = () => {
                 items={ItemsLogical.map(item => ({ ...item/* , id: Utils.getUUID() */ }))}
                 // onMouseEnter={console.log}
                 // onMouseLeave={console.log}
+                onContextMenu={console.log}
                 configs={{
                     // disableSelection: true,
                     flowItemWarningColor: 'var(--main-warning-color)',
                     flowItemSelectedColor: 'var(--color-botton-bar)',
                     flowItemErrorColor: 'var(--main-error-color)',
                     snapGridWhileDragging: true,
+                    flowItemTextColor: 'white',
                     backgroundType: "dotted",
                     dottedSize: 15,
                 }}

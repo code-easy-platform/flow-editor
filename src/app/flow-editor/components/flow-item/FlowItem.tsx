@@ -1,13 +1,18 @@
 import React, { useCallback, useRef } from 'react';
 
-import { useFlowItem, useDragAllElements } from '../../shared/hooks';
+import { useFlowItem, useDragAllElements, useSelectItemById } from '../../shared/hooks';
 import { EFlowItemType } from '../../shared/interfaces';
 import { Comment } from './Comment';
 import { Acorn } from './Acorn';
 
-export const FlowItem: React.FC<{ id: string }> = ({ id }) => {
-    const [flowItem] = useFlowItem(id);
+interface FlowProps {
+    id: string;
+    onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
+}
+export const FlowItem: React.FC<FlowProps> = ({ id, onContextMenu }) => {
     const dragAllFlowItems = useDragAllElements();
+    const selectItemById = useSelectItemById();
+    const [flowItem] = useFlowItem(id);
 
     /**
      * Ajuda a evitar que bugs aconteçam por estar uma fun declarada
@@ -43,9 +48,11 @@ export const FlowItem: React.FC<{ id: string }> = ({ id }) => {
             left: e.nativeEvent.offsetX - (flowItem?.left || 0),
         };
 
+        selectItemById(flowItem.id, e.ctrlKey);
+
         window.onmousemove = mouseMove;
         window.onmouseup = mouseUp;
-    }, [flowItem, mouseMove, mouseUp]);
+    }, [flowItem, mouseMove, mouseUp, selectItemById]);
 
     switch (flowItem.flowItemType) {
         case EFlowItemType.acorn:
@@ -54,7 +61,7 @@ export const FlowItem: React.FC<{ id: string }> = ({ id }) => {
                 <Acorn
                     item={flowItem}
                     onMouseDown={mouseDown}
-                // onContextMenu={onContextMenu}
+                    onContextMenu={onContextMenu}
                 />
             );
         case EFlowItemType.comment:

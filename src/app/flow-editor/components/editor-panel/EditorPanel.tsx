@@ -1,6 +1,8 @@
 import React, { memo, useRef } from 'react';
 import { useDrop, DropTargetMonitor } from 'react-dnd';
 
+import { useBoardSize } from '../../shared/hooks';
+
 type EditorPanelProps = Omit<{
     dottedSize?: number;
     allowedsInDrop?: string[];
@@ -25,6 +27,7 @@ type EditorPanelProps = Omit<{
  * @param backgroundType - **'dotted'** | **'checkered'** | **'custom'** - Parâmetro que controla o estilo do background do painel
  */
 export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, onChangeZoom, dottedSize = 15, backgroundType = 'dotted', onArrowKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV, onKeyDownCtrlA, onKeyDownDelete, onAnyKeyDown, ...props }: EditorPanelProps, ref: any) => {
+    const { height, width } = useBoardSize();
 
     const [zoom, setZoom] = React.useState(1);
     const wheel = (e: React.WheelEvent<SVGSVGElement>) => {
@@ -84,6 +87,8 @@ export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, 
             {...props}
             ref={ref}
             tabIndex={0}
+            width={width}
+            height={height}
             onWheel={wheel}
             preserveAspectRatio="none"
             style={{
