@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/code-easy-platform/flow-editor/master/project/Logo%20github.png" width="100%" alt="Code easy platform" />
+</p>
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
