@@ -1,10 +1,24 @@
 import React, { memo, useEffect, useState, useCallback } from 'react';
 import { Utils } from 'code-easy-components';
+import { useRecoilValue } from 'recoil';
 
-import { ILine } from '../../shared/interfaces/FlowItemInterfaces';
-import { useConfigs } from '../../shared/hooks';
+import { useConfigs, useSelectItemById, useCreateOrUpdateConnection } from '../../shared/hooks';
+import { EFlowItemType } from '../../shared/interfaces';
+import { FlowItemStore } from '../../shared/stores';
 
-interface LineProps extends ILine {
+interface LineProps {
+    /**
+     * 
+     */
+    id: string | undefined;
+    /**
+     * 
+     */
+    originId: string | undefined;
+    /**
+     * 
+     */
+    targetId: string | undefined;
     /**
      * Used in parent component to move this element in the screen
      */
@@ -14,9 +28,30 @@ interface LineProps extends ILine {
      */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const Line: React.FC<LineProps> = memo(({ id, originId, left, top, description, radius = 40, isCurved, isDisabled, isSelected, label, left2 = 0, lineType, onContextMenu, onMouseDown, top2 = 0 }) => {
+export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onContextMenu, onMouseDown }) => {
     const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor } = useConfigs();
-    // const { selectItemById, createOrUpdateConnection } = useFlowItems();
+    const createOrUpdateConnection = useCreateOrUpdateConnection();
+    const selectItemById = useSelectItemById();
+
+    // Find the origin component
+    const { left: _left, top: _top, connections = [], isDisabled, ...originItem } = useRecoilValue(FlowItemStore(String(originId)));
+    const lineType = originItem.flowItemType === EFlowItemType.comment ? 'dotted' : 'normal';
+    const radius: number = (originItem.width || 0) - ((originItem.width || 0) / 4);
+    console.log(radius)
+
+    // Find the current connection in their item
+    const connection = connections.find(connection => connection.id === id) || { connectionDescription: '', connectionLabel: '', isSelected: false };
+    const { connectionDescription: description, connectionLabel: label, isSelected } = connection;
+
+    // Find the target component
+    const { connections: targetConnections = [], ...targetItem } = useRecoilValue(FlowItemStore(String(targetId)));
+    const isCurved = targetConnections.some(connection => connection.targetId === originId);
+
+    // Calc the correct positions of the line arrow
+    const top = _top + ((originItem.width || 0) / 2);
+    const left = _left + ((originItem.height || 0) / 2);
+    const top2 = targetItem ? targetItem.top + ((targetItem.height || 0) / 2) : _top + ((originItem.height || 0) / 2);
+    const left2 = targetItem ? targetItem.left + ((targetItem.width || 0) / 2) : _left + ((originItem.width || 0) / 2);
 
     // Sets the color of the line when selected
     const strokeColor: string = isSelected ? `${flowItemSelectedColor}` : `${linesColor}`;
@@ -68,7 +103,7 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, left, top, descri
     const onMouseUp = useCallback((e: any) => {
         e.stopPropagation();
 
-        // createOrUpdateConnection(id, originId, e.target.id);
+        createOrUpdateConnection(id, originId, e.target.id);
 
         window.onmouseup = null;
         window.onmousemove = null;
@@ -86,7 +121,7 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, left, top, descri
             lineDistance: (Math.hypot((top2 - top), (left2 - left)) - 40),
         });
 
-    }, [left, left2, top, top2, isCurved, id, originId, /* createOrUpdateConnection */]);
+    }, [left, left2, top, top2, isCurved, id, originId, createOrUpdateConnection]);
 
     const mouseDown = useCallback((e: any) => {
         e.stopPropagation();
@@ -94,18 +129,19 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, left, top, descri
         document.body.style.cursor = 'crosshair';
         window.onmousemove = mouseMove;
         window.onmouseup = onMouseUp;
-        // selectItemById(id, e.ctrlKey);
-    }, [mouseMove, onMouseUp, /* selectItemById */, id]);
 
-    const handleSelectLine = (e: any) => {
+        selectItemById(id, e.ctrlKey);
+    }, [mouseMove, onMouseUp, selectItemById, id]);
+
+    const handleSelectLine = useCallback((e: any) => {
         e.stopPropagation();
-        // selectItemById(id, e.ctrlKey);
-    }
+        selectItemById(id, e.ctrlKey);
+    }, [selectItemById, id]);
 
     return (
         <g style={{ opacity: isDisabled ? disableOpacity : 1 }}>
             <g style={{ transform: `rotate(${basicPosition.rotate}deg)`, transformOrigin: `${basicPosition.left1}px ${basicPosition.top1}px` }}>
-                <text
+                <text // Render the text over the line
                     fontSize={"small"}
                     textAnchor={"middle"}
                     x={basicPosition.left1}
@@ -129,7 +165,7 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, left, top, descri
                 }}
                 d={`M${basicPosition.left1} ${basicPosition.top1 + 30} Q${basicPosition.left1 - (basicPosition.isCurved ? 50 : 0)} ${basicPosition.top1 + (basicPosition.lineDistance / 2)} ${basicPosition.left1} ${basicPosition.top1 + basicPosition.lineDistance}`}
             />
-            <path
+            <path // Render the arrow in the line
                 id={"path_" + id}
                 key={"path_" + id}
                 onMouseDown={mouseDown}

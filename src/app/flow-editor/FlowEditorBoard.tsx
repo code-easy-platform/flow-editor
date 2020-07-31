@@ -6,14 +6,18 @@ import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
 import { EditorPanel } from './components/editor-panel/EditorPanel';
 import { SelectorArea } from './components/selector/SelectorArea';
 import { FlowItem } from './components/flow-item/FlowItem';
-import { useFlowItems, useConfigs } from './shared/hooks';
+import { useFlowItems, useConfigs, useSelectItemById, useCopySelecteds, usePasteSelecteds } from './shared/hooks';
 import { ICoords, IFlowItem } from './shared/interfaces';
-import { FlowItemStore } from './shared/stores';
+import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector } from './shared/stores';
+import { Lines } from './components/flow-item/Lines';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const { dottedSize, typesAllowedToDrop, backgroundType, disableSelection } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit" } = props;
     const { onMouseEnter, onMouseLeave, onContextMenu } = props;
+    const pasteSelectedItems = usePasteSelecteds();
+    const copySelectedItems = useCopySelecteds();
+    const selectItemById = useSelectItemById();
     const items = useFlowItems();
 
     const selectItem = useCallback((item: IFlowItem, coords: ICoords) => {
@@ -56,19 +60,33 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     : lessThan0Selected(item.left, left2, coords.startX, coords.endX)
             )
         );
-    }, [])
+    }, []);
 
     const setSelectedFlowItem = useRecoilCallback(({ set, snapshot }) => (coords: ICoords) => {
         items.forEach(async id => {
-
             const item = await snapshot.getPromise(FlowItemStore(id));
             const isSelected = selectItem(item, coords);
-
             if (item.isSelected !== isSelected) {
                 set(FlowItemStore(id), { ...item, isSelected });
             }
-
         });
+    });
+
+    const handleSelecteAllFlowItems = useRecoilCallback(({ set }) => () => {
+        items.forEach(id => {
+            set(FlowItemStore(String(id)), oldState => ({
+                ...oldState,
+                isSelected: true
+            }))
+        });
+    }, [items]);
+
+    const handleDelte = useRecoilCallback(({ set, snapshot, reset }) => async () => {
+        const itemsComplete = await snapshot.getPromise(GetFlowItemsSelector);
+        set(FlowItemsStore, itemsComplete.filter(item => !item.isSelected).map(item => {
+            reset(FlowItemStore(id))
+            return String(item.id)
+        }));
     });
 
     return (
@@ -76,18 +94,17 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
             <main key={id} className="overflow-auto flex1 full-height full-width">
                 <EditorPanel
                     id={`${id}_SVG`}
-                    // ref={editorPanelRef}
                     dottedSize={dottedSize}
                     onContextMenu={onContextMenu}
-                    // onKeyDownCtrlA={selectAll}
-                    // onKeyDownCtrlC={handleCtrlC}
-                    // onKeyDownCtrlV={handleCtrlV}
-                    // onMouseDown={removeSelection}
+                    onKeyDownDelete={handleDelte}
                     backgroundType={backgroundType}
+                    onKeyDownCtrlC={copySelectedItems}
+                    onKeyDownCtrlV={pasteSelectedItems}
                     allowedsInDrop={typesAllowedToDrop}
-                // onKeyDownDelete={removeSelectedItems}
+                    onKeyDownCtrlA={handleSelecteAllFlowItems}
+                    onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                 >
-                    {/* getLines().map((line, index) => <Line key={index} {...line} onContextMenu={onContextMenu} />) */}
+                    <Lines />
 
                     {items.map(id => (
                         <FlowItem

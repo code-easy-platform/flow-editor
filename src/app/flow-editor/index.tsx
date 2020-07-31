@@ -20,7 +20,21 @@ export const FlowEditor = ({ configs, items, ...rest }: IFlowEditorProps) => {
         });
 
         // Set configurations
-        set(ConfigurationsStore, configs);
+        set(ConfigurationsStore, {
+            flowItemWarningColor: configs.flowItemWarningColor || 'yellow',
+            flowItemSelectedColor: configs.flowItemSelectedColor || 'blue',
+            snapGridWhileDragging: configs.snapGridWhileDragging || true,
+            flowItemTextColor: configs.flowItemTextColor || 'white',
+            flowItemErrorColor: configs.flowItemErrorColor || 'red',
+            backgroundType: configs.backgroundType || 'dotted',
+            disableSelection: configs.disableSelection || false,
+            typesAllowedToDrop: configs.typesAllowedToDrop || [],
+            commentColor: configs.commentColor || 'green',
+            disableOpacity: configs.disableOpacity || 0.5,
+            linesColor: configs.linesColor || 'gray',
+            dottedSize: configs.dottedSize || 15,
+            lineWidth: configs.lineWidth || 1,
+        });
     }
 
     return (

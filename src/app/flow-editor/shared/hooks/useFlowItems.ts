@@ -1,7 +1,8 @@
 import { useRecoilValue, useRecoilState, useRecoilCallback } from "recoil";
+import { Utils } from "code-easy-components";
 
-import { FlowItemsStore, FlowItemStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector, ConfigurationsStore, GetBoardSize } from "../stores";
-import { IConnection } from "../interfaces";
+import { FlowItemsStore, FlowItemStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector, ConfigurationsStore, GetBoardSize, GetFlowItemsConnections } from "../stores";
+import { IConnection, IFlowItem } from "../interfaces";
 
 export const useFlowItems = () => {
     return useRecoilValue(FlowItemsStore);
@@ -13,6 +14,10 @@ export const useFlowItem = (id: string) => {
 
 export const useFlowItemsCompleteSelector = () => {
     return useRecoilValue(GetFlowItemsSelector);
+}
+
+export const useFlowItemsConnetioncSelector = () => {
+    return useRecoilValue(GetFlowItemsConnections);
 }
 
 export const useSelectedFlowItemsSelector = () => {
@@ -124,7 +129,7 @@ export const useSelectItemById = () => useRecoilCallback(({ snapshot, set }) => 
             }
 
             if (hasChange) {
-                set(FlowItemStore(`${id}`), _item);
+                set(FlowItemStore(String(id)), _item);
             }
         });
     } else {
@@ -169,4 +174,86 @@ export const useSelectItemById = () => useRecoilCallback(({ snapshot, set }) => 
             });
         }
     }
+});
+
+export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, set }) => async (connectionId: string | undefined, originItemId: string | undefined, targetItemId: string | undefined) => {
+
+    /**
+     *
+     * If the "connectionId" is undefined it means that a new connection is being created
+     * 
+     */
+
+    // Validate that you are connecting to yourself
+    if (originItemId === targetItemId) return;
+
+    // Find all items from the board
+    const items = await snapshot.getPromise(GetFlowItemsSelector);
+
+    /** Validates that the target item does exist */
+    if (!items.some(item => item.id === targetItemId)) return;
+
+
+    set(FlowItemStore(String(originItemId)), ({ connections = [], ...itemCurrent }) => {
+
+        // Validates whether you are creating a new connection or just editing an existing one
+        if (connectionId) {
+            connections = connections.map(connection => {
+                if (connection.id === connectionId) {
+                    connection = {
+                        ...connection,
+                        targetId: String(targetItemId)
+                    };
+                }
+                return connection;
+            });
+        } else {
+            connections = [
+                ...connections,
+                {
+                    originId: String(originItemId),
+                    targetId: String(targetItemId),
+                    connectionDescription: '',
+                    connectionLabel: '',
+                    id: Utils.getUUID(),
+                    isSelected: false,
+                }
+            ];
+        }
+
+        return { ...itemCurrent, connections };
+    });
+});
+
+/** Copy selected flow items */
+export const useCopySelecteds = () => useRecoilCallback(({ snapshot }) => async () => {
+    const selectedFlowItems = await snapshot.getPromise(GetSelectedFlowItemsSelector);
+    navigator.clipboard.writeText(JSON.stringify(selectedFlowItems));
+});
+
+/** Paste selected flow items */
+export const usePasteSelecteds = () => useRecoilCallback(({ snapshot, set }) => async () => {
+    try {
+        navigator
+            .clipboard
+            .readText()
+            .then(async text => {
+
+                const components: IFlowItem[] = JSON.parse(text || '[]');
+                let itemIds = await snapshot.getPromise(FlowItemsStore);
+
+                components.forEach(item => {
+                    item.id = Utils.getUUID();
+                    item.left = item.left + 100;
+                    item.top = item.top + 50;
+                    itemIds = [
+                        ...itemIds,
+                        String(item.id),
+                    ];
+                    set(FlowItemStore(item.id), item);
+                });
+
+                set(FlowItemsStore, itemIds);
+            });
+    } catch (e) { console.log(e) }
 });
