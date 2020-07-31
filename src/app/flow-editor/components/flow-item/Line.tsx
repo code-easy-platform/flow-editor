@@ -100,27 +100,28 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onConte
         }));
     }, [left, top]);
 
-    const onMouseUp = useCallback((e: any) => {
+    const onMouseUp = useCallback(async (e: any) => {
         e.stopPropagation();
 
-        createOrUpdateConnection(id, originId, e.target.id);
+        const hasChange = await createOrUpdateConnection(id, originId, e.target.id);
 
         window.onmouseup = null;
         window.onmousemove = null;
         document.body.style.cursor = 'unset';
 
-        setBasicPosition({
-            isCurved,
-            top1: top,
-            top2: top2,
-            left1: left,
-            left2: left2,
-            showNewLine: false,
-            isLeftToRight: (left2 >= left),
-            rotate: Utils.getAngle(left2, top2, left, top),
-            lineDistance: (Math.hypot((top2 - top), (left2 - left)) - 40),
-        });
-
+        if (!hasChange) {
+            setBasicPosition({
+                isCurved,
+                top1: top,
+                top2: top2,
+                left1: left,
+                left2: left2,
+                showNewLine: false,
+                isLeftToRight: (left2 >= left),
+                rotate: Utils.getAngle(left2, top2, left, top),
+                lineDistance: (Math.hypot((top2 - top), (left2 - left)) - 40),
+            });
+        }
     }, [left, left2, top, top2, isCurved, id, originId, createOrUpdateConnection]);
 
     const mouseDown = useCallback((e: any) => {
@@ -194,7 +195,7 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onConte
                 rx={50}
                 ry={50}
             />}
-            <title>{description}</title>
+            {description && <title>{description}</title>}
         </g>
     );
 });

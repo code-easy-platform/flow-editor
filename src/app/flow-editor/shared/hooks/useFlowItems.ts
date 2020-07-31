@@ -185,14 +185,13 @@ export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, 
      */
 
     // Validate that you are connecting to yourself
-    if (originItemId === targetItemId) return;
+    if (originItemId === targetItemId) return false;
 
     // Find all items from the board
     const items = await snapshot.getPromise(GetFlowItemsSelector);
 
     /** Validates that the target item does exist */
-    if (!items.some(item => item.id === targetItemId)) return;
-
+    if (!items.some(item => item.id === targetItemId)) return false;
 
     set(FlowItemStore(String(originItemId)), ({ connections = [], ...itemCurrent }) => {
 
@@ -223,6 +222,9 @@ export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, 
 
         return { ...itemCurrent, connections };
     });
+
+    // If has changed connection or create
+    return true;
 });
 
 /** Copy selected flow items */

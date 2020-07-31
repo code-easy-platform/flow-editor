@@ -8,7 +8,7 @@ import { SelectorArea } from './components/selector/SelectorArea';
 import { FlowItem } from './components/flow-item/FlowItem';
 import { useFlowItems, useConfigs, useSelectItemById, useCopySelecteds, usePasteSelecteds } from './shared/hooks';
 import { ICoords, IFlowItem } from './shared/interfaces';
-import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector } from './shared/stores';
+import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector } from './shared/stores';
 import { Lines } from './components/flow-item/Lines';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
@@ -82,16 +82,37 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     }, [items]);
 
     const handleDelte = useRecoilCallback(({ set, snapshot, reset }) => async () => {
+        const itemsCompleteSelecteds = await snapshot.getPromise(GetSelectedFlowItemsSelector);
         const itemsComplete = await snapshot.getPromise(GetFlowItemsSelector);
+
+        // Remove all dependencies with the selecteds items
+        itemsCompleteSelecteds.forEach(itemSelected => {
+            itemsComplete.forEach(dependentItem => {
+
+                // Remove old connections
+                if ((dependentItem.connections || []).some(connection => connection.targetId === itemSelected.id)) {
+                    dependentItem = {
+                        ...dependentItem,
+                        connections: [
+                            ...(dependentItem.connections || []).filter(connection => connection.targetId !== itemSelected.id)
+                        ]
+                    };
+
+                    // Save in the state
+                    set(FlowItemStore(String(dependentItem.id)), dependentItem);
+                }
+            });
+        });
+
+        // Save a new list
         set(FlowItemsStore, itemsComplete.filter(item => !item.isSelected).map(item => {
-            reset(FlowItemStore(id))
-            return String(item.id)
+            return String(item.id);
         }));
     });
 
     return (
-        <div className="full-height full-width" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-            <main key={id} className="overflow-auto flex1 full-height full-width">
+        <div style={{ width: '100%', height: '100%' }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+            <main key={id} style={{ width: '100%', height: '100%', flex: 1, overflow: 'auto' }}>
                 <EditorPanel
                     id={`${id}_SVG`}
                     dottedSize={dottedSize}
@@ -105,7 +126,6 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                 >
                     <Lines />
-
                     {items.map(id => (
                         <FlowItem
                             id={id}
