@@ -88,21 +88,24 @@ export const useSelectItemById = () => useRecoilCallback(({ snapshot, set }) => 
     const items = await snapshot.getPromise(GetFlowItemsSelector);
 
     const selectConnection = (connections: IConnection[], hasChange: boolean) => {
-        connections.forEach(conection => {
-            if (conection.id === id) {
-                hasChange = conection.isSelected !== true;
-                conection = {
-                    ...conection,
-                    isSelected: true,
+        connections = [
+            ...connections.map(conection => {
+                if (conection.id === id) {
+                    hasChange = conection.isSelected !== true;
+                    conection = {
+                        ...conection,
+                        isSelected: true,
+                    }
+                } else {
+                    hasChange = (conection.isSelected !== false && conection.isSelected !== undefined) || hasChange;
+                    conection = {
+                        ...conection,
+                        isSelected: false,
+                    }
                 }
-            } else {
-                hasChange = (conection.isSelected !== false && conection.isSelected !== undefined) || hasChange;
-                conection = {
-                    ...conection,
-                    isSelected: false,
-                }
-            }
-        });
+                return conection;
+            }),
+        ];
         return { connections, hasChange };
     }
 
@@ -111,32 +114,31 @@ export const useSelectItemById = () => useRecoilCallback(({ snapshot, set }) => 
             let hasChange = false;
 
             if (_item.id === id) {
+
                 hasChange = true;
+                _item = { ..._item, isSelected: !_item.isSelected };
+
+            } else {
                 _item = {
                     ..._item,
-                    isSelected: !_item.isSelected
-                };
-            } else {
-                (_item.connections || []).forEach(connection => {
-                    if (connection.id === id) {
-                        hasChange = true;
-                        connection = {
-                            ...connection,
-                            isSelected: !connection.isSelected
+                    connections: (_item.connections || []).map(connection => {
+                        if (connection.id === id) {
+                            hasChange = true;
+                            connection = { ...connection, isSelected: !connection.isSelected };
                         }
-                    }
-                });
+                        return connection;
+                    })
+                };
             }
 
             if (hasChange) {
-                set(FlowItemStore(String(id)), _item);
+                set(FlowItemStore(String(_item.id)), _item);
             }
         });
     } else {
-        const flowItemSelecteds = items.filter(item => item.isSelected);
-
         // Serve para o caso de você clicar em um item que que já está selecionado, deve ser mantida a seleção de todos
-        const keepMULTselect = flowItemSelecteds.length > 1 && flowItemSelecteds.some(item => item.id === id);
+        const keepMULTselect = items.filter(item => item.isSelected).some(item => item.id === id);
+
         if (!keepMULTselect) {
 
             items.forEach(item => {
@@ -144,19 +146,20 @@ export const useSelectItemById = () => useRecoilCallback(({ snapshot, set }) => 
 
                 if (item.id === id) {
                     hasChange = item.isSelected !== true;
+                    item = { ...item, isSelected: true };
+
                     item = {
                         ...item,
-                        isSelected: true,
+                        connections: (item.connections || []).map(conection => {
+                            hasChange = (conection.isSelected !== false) || hasChange;
+                            return {
+                                ...conection,
+                                isSelected: false
+                            };
+                        }),
                     };
-                    (item.connections || []).forEach(conection => {
-                        hasChange = (conection.isSelected !== false) || hasChange;
-                        conection = {
-                            ...conection,
-                            isSelected: false
-                        };
-                    });
                 } else {
-                    hasChange = item.isSelected !== false && item.isSelected !== undefined;
+                    hasChange = item.isSelected !== false;
 
                     const { connections, hasChange: change } = selectConnection(item.connections || [], hasChange);
                     hasChange = change || hasChange;
@@ -245,17 +248,42 @@ export const usePasteSelecteds = () => useRecoilCallback(({ snapshot, set }) => 
                 let itemIds = await snapshot.getPromise(FlowItemsStore);
 
                 components.forEach(item => {
+                    item.top = item.top + 50;
                     item.id = Utils.getUUID();
                     item.left = item.left + 100;
-                    item.top = item.top + 50;
+
+                    item = {
+                        ...item,
+                        connections: (item.connections || []).map(connection => ({ ...connection, originId: String(item.id) })),
+                    };
+
                     itemIds = [
                         ...itemIds,
                         String(item.id),
                     ];
-                    set(FlowItemStore(item.id), item);
+                    set(FlowItemStore(String(item.id)), item);
                 });
 
                 set(FlowItemsStore, itemIds);
             });
     } catch (e) { console.log(e) }
+});
+
+export const useSizeByText = () => useRecoilCallback(() => (text: string) => {
+    var span = document.createElement("span");
+    document.body.appendChild(span);
+    span.style.whiteSpace = 'pre-line';
+    span.style.position = 'absolute';
+    span.style.textAlign = 'start';
+    span.style.fontSize = 'small';
+    span.style.height = 'auto';
+    span.style.width = 'auto';
+    span.innerText = text;
+    var formattedWidth = Math.ceil(span.clientWidth);
+    var formattedHeight = Math.ceil(span.clientHeight);
+    document.body.removeChild(span);
+    return {
+        width: (formattedWidth < 100 ? 100 : formattedWidth) + 10,
+        height: (formattedHeight < 70 ? 70 : formattedHeight) + 10,
+    };
 });

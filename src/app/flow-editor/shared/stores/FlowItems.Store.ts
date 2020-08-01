@@ -62,7 +62,6 @@ export const GetFlowItemsConnections = selector<{ id: string | undefined, origin
                 ...(!isEnabledNewConnetion ? [] : [{ id: undefined, originId: id, targetId: undefined }]),
             ];
         });
-        console.log(res)
         return res;
     }
 });

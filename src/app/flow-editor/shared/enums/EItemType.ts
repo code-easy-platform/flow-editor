@@ -1,5 +1,5 @@
 /** Tipos de items existentes na toolbar. */
-export enum ItemType {
+export enum EItemType {
     COMMENT = "COMMENT",
     FOREACH = "FOREACH",
     SWITCH = "SWITCH",

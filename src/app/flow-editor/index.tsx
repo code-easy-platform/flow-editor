@@ -1,11 +1,11 @@
 import React from 'react';
 import { RecoilRoot, MutableSnapshot } from 'recoil';
-import { DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+import { DndProvider } from 'react-dnd';
 
+import { FlowItemsStore, FlowItemStore, ConfigurationsStore } from './shared/stores';
 import { IFlowEditorProps } from './shared/interfaces/FlowEditorInterfaces';
 import { FlowEditorBoard } from './FlowEditorBoard';
-import { FlowItemsStore, FlowItemStore, ConfigurationsStore } from './shared/stores';
 
 export const FlowEditor = ({ configs, items, ...rest }: IFlowEditorProps) => {
     const handleInitializaState = ({ set }: MutableSnapshot) => {
@@ -26,9 +26,10 @@ export const FlowEditor = ({ configs, items, ...rest }: IFlowEditorProps) => {
             snapGridWhileDragging: configs.snapGridWhileDragging || true,
             flowItemTextColor: configs.flowItemTextColor || 'white',
             flowItemErrorColor: configs.flowItemErrorColor || 'red',
-            backgroundType: configs.backgroundType || 'dotted',
-            disableSelection: configs.disableSelection || false,
             typesAllowedToDrop: configs.typesAllowedToDrop || [],
+            commentTextColor: configs.commentTextColor || '#fff',
+            disableSelection: configs.disableSelection || false,
+            backgroundType: configs.backgroundType || 'dotted',
             commentColor: configs.commentColor || 'green',
             disableOpacity: configs.disableOpacity || 0.5,
             linesColor: configs.linesColor || 'gray',

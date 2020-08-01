@@ -43,6 +43,10 @@ export interface IFlowEditorConfigs {
      */
     flowItemErrorColor?: string;
     /**
+     * Color used to the texts in comments in the flow
+     */
+    commentTextColor?: string;
+    /**
      * Color used in comments in the flow
      */
     commentColor?: string;

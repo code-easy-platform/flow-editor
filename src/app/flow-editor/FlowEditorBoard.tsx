@@ -1,15 +1,15 @@
 import React, { useCallback } from 'react';
 import { useRecoilCallback } from 'recoil';
 
+import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector } from './shared/stores';
+import { useFlowItems, useConfigs, useSelectItemById, useCopySelecteds, usePasteSelecteds } from './shared/hooks';
 import { IFlowEditorBoardProps } from './shared/interfaces/FlowEditorInterfaces';
 import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
+import { SelectorArea } from './components/area-selector/SelectorArea';
 import { EditorPanel } from './components/editor-panel/EditorPanel';
-import { SelectorArea } from './components/selector/SelectorArea';
 import { FlowItem } from './components/flow-item/FlowItem';
-import { useFlowItems, useConfigs, useSelectItemById, useCopySelecteds, usePasteSelecteds } from './shared/hooks';
+import { Lines } from './components/flow-item/line/Lines';
 import { ICoords, IFlowItem } from './shared/interfaces';
-import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector } from './shared/stores';
-import { Lines } from './components/flow-item/Lines';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const { dottedSize, typesAllowedToDrop, backgroundType, disableSelection } = useConfigs();

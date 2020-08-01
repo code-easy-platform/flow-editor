@@ -2,9 +2,13 @@ import React, { memo, useEffect, useState, useCallback } from 'react';
 import { Utils } from 'code-easy-components';
 import { useRecoilValue } from 'recoil';
 
-import { useConfigs, useSelectItemById, useCreateOrUpdateConnection } from '../../shared/hooks';
-import { EFlowItemType } from '../../shared/interfaces';
-import { FlowItemStore } from '../../shared/stores';
+import { useConfigs, useSelectItemById, useCreateOrUpdateConnection } from '../../../shared/hooks';
+import { NewConnectionBox } from './components/NewConnectionBox';
+import { TextOverLine } from './components/TextOverLine';
+import { FlowItemStore } from '../../../shared/stores';
+import { EFlowItemType } from '../../../shared/enums';
+import { SingleLine } from './components/SingleLine';
+import { Arrow } from './components/Arrow';
 
 interface LineProps {
     /**
@@ -29,7 +33,7 @@ interface LineProps {
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
 export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onContextMenu, onMouseDown }) => {
-    const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor } = useConfigs();
+    const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor, flowItemTextColor } = useConfigs();
     const createOrUpdateConnection = useCreateOrUpdateConnection();
     const selectItemById = useSelectItemById();
 
@@ -37,11 +41,9 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onConte
     const { left: _left, top: _top, connections = [], isDisabled, ...originItem } = useRecoilValue(FlowItemStore(String(originId)));
     const lineType = originItem.flowItemType === EFlowItemType.comment ? 'dotted' : 'normal';
     const radius: number = (originItem.width || 0) - ((originItem.width || 0) / 4);
-    console.log(radius)
 
     // Find the current connection in their item
-    const connection = connections.find(connection => connection.id === id) || { connectionDescription: '', connectionLabel: '', isSelected: false };
-    const { connectionDescription: description, connectionLabel: label, isSelected } = connection;
+    const connection = connections.find(connection => connection.id === id);
 
     // Find the target component
     const { connections: targetConnections = [], ...targetItem } = useRecoilValue(FlowItemStore(String(targetId)));
@@ -50,11 +52,11 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onConte
     // Calc the correct positions of the line arrow
     const top = _top + ((originItem.width || 0) / 2);
     const left = _left + ((originItem.height || 0) / 2);
-    const top2 = targetItem ? targetItem.top + ((targetItem.height || 0) / 2) : _top + ((originItem.height || 0) / 2);
-    const left2 = targetItem ? targetItem.left + ((targetItem.width || 0) / 2) : _left + ((originItem.width || 0) / 2);
+    const top2 = id !== undefined ? targetItem.top + ((targetItem.height || 0) / 2) : _top + ((originItem.height || 0) / 2);
+    const left2 = id !== undefined ? targetItem.left + ((targetItem.width || 0) / 2) : _left + ((originItem.width || 0) / 2);
 
     // Sets the color of the line when selected
-    const strokeColor: string = isSelected ? `${flowItemSelectedColor}` : `${linesColor}`;
+    const strokeColor: string = connection?.isSelected ? `${flowItemSelectedColor}` : `${linesColor}`;
 
     const [basicPosition, setBasicPosition] = useState({
         isCurved,
@@ -80,12 +82,6 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onConte
             lineDistance: Math.hypot((top2 - top), (left2 - left)) - (radius + 5),
         }));
     }, [left, left2, top, top2, radius, isCurved]);
-
-    const polygonTop: number = (basicPosition.top2 - (radius + 15));
-    const polygonLeft: number = (basicPosition.left2 - 5);
-    const polygonRight: number = (basicPosition.left2 + 5);
-    const polygonBottonCenter: number = basicPosition.left2;
-    const polygonBotton: number = (basicPosition.top2 - (radius + 5));
 
     const mouseMove = useCallback((event: MouseEvent) => {
         setBasicPosition(oldBasicPosition => ({
@@ -132,70 +128,66 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onConte
         window.onmouseup = onMouseUp;
 
         selectItemById(id, e.ctrlKey);
-    }, [mouseMove, onMouseUp, selectItemById, id]);
+        onMouseDown && onMouseDown(e);
+    }, [mouseMove, onMouseUp, onMouseDown, selectItemById, id]);
 
     const handleSelectLine = useCallback((e: any) => {
         e.stopPropagation();
         selectItemById(id, e.ctrlKey);
-    }, [selectItemById, id]);
+        onMouseDown && onMouseDown(e);
+    }, [onMouseDown, selectItemById, id]);
 
     return (
         <g style={{ opacity: isDisabled ? disableOpacity : 1 }}>
-            <g style={{ transform: `rotate(${basicPosition.rotate}deg)`, transformOrigin: `${basicPosition.left1}px ${basicPosition.top1}px` }}>
-                <text // Render the text over the line
-                    fontSize={"small"}
-                    textAnchor={"middle"}
-                    x={basicPosition.left1}
-                    fill={"var(--color-white)"}
-                    onMouseDown={handleSelectLine}
-                    y={basicPosition.top1 + (basicPosition.lineDistance / 2) + (basicPosition.isCurved ? (basicPosition.isLeftToRight ? 35 : -35) : -5)}
-                    style={{ transform: `rotate(${basicPosition.isLeftToRight ? 90 : -90}deg)`, transformOrigin: `${basicPosition.left1}px ${basicPosition.top1 + (basicPosition.lineDistance / 2)}px` }}
-                >{label}</text>
-            </g>
-            <path
-                fill={"none"}
-                id={"line_" + id}
-                key={"line_" + id}
-                stroke={strokeColor || "gray"}
+            <TextOverLine
+                top={basicPosition.top1}
+                left={basicPosition.left1}
+                onContextMenu={onContextMenu}
+                textColor={flowItemTextColor}
+                rotate={basicPosition.rotate}
                 onMouseDown={handleSelectLine}
-                strokeDasharray={lineType === 'normal' ? undefined : "5,5"}
-                style={{
-                    transform: `rotate(${basicPosition.rotate}deg)`,
-                    transformOrigin: `${basicPosition.left1}px ${basicPosition.top1}px`,
-                    display: (!basicPosition.showNewLine && id === undefined) ? 'none' : 'unset',
-                }}
-                d={`M${basicPosition.left1} ${basicPosition.top1 + 30} Q${basicPosition.left1 - (basicPosition.isCurved ? 50 : 0)} ${basicPosition.top1 + (basicPosition.lineDistance / 2)} ${basicPosition.left1} ${basicPosition.top1 + basicPosition.lineDistance}`}
+                isCurved={basicPosition.isCurved}
+                text={connection?.connectionLabel}
+                lineDistance={basicPosition.lineDistance}
+                isLeftToRight={basicPosition.isLeftToRight}
             />
-            <path // Render the arrow in the line
-                id={"path_" + id}
-                key={"path_" + id}
-                onMouseDown={mouseDown}
-                fill={"var(--main-background)"}
-                d={`M${polygonLeft} ${polygonTop} L${polygonBottonCenter} ${polygonBotton} L${polygonRight} ${polygonTop} Z`}
-                style={{
-                    cursor: 'crosshair',
-                    strokeWidth: lineWidth,
-                    fill: strokeColor || "gray",
-                    stroke: strokeColor || "gray",
-                    transform: `rotate(${basicPosition.rotate}deg)`,
-                    transformOrigin: `${basicPosition.left2}px ${basicPosition.top2}px`,
-                    display: (!basicPosition.showNewLine && id === undefined) ? 'none' : 'unset',
-                }}
+            <SingleLine
+                id={String(id)}
+                lineType={lineType}
+                top1={basicPosition.top1}
+                strokeColor={strokeColor}
+                left1={basicPosition.left1}
+                onContextMenu={onContextMenu}
+                rotate={basicPosition.rotate}
+                onMouseDown={handleSelectLine}
+                isCurved={basicPosition.isCurved}
+                lineDistance={basicPosition.lineDistance}
+                visible={!basicPosition.showNewLine && id === undefined}
             />
-            {id === undefined && <rect // Allow create a new connection
-                style={{ cursor: 'crosshair', zIndex: 3 }}
-                strokeWidth={"var(--main-border-width)"}
-                x={basicPosition.left2 - radius}
-                y={basicPosition.top2 - radius}
+            <Arrow
+                id={String(id)}
+                radius={radius}
+                cursor={"crosshair"}
+                lineWidth={lineWidth}
                 onMouseDown={mouseDown}
-                fill={"transparent"}
-                height={radius * 2}
-                width={radius * 2}
-                id={id}
-                rx={50}
-                ry={50}
+                top={basicPosition.top2}
+                strokeColor={strokeColor}
+                left={basicPosition.left2}
+                rotate={basicPosition.rotate}
+                onContextMenu={onContextMenu}
+                visible={!basicPosition.showNewLine && id === undefined}
+            />
+            {id === undefined && <NewConnectionBox
+                id={String(id)}
+                radius={radius}
+                cursor={"crosshair"}
+                lineWidth={lineWidth}
+                onMouseDown={mouseDown}
+                top={basicPosition.top2}
+                left={basicPosition.left2}
+                onContextMenu={onContextMenu}
             />}
-            {description && <title>{description}</title>}
+            {connection?.connectionDescription && <title>{connection.connectionDescription}</title>}
         </g>
     );
 });

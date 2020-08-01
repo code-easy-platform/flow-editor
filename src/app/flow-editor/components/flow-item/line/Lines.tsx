@@ -1,5 +1,6 @@
 import React from 'react';
-import { useFlowItemsConnetioncSelector } from '../../shared/hooks';
+
+import { useFlowItemsConnetioncSelector } from '../../../shared/hooks';
 import { Line } from './Line';
 
 interface LinesProp {

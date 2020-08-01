@@ -18,6 +18,7 @@ const App: React.FC = () => {
                     flowItemWarningColor: 'var(--main-warning-color)',
                     flowItemSelectedColor: 'var(--color-botton-bar)',
                     flowItemErrorColor: 'var(--main-error-color)',
+                    commentTextColor: '#fff000',
                     snapGridWhileDragging: true,
                     flowItemTextColor: 'white',
                     backgroundType: "dotted",

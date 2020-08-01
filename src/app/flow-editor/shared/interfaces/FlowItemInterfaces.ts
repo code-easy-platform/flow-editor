@@ -1,17 +1,5 @@
-export enum EFlowItemType {
-    /**
-     * Used to connect a acorn in other
-     */
-    line = "LINE",
-    /**
-     * Represents the logical components
-     */
-    acorn = "ACORN",
-    /**
-     * Used to help in the code documentation
-     */
-    comment = "COMMENT",
-}
+import { EFlowItemType } from "../enums/EFlowItemType";
+
 /**
  * Used to represente lines in the flow between flow items
  */
@@ -31,7 +19,7 @@ export interface IConnection {
     /**
      * Used to identify when the user click over the line
      */
-    isSelected?: boolean;
+    isSelected: boolean;
     /**
      * Identifier of the element that is connected by the line 
      */
@@ -41,7 +29,10 @@ export interface IConnection {
      */
     targetId: string;
 }
-export interface BasicFlowItem {
+/**
+ * 
+ */
+export interface IBasicFlowItem {
     label?: string;
     top: number | 0;
     left: number | 0;
@@ -54,7 +45,7 @@ export interface BasicFlowItem {
 /**
  * 
  */
-export interface ILine extends BasicFlowItem {
+export interface ILine extends IBasicFlowItem {
     top2?: number;
     left2?: number;
     radius?: number;
@@ -62,7 +53,10 @@ export interface ILine extends BasicFlowItem {
     isCurved?: boolean;
     lineType?: 'dotted' | 'normal';
 }
-export interface IFlowItem extends BasicFlowItem {
+/**
+ * 
+ */
+export interface IFlowItem extends IBasicFlowItem {
     icon?: any;
     width?: number;
     height?: number;

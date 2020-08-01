@@ -9,6 +9,7 @@ export const ConfigurationsStore = atom<IFlowEditorConfigs>({
         snapGridWhileDragging: true,
         flowItemTextColor: 'white',
         flowItemErrorColor: 'red',
+        commentTextColor: 'white',
         backgroundType: 'dotted',
         disableSelection: false,
         typesAllowedToDrop: [],

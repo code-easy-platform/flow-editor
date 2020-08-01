@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from 'react';
 
 import { useFlowItem, useDragAllElements, useSelectItemById } from '../../shared/hooks';
-import { EFlowItemType } from '../../shared/interfaces';
+import { EFlowItemType } from '../../shared/enums';
 import { Comment } from './Comment';
 import { Acorn } from './Acorn';
 
@@ -70,7 +70,7 @@ export const FlowItem: React.FC<FlowProps> = ({ id, onContextMenu }) => {
                 <Comment
                     item={flowItem}
                     onMouseDown={mouseDown}
-                // onContextMenu={onContextMenu}
+                    onContextMenu={onContextMenu}
                 />
             );
         default:

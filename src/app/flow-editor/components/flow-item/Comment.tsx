@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 
 import { IFlowItem } from '../../shared/interfaces/FlowItemInterfaces';
-import { useConfigs } from '../../shared/hooks';
+import { useConfigs, useSizeByText } from '../../shared/hooks';
 
 interface CommentProps {
     item: IFlowItem;
@@ -12,36 +12,21 @@ interface CommentProps {
     onContextMenu?(event: React.MouseEvent<SVGGElement | HTMLDivElement, MouseEvent>): void;
 }
 export const Comment: React.FC<CommentProps> = memo(({ item, onMouseDown, onContextMenu }) => {
-    const { flowItemSelectedColor, commentColor } = useConfigs();
-    // const { getSizeByText } = useFlowItems();
+    const { flowItemSelectedColor, commentColor, lineWidth, flowItemErrorColor, flowItemWarningColor, commentTextColor } = useConfigs();
+    const getSizeByText = useSizeByText();
 
-    const strokeColor: string = item.isSelected ? `${flowItemSelectedColor}` : "#383321";
+    const strokeColor: string = item.isSelected
+        ? `${flowItemSelectedColor}`
+        : item.hasError
+            ? `${flowItemErrorColor}`
+            : item.hasWarning
+                ? `${flowItemWarningColor}`
+                : "transparent";
 
-    // const { height, width } = getSizeByText(item.description || '');
-    // item.height = 100;
-    // item.width = 100;
+    const { height, width } = getSizeByText(item.description || '');
+    item = { ...item, height, width };
 
     return (
-        /* <g>
-            <rect
-                strokeWidth={'var(--main-border-width)'}
-                style={{ cursor: 'move' }}
-                onMouseDown={onMouseDown}
-                stroke={strokeColor}
-                height={item.height}
-                fill={commentColor}
-                width={item.width}
-                x={item.left}
-                y={item.top}
-            />
-            <text
-                x={item.left + ((item.width || 0) / 2)}
-                y={item.top + 5 + (item.height / 2)}
-                style={{ whiteSpace: 'pre-line', }}
-                textAnchor={"middle"}
-                fontSize={"small"}
-            >{item.description}</text>
-        </g> */
         <foreignObject
             id={item.id}
             y={item.top}
@@ -61,17 +46,17 @@ export const Comment: React.FC<CommentProps> = memo(({ item, onMouseDown, onCont
                 onContextMenu={onContextMenu}
                 children={item.description}
                 onMouseDown={onMouseDown}
-                className={"padding-xs"}
                 style={{
-                    border: `var(--main-border-width) solid ${strokeColor}`,
+                    border: `${lineWidth} solid ${strokeColor}`,
                     height: '-webkit-fill-available',
                     width: '-webkit-fill-available',
                     backgroundColor: commentColor,
+                    color: commentTextColor,
                     whiteSpace: 'pre-line',
-                    //pointerEvents: 'none',
+                    pointerEvents: 'none',
                     textAlign: 'start',
                     fontSize: 'small',
-                    color: '#fff',
+                    padding: 8,
                 }}
             />
         </foreignObject>

@@ -1,6 +1,6 @@
 import React, { useState, memo, useRef, useEffect } from 'react';
 
-import { ICoords } from './../../shared/interfaces';
+import { ICoords } from '../../shared/interfaces';
 
 interface SelectorAreaProps {
     isDisabled?: boolean;
