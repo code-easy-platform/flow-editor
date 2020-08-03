@@ -1,6 +1,7 @@
 import React, { memo, useCallback } from 'react';
 
 import { IFlowItem } from '../../shared/interfaces/FlowItemInterfaces';
+import { NewConnectionBox } from './line/NewConnectionBox';
 import { useConfigs } from '../../shared/hooks';
 
 interface FlowComponentProps {
@@ -42,6 +43,14 @@ export const Acorn: React.FC<FlowComponentProps> = memo(({ item, onContextMenu, 
             role={item.flowItemType}
             onContextMenu={contextMenu}
         >
+            {item.isEnabledNewConnetion && <NewConnectionBox
+                height={(item.height || 0) + 20}
+                width={(item.width || 0) + 20}
+                originId={String(item.id)}
+                left={item.left - 10}
+                top={item.top - 10}
+                isRounded={true}
+            />}
             <text // Move element and display their title
                 x={item.left + ((item.width || 0) / 2)}
                 onMouseDown={mouseDownMove}
@@ -52,6 +61,7 @@ export const Acorn: React.FC<FlowComponentProps> = memo(({ item, onContextMenu, 
             >{item.label}</text>
             <rect // Ajuda no backbround
                 strokeWidth={"var(--main-border-width)"}
+                style={{ pointerEvents: 'none' }}
                 fill="var(--main-background)"
                 strokeLinejoin="round"
                 height={item.height}

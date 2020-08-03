@@ -81,16 +81,29 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         });
     }, [items]);
 
-    const handleDelte = useRecoilCallback(({ set, snapshot, reset }) => async () => {
-        const itemsCompleteSelecteds = await snapshot.getPromise(GetSelectedFlowItemsSelector);
+    const handleDelte = useRecoilCallback(({ set, snapshot }) => async () => {
+        let itemsCompleteSelecteds = await snapshot.getPromise(GetSelectedFlowItemsSelector);
         const itemsComplete = await snapshot.getPromise(GetFlowItemsSelector);
+
+        // Remove all lines selecteds
+        itemsCompleteSelecteds = itemsCompleteSelecteds.map(itemSelected => {
+            const res = {
+                ...itemSelected,
+                connections: (itemSelected.connections || []).filter(connection => !connection.isSelected),
+            };
+
+            // Save in the state
+            set(FlowItemStore(String(itemSelected.id)), res);
+
+            return res;
+        });
 
         // Remove all dependencies with the selecteds items
         itemsCompleteSelecteds.forEach(itemSelected => {
             itemsComplete.forEach(dependentItem => {
 
                 // Remove old connections
-                if ((dependentItem.connections || []).some(connection => connection.targetId === itemSelected.id)) {
+                if ((dependentItem.connections || []).some(connection => (connection.targetId === itemSelected.id && itemSelected.isSelected))) {
                     dependentItem = {
                         ...dependentItem,
                         connections: [
@@ -110,6 +123,42 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         }));
     });
 
+    const handleArrowKeyDown = useRecoilCallback(({ set, snapshot }) => async (direction: "ArrowUp" | "ArrowDown" | "ArrowLeft" | "ArrowRight") => {
+        const items = await snapshot.getPromise(GetFlowItemsSelector);
+
+        items.forEach(item => {
+            if (item.isSelected) {
+                switch (direction) {
+                    case 'ArrowDown':
+                        item = {
+                            ...item,
+                            top: item.top + 15
+                        };
+                        break;
+                    case 'ArrowUp':
+                        item = {
+                            ...item,
+                            top: item.top - 15
+                        };
+                        break;
+                    case 'ArrowLeft':
+                        item = {
+                            ...item,
+                            left: item.left - 15
+                        };
+                        break;
+                    case 'ArrowRight':
+                        item = {
+                            ...item,
+                            left: item.left + 15
+                        };
+                        break;
+                }
+                set(FlowItemStore(String(item.id)), item);
+            }
+        });
+    });
+
     return (
         <div style={{ width: '100%', height: '100%' }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
             <main key={id} style={{ width: '100%', height: '100%', flex: 1, overflow: 'auto' }}>
@@ -122,7 +171,13 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     onKeyDownCtrlC={copySelectedItems}
                     onKeyDownCtrlV={pasteSelectedItems}
                     allowedsInDrop={typesAllowedToDrop}
+                    onArrowKeyDown={handleArrowKeyDown}
                     onKeyDownCtrlA={handleSelecteAllFlowItems}
+                    onKeyDownCtrlD={e => {
+                        e.preventDefault();
+                        copySelectedItems();
+                        pasteSelectedItems();
+                    }}
                     onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                 >
                     <Lines />

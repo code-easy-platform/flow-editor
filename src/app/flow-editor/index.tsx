@@ -15,8 +15,9 @@ export const FlowEditor = ({ configs, items, ...rest }: IFlowEditorProps) => {
 
         // Set items content
         items.forEach(item => {
-            if (item.id)
+            if (item.id) {
                 set(FlowItemStore(item.id), item);
+            }
         });
 
         // Set configurations

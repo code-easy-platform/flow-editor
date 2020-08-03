@@ -22,27 +22,25 @@ export const GetSelectedFlowItemsSelector = selector<IFlowItem[]>({
     get: ({ get }) => {
         return get(FlowItemsStore)
             .map((id) => get(FlowItemStore(id)))
-            .filter(item => item.isSelected);
+            .filter(item => (
+                item.isSelected ||
+                (item.connections || []).some(connection => connection.isSelected)
+            ));
     },
 });
 
 export const GetBoardSize = selector<{ width: number, height: number }>({
     key: 'get-board-size',
     get: ({ get }) => {
-        const flowItems = get(GetFlowItemsSelector);
-
-        console.log(flowItems/* .sort((a, b) => (b?.top || 0) - (a?.top || 0)) */);
+        const flowItems = get(GetFlowItemsSelector).map(item => item);
 
         try {
-            const maiorTop = flowItems/* .sort((a, b) => b.top - a.top) */.shift();
-            const maiorLeft = flowItems/* .sort((a, b) => b.left - a.left) */.shift();
-
             return {
-                width: maiorLeft ? maiorLeft.left + 200 : 0,
-                height: maiorTop ? maiorTop.top + 300 : 0,
+                width: flowItems.length > 0 ? flowItems.sort((a, b) => b.left - a.left)[0].left + 200 : 0,
+                height: flowItems.length > 0 ? flowItems.sort((a, b) => b.top - a.top)[0].top + 300 : 0,
             }
         } catch (e) {
-            //console.log(e)
+            console.log(e)
             return {
                 width: 0,
                 height: 0,
@@ -55,11 +53,10 @@ export const GetFlowItemsConnections = selector<{ id: string | undefined, origin
     key: 'get-flow-items-connection',
     get: ({ get }) => {
         let res: any[] = [];
-        get(GetFlowItemsSelector).forEach(({ connections, isEnabledNewConnetion, id }) => {
+        get(GetFlowItemsSelector).forEach(({ connections }) => {
             res = [
                 ...res,
                 ...(connections || []).map(({ id, originId, targetId }) => ({ id, originId, targetId, })),
-                ...(!isEnabledNewConnetion ? [] : [{ id: undefined, originId: id, targetId: undefined }]),
             ];
         });
         return res;

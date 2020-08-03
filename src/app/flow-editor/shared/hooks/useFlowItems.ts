@@ -196,6 +196,9 @@ export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, 
     /** Validates that the target item does exist */
     if (!items.some(item => item.id === targetItemId)) return false;
 
+    // Validates that the source item is already connected
+    if (items.some(item => item.id === originItemId && (item.connections || []).some(connection => connection.targetId === targetItemId))) return false;
+
     set(FlowItemStore(String(originItemId)), ({ connections = [], ...itemCurrent }) => {
 
         // Validates whether you are creating a new connection or just editing an existing one
@@ -246,6 +249,10 @@ export const usePasteSelecteds = () => useRecoilCallback(({ snapshot, set }) => 
 
                 const components: IFlowItem[] = JSON.parse(text || '[]');
                 let itemIds = await snapshot.getPromise(FlowItemsStore);
+
+                itemIds.forEach(id => {
+                    set(FlowItemStore(String(id)), oldState => ({ ...oldState, isSelected: false }));
+                });
 
                 components.forEach(item => {
                     item.top = item.top + 50;

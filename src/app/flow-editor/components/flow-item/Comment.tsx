@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 
 import { IFlowItem } from '../../shared/interfaces/FlowItemInterfaces';
 import { useConfigs, useSizeByText } from '../../shared/hooks';
+import { NewConnectionBox } from './line/NewConnectionBox';
 
 interface CommentProps {
     item: IFlowItem;
@@ -26,39 +27,58 @@ export const Comment: React.FC<CommentProps> = memo(({ item, onMouseDown, onCont
     const { height, width } = getSizeByText(item.description || '');
     item = { ...item, height, width };
 
+    const handleOnContextMenu = (e: React.MouseEvent<SVGRectElement, MouseEvent>) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onContextMenu && onContextMenu(e);
+    }
+
+    const handleOnMouseDown = (e: React.MouseEvent<SVGRectElement, MouseEvent>) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onMouseDown && onMouseDown(e);
+    }
+
     return (
-        <foreignObject
-            id={item.id}
-            y={item.top}
-            x={item.left}
-            width={item.width}
-            height={item.height}
-            onMouseDown={onMouseDown}
-            onContextMenu={onContextMenu}
-            style={{
-                zIndex: 2,
-                cursor: 'move',
-                width: item.width,
-                height: item.height,
-            }}
-        >
-            <div
-                onContextMenu={onContextMenu}
-                children={item.description}
-                onMouseDown={onMouseDown}
-                style={{
-                    border: `${lineWidth} solid ${strokeColor}`,
-                    height: '-webkit-fill-available',
-                    width: '-webkit-fill-available',
-                    backgroundColor: commentColor,
-                    color: commentTextColor,
-                    whiteSpace: 'pre-line',
-                    pointerEvents: 'none',
-                    textAlign: 'start',
-                    fontSize: 'small',
-                    padding: 8,
-                }}
+        <>
+            <NewConnectionBox
+                height={(item.height || 0) + 20}
+                width={(item.width || 0) + 20}
+                originId={String(item.id)}
+                left={item.left - 10}
+                top={item.top - 10}
             />
-        </foreignObject>
+            <foreignObject
+                id={item.id}
+                y={item.top}
+                x={item.left}
+                width={item.width}
+                height={item.height}
+                onMouseDown={handleOnMouseDown}
+                onContextMenu={handleOnContextMenu}
+                style={{
+                    zIndex: 2,
+                    cursor: 'move',
+                    width: item.width,
+                    height: item.height,
+                }}
+            >
+                <div
+                    children={item.description}
+                    style={{
+                        border: `${lineWidth}px solid ${strokeColor}`,
+                        height: '-webkit-fill-available',
+                        width: '-webkit-fill-available',
+                        backgroundColor: commentColor,
+                        color: commentTextColor,
+                        whiteSpace: 'pre-line',
+                        pointerEvents: 'none',
+                        textAlign: 'start',
+                        fontSize: 'small',
+                        padding: 8,
+                    }}
+                />
+            </foreignObject>
+        </>
     );
 });

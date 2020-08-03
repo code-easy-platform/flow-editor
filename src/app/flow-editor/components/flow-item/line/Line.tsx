@@ -2,8 +2,7 @@ import React, { memo, useEffect, useState, useCallback } from 'react';
 import { Utils } from 'code-easy-components';
 import { useRecoilValue } from 'recoil';
 
-import { useConfigs, useSelectItemById, useCreateOrUpdateConnection } from '../../../shared/hooks';
-import { NewConnectionBox } from './components/NewConnectionBox';
+import { useConfigs, useSelectItemById, useCreateOrUpdateConnection, useSizeByText } from '../../../shared/hooks';
 import { TextOverLine } from './components/TextOverLine';
 import { FlowItemStore } from '../../../shared/stores';
 import { EFlowItemType } from '../../../shared/enums';
@@ -24,6 +23,10 @@ interface LineProps {
      */
     targetId: string | undefined;
     /**
+     * 
+     */
+    newConnectionBox?: React.MutableRefObject<SVGRectElement | null>;
+    /**
      * Used in parent component to move this element in the screen
      */
     onMouseDown?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
@@ -31,16 +34,28 @@ interface LineProps {
      * Used to start the context menu for this específic component
      */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
+    /**
+     * 
+     */
+    useResetLine?: boolean;
 }
-export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onContextMenu, onMouseDown }) => {
+export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, useResetLine = false, newConnectionBox, onContextMenu, onMouseDown }) => {
     const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor, flowItemTextColor } = useConfigs();
     const createOrUpdateConnection = useCreateOrUpdateConnection();
     const selectItemById = useSelectItemById();
+    const getSizeByText = useSizeByText();
 
     // Find the origin component
-    const { left: _left, top: _top, connections = [], isDisabled, ...originItem } = useRecoilValue(FlowItemStore(String(originId)));
-    const lineType = originItem.flowItemType === EFlowItemType.comment ? 'dotted' : 'normal';
-    const radius: number = (originItem.width || 0) - ((originItem.width || 0) / 4);
+    const { connections = [], isDisabled, ...originItem } = useRecoilValue(FlowItemStore(String(originId)));
+    const isComment = originItem.flowItemType === EFlowItemType.comment;
+    const lineType = isComment ? 'dotted' : 'normal';
+    let { width, height, top, left } = originItem;
+
+    if (isComment) {
+        const commentSizes = getSizeByText(originItem.description || '');
+        width = commentSizes.width;
+        height = commentSizes.height;
+    }
 
     // Find the current connection in their item
     const connection = connections.find(connection => connection.id === id);
@@ -50,10 +65,13 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onConte
     const isCurved = targetConnections.some(connection => connection.targetId === originId);
 
     // Calc the correct positions of the line arrow
-    const top = _top + ((originItem.width || 0) / 2);
-    const left = _left + ((originItem.height || 0) / 2);
-    const top2 = id !== undefined ? targetItem.top + ((targetItem.height || 0) / 2) : _top + ((originItem.height || 0) / 2);
-    const left2 = id !== undefined ? targetItem.left + ((targetItem.width || 0) / 2) : _left + ((originItem.width || 0) / 2);
+    top = top + ((width || 0) / 2);
+    left = left + ((height || 0) / 2);
+    const top2 = id !== undefined ? targetItem.top + ((targetItem.height || 0) / 2) : top + ((height || 0) / 2);
+    const left2 = id !== undefined ? targetItem.left + ((targetItem.width || 0) / 2) : left + ((width || 0) / 2);
+
+    /** Used to guide the line arrow when connected */
+    let radius: number = (targetItem.width || 0) - ((targetItem.width || 0) / 4);
 
     // Sets the color of the line when selected
     const strokeColor: string = connection?.isSelected ? `${flowItemSelectedColor}` : `${linesColor}`;
@@ -105,7 +123,7 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onConte
         window.onmousemove = null;
         document.body.style.cursor = 'unset';
 
-        if (!hasChange) {
+        if (!hasChange || useResetLine) {
             setBasicPosition({
                 isCurved,
                 top1: top,
@@ -118,7 +136,7 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onConte
                 lineDistance: (Math.hypot((top2 - top), (left2 - left)) - 40),
             });
         }
-    }, [left, left2, top, top2, isCurved, id, originId, createOrUpdateConnection]);
+    }, [left, left2, top, top2, isCurved, id, originId, useResetLine, createOrUpdateConnection]);
 
     const mouseDown = useCallback((e: any) => {
         e.stopPropagation();
@@ -130,6 +148,10 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onConte
         selectItemById(id, e.ctrlKey);
         onMouseDown && onMouseDown(e);
     }, [mouseMove, onMouseUp, onMouseDown, selectItemById, id]);
+
+    if (newConnectionBox?.current) {
+        newConnectionBox.current.onmousedown = mouseDown;
+    }
 
     const handleSelectLine = useCallback((e: any) => {
         e.stopPropagation();
@@ -177,16 +199,6 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, onConte
                 onContextMenu={onContextMenu}
                 visible={!basicPosition.showNewLine && id === undefined}
             />
-            {id === undefined && <NewConnectionBox
-                id={String(id)}
-                radius={radius}
-                cursor={"crosshair"}
-                lineWidth={lineWidth}
-                onMouseDown={mouseDown}
-                top={basicPosition.top2}
-                left={basicPosition.left2}
-                onContextMenu={onContextMenu}
-            />}
             {connection?.connectionDescription && <title>{connection.connectionDescription}</title>}
         </g>
     );
