@@ -2,8 +2,8 @@ import React, { useCallback, useRef } from 'react';
 
 import { useFlowItem, useDragAllElements, useSelectItemById } from '../../shared/hooks';
 import { EFlowItemType } from '../../shared/enums';
+import { Acorn } from './acorn/Acorn';
 import { Comment } from './Comment';
-import { Acorn } from './Acorn';
 
 interface FlowProps {
     id: string;

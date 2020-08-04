@@ -24,6 +24,7 @@ const App: React.FC = () => {
                     flowItemTextColor: 'white',
                     backgroundType: "dotted",
                     dottedSize: 15,
+                    lineWidth: 1,
                 }}
                 childrenWhenItemsEmpty={<>
                     <h1>Drag and drop something here to start</h1>
