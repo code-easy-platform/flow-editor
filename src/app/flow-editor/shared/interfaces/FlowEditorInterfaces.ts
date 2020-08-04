@@ -62,9 +62,10 @@ export interface IFlowEditorConfigs {
 
 /** Set of events used by FlowEditorBoard */
 export interface IFlowEditorBoardEvents {
+    onChange?(items: IFlowItem[]):void;
+    onContextMenu?(event: React.MouseEvent<any, MouseEvent>): void;
     onMouseEnter?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
     onMouseLeave?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
-    onContextMenu?(event: React.MouseEvent<any, MouseEvent>): void;
 }
 
 /** Set of properties used by FlowEditorBoard */

@@ -13,6 +13,7 @@ const App: React.FC = () => {
                 // onMouseEnter={console.log}
                 // onMouseLeave={console.log}
                 onContextMenu={console.log}
+                onChange={console.log}
                 configs={{
                     // disableSelection: true,
                     flowItemWarningColor: 'var(--main-warning-color)',

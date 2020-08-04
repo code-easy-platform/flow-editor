@@ -3,6 +3,7 @@ import { useRecoilCallback } from 'recoil';
 
 import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector } from './shared/stores';
 import { useFlowItems, useConfigs, useSelectItemById, useCopySelecteds, usePasteSelecteds } from './shared/hooks';
+import { OnChangeEmitter } from './components/on-change-emitter/OnChangeEmitter';
 import { IFlowEditorBoardProps } from './shared/interfaces/FlowEditorInterfaces';
 import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
 import { SelectorArea } from './components/area-selector/SelectorArea';
@@ -14,7 +15,7 @@ import { ICoords, IFlowItem } from './shared/interfaces';
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const { dottedSize, typesAllowedToDrop, backgroundType, disableSelection } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit" } = props;
-    const { onMouseEnter, onMouseLeave, onContextMenu } = props;
+    const { onMouseEnter, onMouseLeave, onContextMenu, onChange } = props;
     const pasteSelectedItems = usePasteSelecteds();
     const copySelectedItems = useCopySelecteds();
     const selectItemById = useSelectItemById();
@@ -173,12 +174,12 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     allowedsInDrop={typesAllowedToDrop}
                     onArrowKeyDown={handleArrowKeyDown}
                     onKeyDownCtrlA={handleSelecteAllFlowItems}
+                    onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                     onKeyDownCtrlD={e => {
                         e.preventDefault();
                         copySelectedItems();
                         pasteSelectedItems();
                     }}
-                    onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                 >
                     <Lines />
                     {items.map(id => (
@@ -193,6 +194,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                         onCoordsChange={setSelectedFlowItem}
                     />
                     <EmptyFeedback show={items.length === 0} children={childrenWhenItemsEmpty} />
+                    <OnChangeEmitter onChange={onChange} />
                 </EditorPanel>
             </main>
         </div>
