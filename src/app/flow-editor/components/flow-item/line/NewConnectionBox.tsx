@@ -35,10 +35,9 @@ export const NewConnectionBox: React.FC<INewConnectionBoxProps> = memo(({ origin
         <>
             <Line
                 id={undefined}
-                useResetLine={true}
                 originId={originId}
                 targetId={undefined}
-                newConnectionBox={ref}
+                newConnectionBoxRef={ref}
             />
             <rect
                 onContextMenu={handleOnContextMenu}

@@ -16,7 +16,7 @@ interface FlowComponentProps {
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
 export const Acorn: React.FC<FlowComponentProps> = memo(({ item, onContextMenu, onMouseDown }) => {
-    const { flowItemErrorColor, flowItemTextColor, flowItemWarningColor, flowItemSelectedColor, lineWidth } = useConfigs();
+    const { flowItemErrorColor, flowItemTextColor, flowItemWarningColor, flowItemSelectedColor, lineWidth, backgroundColor } = useConfigs();
     const selectItemById = useSelectItemById();
 
     const strokeColor: string = item.isSelected
@@ -61,8 +61,8 @@ export const Acorn: React.FC<FlowComponentProps> = memo(({ item, onContextMenu, 
                 top={item.top}
             />
             <SelectionBox
-                fullDraggable={item.isEnabledNewConnetion}
-                backgroundColor={"var(--main-background)"}
+                fullDraggable={!item.isEnabledNewConnetion}
+                backgroundColor={backgroundColor}
                 onMouseDown={mouseDownMove}
                 strokeColor={strokeColor}
                 height={item.height || 0}

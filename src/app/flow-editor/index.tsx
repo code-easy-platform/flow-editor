@@ -22,11 +22,16 @@ export const FlowEditor = ({ configs, items, ...rest }: IFlowEditorProps) => {
 
         // Set configurations
         set(ConfigurationsStore, {
+            selectionBackgroundColor: configs.selectionBackgroundColor || '#007bff1c',
             flowItemWarningColor: configs.flowItemWarningColor || 'yellow',
             flowItemSelectedColor: configs.flowItemSelectedColor || 'blue',
+            selectionBorderColor: configs.selectionBorderColor || 'blue',
+            selectionBorderType: configs.selectionBorderType || 'normal',
             snapGridWhileDragging: configs.snapGridWhileDragging || true,
+            selectionBorderWidth: configs.selectionBorderWidth || 1,
             flowItemTextColor: configs.flowItemTextColor || 'white',
             flowItemErrorColor: configs.flowItemErrorColor || 'red',
+            backgroundColor: configs.backgroundColor || '#171717',
             typesAllowedToDrop: configs.typesAllowedToDrop || [],
             commentTextColor: configs.commentTextColor || '#fff',
             disableSelection: configs.disableSelection || false,
@@ -34,6 +39,7 @@ export const FlowEditor = ({ configs, items, ...rest }: IFlowEditorProps) => {
             commentColor: configs.commentColor || 'green',
             disableOpacity: configs.disableOpacity || 0.5,
             linesColor: configs.linesColor || 'gray',
+            dotColor: configs.dotColor || '#484848',
             dottedSize: configs.dottedSize || 15,
             lineWidth: configs.lineWidth || 1,
         });

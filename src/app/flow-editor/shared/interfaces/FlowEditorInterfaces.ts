@@ -58,11 +58,37 @@ export interface IFlowEditorConfigs {
      * Stroke width used in lines in the flow
      */
     lineWidth?: number;
+    /**
+     * Selection border type
+     */
+    selectionBorderType?: 'dash' | 'normal',
+    /**
+     * Selection border width
+     */
+    selectionBorderWidth?: number,
+    /**
+     * Selection border color
+     */
+    selectionBorderColor?: string,
+    /**
+     * Selection background color
+     */
+    selectionBackgroundColor?: string,
+    /**
+     * Board background color
+     */
+    backgroundColor?: string,
+    /**
+     * Dot color
+     * 
+     * This property is used only when the background type is set to "dotted"
+     */
+    dotColor?: string,
 }
 
 /** Set of events used by FlowEditorBoard */
 export interface IFlowEditorBoardEvents {
-    onChange?(items: IFlowItem[]):void;
+    onChange?(items: IFlowItem[]): void;
     onContextMenu?(event: React.MouseEvent<any, MouseEvent>): void;
     onMouseEnter?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
     onMouseLeave?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;

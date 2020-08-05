@@ -12,19 +12,31 @@ const App: React.FC = () => {
                 items={ItemsLogical.map(item => ({ ...item/* , id: Utils.getUUID() */ }))}
                 // onMouseEnter={console.log}
                 // onMouseLeave={console.log}
-                onContextMenu={console.log}
-                onChange={console.log}
+                // onContextMenu={console.log}
+                // onChange={console.log}
                 configs={{
                     // disableSelection: true,
                     flowItemWarningColor: 'var(--main-warning-color)',
                     flowItemSelectedColor: 'var(--color-botton-bar)',
                     flowItemErrorColor: 'var(--main-error-color)',
                     commentTextColor: '#fff000',
-                    snapGridWhileDragging: true,
-                    flowItemTextColor: 'white',
+
+                    // linesColor: '',
+                    // commentColor: '',
+                    // disableOpacity: 0.5,
+                    // disableSelection: true,
+                    // typesAllowedToDrop: [],
+                    // flowItemTextColor: 'white',
+                    // snapGridWhileDragging: true,
+
+                    selectionBorderColor: 'var(--color-botton-bar)',
+                    selectionBackgroundColor: '#ffffff11',
+                    // selectionBorderType: 'dash',
+                    // selectionBorderWidth: 1,
+
                     backgroundType: "dotted",
                     dottedSize: 15,
-                    lineWidth: 1,
+                    lineWidth: 2,
                 }}
                 childrenWhenItemsEmpty={<>
                     <h1>Drag and drop something here to start</h1>

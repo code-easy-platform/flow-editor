@@ -13,7 +13,11 @@ import { Lines } from './components/flow-item/line/Lines';
 import { ICoords, IFlowItem } from './shared/interfaces';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
-    const { dottedSize, typesAllowedToDrop, backgroundType, disableSelection } = useConfigs();
+    const {
+        selectionBorderWidth, backgroundColor, disableSelection,
+        dottedSize, dotColor, typesAllowedToDrop, backgroundType,
+        selectionBackgroundColor, selectionBorderColor, selectionBorderType,
+    } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit" } = props;
     const { onMouseEnter, onMouseLeave, onContextMenu, onChange } = props;
     const pasteSelectedItems = usePasteSelecteds();
@@ -165,10 +169,12 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
             <main key={id} style={{ width: '100%', height: '100%', flex: 1, overflow: 'auto' }}>
                 <EditorPanel
                     id={`${id}_SVG`}
+                    dotColor={dotColor}
                     dottedSize={dottedSize}
                     onContextMenu={onContextMenu}
                     onKeyDownDelete={handleDelte}
                     backgroundType={backgroundType}
+                    backgroundColor={backgroundColor}
                     onKeyDownCtrlC={copySelectedItems}
                     onKeyDownCtrlV={pasteSelectedItems}
                     allowedsInDrop={typesAllowedToDrop}
@@ -191,7 +197,11 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     ))}
                     <SelectorArea
                         isDisabled={disableSelection}
+                        borderType={selectionBorderType}
+                        borderWidth={selectionBorderWidth}
+                        borderColor={selectionBorderColor}
                         onCoordsChange={setSelectedFlowItem}
+                        backgroundColor={selectionBackgroundColor}
                     />
                     <EmptyFeedback show={items.length === 0} children={childrenWhenItemsEmpty} />
                     <OnChangeEmitter onChange={onChange} />

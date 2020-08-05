@@ -28,7 +28,7 @@ export const SelectionBox: React.FC<SelectionBoxProps> = ({ height, left, top, w
                 ry={50}
             />
             <rect // Move element
-                height={(height || 0) - (fullDraggable ? ((height || 0) / 3) : 0)}
+                height={(height || 0) + (fullDraggable ? ((height || 0) / 3) : 0)}
                 y={top - ((height || 0) / 3)}
                 style={{ cursor: 'move' }}
                 onMouseDown={onMouseDown}

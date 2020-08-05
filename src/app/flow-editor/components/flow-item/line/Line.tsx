@@ -11,21 +11,24 @@ import { Arrow } from './components/Arrow';
 
 interface LineProps {
     /**
-     * 
+     * Identifier
      */
     id: string | undefined;
     /**
-     * 
+     * Source flow item
      */
     originId: string | undefined;
     /**
-     * 
+     * Target flow item
      */
     targetId: string | undefined;
     /**
+     * Reference to the element used to create new connections between items
      * 
+     * If this reference is not present, it represents that the line to be 
+     * created is connected to another item in the flow
      */
-    newConnectionBox?: React.MutableRefObject<SVGRectElement | null>;
+    newConnectionBoxRef?: React.MutableRefObject<SVGRectElement | null>;
     /**
      * Used in parent component to move this element in the screen
      */
@@ -34,12 +37,8 @@ interface LineProps {
      * Used to start the context menu for this específic component
      */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
-    /**
-     * 
-     */
-    useResetLine?: boolean;
 }
-export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, useResetLine = false, newConnectionBox, onContextMenu, onMouseDown }) => {
+export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, newConnectionBoxRef, onContextMenu, onMouseDown }) => {
     const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor, flowItemTextColor } = useConfigs();
     const createOrUpdateConnection = useCreateOrUpdateConnection();
     const selectItemById = useSelectItemById();
@@ -85,7 +84,7 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, useRese
         showNewLine: false,
         isLeftToRight: (left2 >= left),
         rotate: Utils.getAngle(left2, top2, left, top),
-        lineDistance: Math.hypot((top2 - top), (left2 - left)) - (radius + 5),
+        lineDistance: Math.hypot((top2 - top), (left2 - left)),
     });
     useEffect(() => {
         setBasicPosition(oldState => ({
@@ -97,9 +96,9 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, useRese
             left2: left2,
             isLeftToRight: (left2 >= left),
             rotate: Utils.getAngle(left2, top2, left, top),
-            lineDistance: Math.hypot((top2 - top), (left2 - left)) - (radius + 5),
+            lineDistance: Math.hypot((top2 - top), (left2 - left)),
         }));
-    }, [left, left2, top, top2, radius, isCurved]);
+    }, [left, left2, top, top2, isCurved, radius]);
 
     const mouseMove = useCallback((event: MouseEvent) => {
         setBasicPosition(oldBasicPosition => ({
@@ -110,7 +109,7 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, useRese
             left2: event.offsetX,
             isLeftToRight: (event.offsetX >= left),
             rotate: Utils.getAngle(event.offsetX, event.offsetY, left, top),
-            lineDistance: (Math.hypot((event.offsetY - top), (event.offsetX - left)) - 40),
+            lineDistance: Math.hypot((event.offsetY - top), (event.offsetX - left)),
         }));
     }, [left, top]);
 
@@ -123,7 +122,7 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, useRese
         window.onmousemove = null;
         document.body.style.cursor = 'unset';
 
-        if (!hasChange || useResetLine) {
+        if (!hasChange || !!newConnectionBoxRef) {
             setBasicPosition({
                 isCurved,
                 top1: top,
@@ -133,10 +132,10 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, useRese
                 showNewLine: false,
                 isLeftToRight: (left2 >= left),
                 rotate: Utils.getAngle(left2, top2, left, top),
-                lineDistance: (Math.hypot((top2 - top), (left2 - left)) - 40),
+                lineDistance: Math.hypot((top2 - top), (left2 - left)),
             });
         }
-    }, [left, left2, top, top2, isCurved, id, originId, useResetLine, createOrUpdateConnection]);
+    }, [left, left2, top, top2, isCurved, id, originId, newConnectionBoxRef, createOrUpdateConnection]);
 
     const mouseDown = useCallback((e: any) => {
         e.stopPropagation();
@@ -149,11 +148,12 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, useRese
         onMouseDown && onMouseDown(e);
     }, [mouseMove, onMouseUp, onMouseDown, selectItemById, id]);
 
-    if (newConnectionBox?.current) {
-        newConnectionBox.current.onmousedown = mouseDown;
+    // Used when being used to create a new line
+    if (newConnectionBoxRef?.current) {
+        newConnectionBoxRef.current.onmousedown = mouseDown;
     }
 
-    const handleSelectLine = useCallback((e: any) => {
+    const handleSelectLine = useCallback((e: React.MouseEvent<SVGPathElement | SVGTextElement, MouseEvent>) => {
         e.stopPropagation();
         selectItemById(id, e.ctrlKey);
         onMouseDown && onMouseDown(e);
@@ -183,7 +183,7 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, useRese
                 rotate={basicPosition.rotate}
                 onMouseDown={handleSelectLine}
                 isCurved={basicPosition.isCurved}
-                lineDistance={basicPosition.lineDistance}
+                lineDistance={basicPosition.lineDistance - (radius + 5)}
                 visible={!basicPosition.showNewLine && id === undefined}
             />
             <Arrow
@@ -197,6 +197,7 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, useRese
                 left={basicPosition.left2}
                 rotate={basicPosition.rotate}
                 onContextMenu={onContextMenu}
+                useEvents={!!!newConnectionBoxRef}
                 visible={!basicPosition.showNewLine && id === undefined}
             />
             {connection?.connectionDescription && <title>{connection.connectionDescription}</title>}

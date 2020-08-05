@@ -4,7 +4,9 @@ import { useDrop, DropTargetMonitor } from 'react-dnd';
 import { useBoardSize } from '../../shared/hooks';
 
 type EditorPanelProps = Omit<{
+    dotColor?: string;
     dottedSize?: number;
+    backgroundColor?: string;
     allowedsInDrop?: string[];
     onChangeZoom?(zoom: number): void;
     backgroundType?: 'dotted' | 'checkered' | 'custom';
@@ -26,7 +28,7 @@ type EditorPanelProps = Omit<{
  * @param onDropItem - **Function** - Função executada quando um elemento for dropado no painel
  * @param backgroundType - **'dotted'** | **'checkered'** | **'custom'** - Parâmetro que controla o estilo do background do painel
  */
-export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, onChangeZoom, dottedSize = 15, backgroundType = 'dotted', onArrowKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV, onKeyDownCtrlA, onKeyDownDelete, onAnyKeyDown, ...props }: EditorPanelProps, ref: any) => {
+export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, onChangeZoom, dotColor = '', backgroundColor = '', dottedSize = 15, backgroundType = 'dotted', onArrowKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV, onKeyDownCtrlA, onKeyDownDelete, onAnyKeyDown, ...props }: EditorPanelProps, ref: any) => {
     const { height, width } = useBoardSize();
 
     const [zoom, setZoom] = React.useState(1);
@@ -66,9 +68,9 @@ export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, 
     // Este bloco serve para configurar o estilo do background do painel
     let background;
     if (backgroundType === 'dotted') {
-        background = 'radial-gradient(var(--main-background-highlighted) 5%, var(--color-transparent) 5%)';
+        background = `radial-gradient(${dotColor} 5%, ${backgroundColor} 5%)`;
     } else if (backgroundType === 'checkered') {
-        background = 'linear-gradient(0deg, var(--main-background-highlighted) 1px, transparent 0px), linear-gradient(90deg, var(--main-background-highlighted) 1px, transparent 0px)'
+        background = `linear-gradient(0deg, ${dotColor} 1px, ${backgroundColor} 0px), linear-gradient(90deg, ${dotColor} 1px, ${backgroundColor} 0px)`
     } else {
         background = props.style?.backgroundImage;
     }

@@ -7,12 +7,13 @@ interface SelectorAreaProps {
     borderColor?: string;
     borderWidth?: number;
     backgroundColor?: string;
+    borderType?: 'dash' | 'normal';
     onSelectionEnd?(e: MouseEvent): void;
     onSelectionStart?(e: MouseEvent): void;
     onCoordsChange?(coords: ICoords): void;
 }
 /** Reinderiza a área de seleção na tela, para que seja possível selecionar diversos items de uma vez. */
-export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd, onSelectionStart, backgroundColor = "#ffffff11", borderColor = "#999fff", borderWidth = 1, isDisabled = false, onCoordsChange }) => {
+export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd, onSelectionStart, borderType, backgroundColor = "#ffffff11", borderColor = "#999fff", borderWidth = 1, isDisabled = false, onCoordsChange }) => {
 
     const selectorAreaRef = useRef<any>(null);
     const selectionStarted = useRef(false);
@@ -104,6 +105,7 @@ export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd,
             ref={selectorAreaRef}
             fill={backgroundColor}
             strokeWidth={borderWidth}
+            strokeDasharray={borderType === 'dash' ? 5.5 : undefined}
             y={((position.endTop - position.startTop) > 0) ? position.startTop : position.endTop}
             x={((position.endLeft - position.startLeft) > 0) ? position.startLeft : position.endLeft}
             height={((position.endTop - position.startTop) > 0) ? (position.endTop - position.startTop) : (position.startTop - position.endTop)}

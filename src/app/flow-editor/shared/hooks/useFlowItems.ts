@@ -247,31 +247,33 @@ export const usePasteSelecteds = () => useRecoilCallback(({ snapshot, set }) => 
             .readText()
             .then(async text => {
 
-                const components: IFlowItem[] = JSON.parse(text || '[]');
-                let itemIds = await snapshot.getPromise(FlowItemsStore);
+                try {
+                    const components: IFlowItem[] = JSON.parse(text || '[]');
+                    let itemIds = await snapshot.getPromise(FlowItemsStore);
 
-                itemIds.forEach(id => {
-                    set(FlowItemStore(String(id)), oldState => ({ ...oldState, isSelected: false }));
-                });
+                    itemIds.forEach(id => {
+                        set(FlowItemStore(String(id)), oldState => ({ ...oldState, isSelected: false }));
+                    });
 
-                components.forEach(item => {
-                    item.top = item.top + 50;
-                    item.id = Utils.getUUID();
-                    item.left = item.left + 100;
+                    components.forEach(item => {
+                        item.top = item.top + 50;
+                        item.id = Utils.getUUID();
+                        item.left = item.left + 100;
 
-                    item = {
-                        ...item,
-                        connections: (item.connections || []).map(connection => ({ ...connection, originId: String(item.id) })),
-                    };
+                        item = {
+                            ...item,
+                            connections: (item.connections || []).map(connection => ({ ...connection, originId: String(item.id) })),
+                        };
 
-                    itemIds = [
-                        ...itemIds,
-                        String(item.id),
-                    ];
-                    set(FlowItemStore(String(item.id)), item);
-                });
+                        itemIds = [
+                            ...itemIds,
+                            String(item.id),
+                        ];
+                        set(FlowItemStore(String(item.id)), item);
+                    });
 
-                set(FlowItemsStore, itemIds);
+                    set(FlowItemsStore, itemIds);
+                } catch (_) { }
             });
     } catch (e) { console.log(e) }
 });
