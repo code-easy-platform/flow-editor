@@ -11,6 +11,7 @@ import { EditorPanel } from './components/editor-panel/EditorPanel';
 import { FlowItem } from './components/flow-item/FlowItem';
 import { Lines } from './components/flow-item/line/Lines';
 import { ICoords, IFlowItem } from './shared/interfaces';
+import { BreandCamps } from './components/breadcamps/BreandCamps';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const {
@@ -18,8 +19,8 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         dottedSize, dotColor, typesAllowedToDrop, backgroundType,
         selectionBackgroundColor, selectionBorderColor, selectionBorderType,
     } = useConfigs();
-    const { id, childrenWhenItemsEmpty = "Nothing here to edit" } = props;
-    const { onMouseEnter, onMouseLeave, onContextMenu, onChange } = props;
+    const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [] } = props;
+    const { onMouseEnter, onMouseLeave, onContextMenu, onChangeItems } = props;
     const pasteSelectedItems = usePasteSelecteds();
     const copySelectedItems = useCopySelecteds();
     const selectItemById = useSelectItemById();
@@ -167,6 +168,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     return (
         <div style={{ width: '100%', height: '100%' }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
             <main key={id} style={{ width: '100%', height: '100%', flex: 1, overflow: 'auto' }}>
+                <BreandCamps breadcrumbs={breadcrumbs} />
                 <EditorPanel
                     id={`${id}_SVG`}
                     dotColor={dotColor}
@@ -204,7 +206,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                         backgroundColor={selectionBackgroundColor}
                     />
                     <EmptyFeedback show={items.length === 0} children={childrenWhenItemsEmpty} />
-                    <OnChangeEmitter onChange={onChange} />
+                    <OnChangeEmitter onChange={onChangeItems} />
                 </EditorPanel>
             </main>
         </div>

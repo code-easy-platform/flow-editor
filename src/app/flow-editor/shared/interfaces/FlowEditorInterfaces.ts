@@ -1,4 +1,5 @@
 import { IFlowItem } from "./FlowItemInterfaces";
+import { IBreadCampButton } from "./BreadCampButton";
 
 /** Specific set of settings used in the flow editor */
 export interface IFlowEditorConfigs {
@@ -88,7 +89,7 @@ export interface IFlowEditorConfigs {
 
 /** Set of events used by FlowEditorBoard */
 export interface IFlowEditorBoardEvents {
-    onChange?(items: IFlowItem[]): void;
+    onChangeItems?(items: IFlowItem[]): void;
     onContextMenu?(event: React.MouseEvent<any, MouseEvent>): void;
     onMouseEnter?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
     onMouseLeave?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
@@ -96,11 +97,18 @@ export interface IFlowEditorBoardEvents {
 
 /** Set of properties used by FlowEditorBoard */
 export interface IFlowEditorBoardProps extends IFlowEditorBoardEvents {
+    /**
+     * Unique identifier
+     */
     id: string;
     /**
      * The component is showed when the items props is empty
      */
-    childrenWhenItemsEmpty?: React.ReactNode
+    childrenWhenItemsEmpty?: React.ReactNode;
+    /**
+     * 
+     */
+    breadcrumbs?: IBreadCampButton[];
 }
 
 /** Set of all properties used in FlowEditor component */

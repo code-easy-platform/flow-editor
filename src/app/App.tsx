@@ -10,9 +10,26 @@ const App: React.FC = () => {
             <FlowEditor
                 id="FlowEditor"
                 items={ItemsLogical.map(item => ({ ...item/* , id: Utils.getUUID() */ }))}
+                breadcrumbs={[
+                    { label: 'Routes', onClick: console.log },
+                    { label: 'authenticate1', onClick: console.log },
+                    { label: 'authenticate2', onClick: console.log },
+                    { label: 'authenticate3', onClick: console.log },
+                    { label: 'authenticate4', onClick: console.log },
+                    { label: 'authenticate5', onClick: console.log },
+                    { label: 'authenticate6', onClick: console.log },
+                    { label: 'authenticate7', onClick: console.log },
+                    { label: 'authenticate8', onClick: console.log },
+                    { label: 'authenticate9', onClick: console.log },
+                    { label: 'authenticate10', onClick: console.log },
+                    { label: 'authenticate11', onClick: console.log },
+                    { label: 'authenticate12', onClick: console.log },
+                    { label: 'authenticate13', onClick: console.log },
+                    { label: 'authenticate14', onClick: console.log },
+                ]}
+                // onContextMenu={console.log}
                 // onMouseEnter={console.log}
                 // onMouseLeave={console.log}
-                // onContextMenu={console.log}
                 // onChange={console.log}
                 configs={{
                     // disableSelection: true,
