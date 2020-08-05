@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useRecoilCallback } from 'recoil';
 
 import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector } from './shared/stores';
@@ -8,21 +8,25 @@ import { IFlowEditorBoardProps } from './shared/interfaces/FlowEditorInterfaces'
 import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
 import { SelectorArea } from './components/area-selector/SelectorArea';
 import { EditorPanel } from './components/editor-panel/EditorPanel';
+import { BreandCamps } from './components/breadcamps/BreandCamps';
 import { FlowItem } from './components/flow-item/FlowItem';
 import { Lines } from './components/flow-item/line/Lines';
 import { ICoords, IFlowItem } from './shared/interfaces';
-import { BreandCamps } from './components/breadcamps/BreandCamps';
 import { Toolbar } from './components/tool-bar/ToolBar';
+import { DropTargetMonitor } from 'react-dnd';
+import { Utils } from 'code-easy-components';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const {
         selectionBorderWidth, backgroundColor, disableSelection,
         dottedSize, dotColor, typesAllowedToDrop, backgroundType,
+        toolbarBackgroundColor, toolbarBorderColor, toolbarItemWidth,
         selectionBackgroundColor, selectionBorderColor, selectionBorderType,
     } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [], toolItems = [], showToolbar = true } = props;
-    const { onMouseEnter, onMouseLeave, onContextMenu, onChangeItems } = props;
+    const { onMouseEnter, onMouseLeave, onContextMenu, onChangeItems, onDropItem } = props;
     const pasteSelectedItems = usePasteSelecteds();
+    const boardRef = useRef<SVGSVGElement>(null);
     const copySelectedItems = useCopySelecteds();
     const selectItemById = useSelectItemById();
     const items = useFlowItems();
@@ -166,15 +170,85 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         });
     });
 
+    /** Essa função é executada sempre um item(aceito como item soltável) é sortado no painel */
+    const handleDroptem = useRecoilCallback(({ snapshot, set }) => async (item: any, monitor: DropTargetMonitor) => {
+
+        const target = boardRef.current;
+        const draggedOffSet = monitor.getClientOffset();
+        if (!target || !draggedOffSet) return;
+
+        const targetSize = target.getBoundingClientRect();
+        const targetOffsetY: number = (draggedOffSet.y + (targetSize.top - targetSize.top - targetSize.top) - 25);
+        const targetOffsetX: number = (draggedOffSet.x + (targetSize.left - targetSize.left - targetSize.left) - 25);
+
+        let newItem = {
+            id: Utils.getUUID().toString(),
+            flowItemType: item.itemProps.flowItemType,
+            left: Math.round(targetOffsetX / 15) * 15,
+            top: Math.round(targetOffsetY / 15) * 15,
+            itemType: item.itemProps.itemType,
+            height: item.itemProps.height,
+            width: item.itemProps.width,
+            label: item.itemProps.label,
+            icon: item.itemProps.icon,
+            isSelected: true,
+        };
+
+        // Get current items to deselect
+        const itemsComplete = await snapshot.getPromise(GetFlowItemsSelector);
+
+        /** Espera o retorno para inserir o item, se receber undefined só insere, se for diferente de undefined insere o resultado do event se existir algo */
+        const onDropRes = onDropItem ? onDropItem(item.id, (newItem.id || Utils.getUUID()), newItem) : undefined;
+        if (onDropRes === undefined) {
+
+            // Add a new item in array state
+            set(FlowItemsStore, [...items, newItem.id]);
+
+            // Creates the state for the item
+            set(FlowItemStore(newItem.id), newItem);
+
+            itemsComplete.forEach(itemComplete => {
+                if (itemComplete.id && itemComplete.isSelected) {
+                    set(FlowItemStore(itemComplete.id), { ...itemComplete, isSelected: false })
+                }
+            });
+
+        } else if (onDropRes) {
+
+            // Add a new item in array state
+            set(FlowItemsStore, [...items, (onDropRes.id || Utils.getUUID())]);
+
+            // Creates the state for the item
+            set(FlowItemStore(onDropRes.id || Utils.getUUID()), onDropRes);
+
+            itemsComplete.forEach(itemComplete => {
+                if (itemComplete.id && itemComplete.isSelected) {
+                    set(FlowItemStore(itemComplete.id), { ...itemComplete, isSelected: false })
+                }
+            });
+        }
+
+        target.focus();
+
+    }, [items, boardRef, onDropItem]);
+
     return (
         <div style={{ width: '100%', height: '100%' }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-            <Toolbar itemsLogica={toolItems} isShow={((toolItems.length > 0) && showToolbar)} />
+            <Toolbar
+                itemsLogica={toolItems}
+                itemWidth={toolbarItemWidth}
+                borderColor={toolbarBorderColor}
+                backgroundColor={toolbarBackgroundColor}
+                isShow={((toolItems.length > 0) && showToolbar)}
+            />
             <main key={id} style={{ width: '100%', height: '100%', flex: 1, overflow: 'auto' }}>
                 <BreandCamps breadcrumbs={breadcrumbs} />
                 <EditorPanel
+                    ref={boardRef}
                     id={`${id}_SVG`}
                     dotColor={dotColor}
                     dottedSize={dottedSize}
+                    onDropItem={handleDroptem}
                     onContextMenu={onContextMenu}
                     onKeyDownDelete={handleDelte}
                     backgroundType={backgroundType}
@@ -185,7 +259,6 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     onArrowKeyDown={handleArrowKeyDown}
                     onKeyDownCtrlA={handleSelecteAllFlowItems}
                     onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
-                    onDropItem={console.log}
                     onKeyDownCtrlD={e => {
                         e.preventDefault();
                         copySelectedItems();

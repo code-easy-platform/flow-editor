@@ -160,7 +160,7 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, newConn
     }, [onMouseDown, selectItemById, id]);
 
     return (
-        <g style={{ opacity: isDisabled ? disableOpacity : 1 }}>
+        <g role={EFlowItemType.line} style={(isDisabled ? { opacity: disableOpacity } : {})}>
             <TextOverLine
                 top={basicPosition.top1}
                 left={basicPosition.left1}

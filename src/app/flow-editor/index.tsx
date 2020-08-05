@@ -23,11 +23,13 @@ export const FlowEditor = ({ configs, items, ...rest }: IFlowEditorProps) => {
         // Set configurations
         set(ConfigurationsStore, {
             selectionBackgroundColor: configs.selectionBackgroundColor || '#007bff1c',
+            toolbarBackgroundColor: configs.toolbarBackgroundColor || '#232323',
             flowItemWarningColor: configs.flowItemWarningColor || 'yellow',
             flowItemSelectedColor: configs.flowItemSelectedColor || 'blue',
             selectionBorderColor: configs.selectionBorderColor || 'blue',
             selectionBorderType: configs.selectionBorderType || 'normal',
             snapGridWhileDragging: configs.snapGridWhileDragging || true,
+            toolbarBorderColor: configs.toolbarBorderColor || '#000',
             selectionBorderWidth: configs.selectionBorderWidth || 1,
             flowItemTextColor: configs.flowItemTextColor || 'white',
             flowItemErrorColor: configs.flowItemErrorColor || 'red',
@@ -36,6 +38,7 @@ export const FlowEditor = ({ configs, items, ...rest }: IFlowEditorProps) => {
             commentTextColor: configs.commentTextColor || '#fff',
             disableSelection: configs.disableSelection || false,
             backgroundType: configs.backgroundType || 'dotted',
+            toolbarItemWidth: configs.toolbarItemWidth || 30,
             commentColor: configs.commentColor || 'green',
             disableOpacity: configs.disableOpacity || 0.5,
             linesColor: configs.linesColor || 'gray',

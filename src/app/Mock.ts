@@ -1,4 +1,4 @@
-import { IconFlowStart, IconFlowIf, IconFlowForeach, IconFlowAction, IconFlowAssign } from 'code-easy-components';
+import { IconFlowStart, IconFlowIf, IconFlowForeach, IconFlowAction, IconFlowAssign, IconFlowComment, IconFlowEnd, IconFlowSwitch } from 'code-easy-components';
 
 import { IFlowItem } from "./flow-editor/shared/interfaces/FlowItemInterfaces";
 import { EItemType } from './flow-editor/shared/enums/EItemType';
@@ -12,3 +12,25 @@ export const ItemsLogical: IFlowItem[] = [
     { id: '5', itemType: EItemType.ASSIGN, isEnabledNewConnetion: true, connections: [{ id: '114', targetId: '4', originId: '5', isSelected: false, connectionLabel: 'Linha 05', connectionDescription: 'Descrição da linha 01' }], icon: IconFlowAssign, label: 'Assign', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 700, height: 40, width: 40 },
     { id: '6', itemType: EItemType.COMMENT, isEnabledNewConnetion: true, connections: [], description: 'Write here \n your comment', flowItemType: EFlowItemType.comment, left: 210, top: 200 },
 ]
+
+export const ToolItems: IFlowItem[] = [
+    { id: undefined, left: 0, top: 0, flowItemType: EFlowItemType.acorn, icon: IconFlowStart, itemType: EItemType.START },
+    { id: undefined, left: 0, top: 0, flowItemType: EFlowItemType.acorn, icon: IconFlowAssign, itemType: EItemType.ASSIGN },
+    { id: undefined, left: 0, top: 0, flowItemType: EFlowItemType.acorn, icon: IconFlowIf, itemType: EItemType.IF },
+    { id: undefined, left: 0, top: 0, flowItemType: EFlowItemType.acorn, icon: IconFlowAction, itemType: EItemType.ACTION },
+    { id: undefined, left: 0, top: 0, flowItemType: EFlowItemType.acorn, icon: IconFlowSwitch, itemType: EItemType.SWITCH },
+    { id: undefined, left: 0, top: 0, flowItemType: EFlowItemType.acorn, icon: IconFlowForeach, itemType: EItemType.FOREACH },
+    { id: undefined, left: 0, top: 0, flowItemType: EFlowItemType.acorn, icon: IconFlowEnd, itemType: EItemType.END },
+    { id: undefined, left: 0, top: 0, itemType: EItemType.COMMENT, flowItemType: EFlowItemType.comment, icon: IconFlowComment },
+];
+
+export const AllowedsInDrop: string[] = [
+    EItemType.COMMENT,
+    EItemType.FOREACH,
+    EItemType.ACTION,
+    EItemType.ASSIGN,
+    EItemType.SWITCH,
+    EItemType.START,
+    EItemType.END,
+    EItemType.IF,
+];

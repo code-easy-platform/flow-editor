@@ -43,7 +43,7 @@ export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, 
         }
     }
 
-    if (!ref?.current) ref = useRef(null);
+    if (!ref) ref = useRef<SVGSVGElement>(null);
 
     if (ref?.current) {
 
@@ -79,6 +79,7 @@ export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, 
     const [, dropRef] = useDrop({
         accept: [...allowedsInDrop || []], // Especifica quem pode ser dropado na editor
         drop: onDropItem,
+        
     });
 
     /** Agrupa as referências do drop com as da ref. */

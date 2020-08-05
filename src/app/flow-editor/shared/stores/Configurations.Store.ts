@@ -5,6 +5,7 @@ export const ConfigurationsStore = atom<IFlowEditorConfigs>({
     key: '',
     default: {
         selectionBackgroundColor: '#007bff1c',
+        toolbarBackgroundColor: '#232323',
         flowItemWarningColor: 'yellow',
         selectionBorderType: 'normal',
         flowItemSelectedColor: 'blue',
@@ -12,6 +13,7 @@ export const ConfigurationsStore = atom<IFlowEditorConfigs>({
         snapGridWhileDragging: true,
         flowItemTextColor: 'white',
         backgroundColor: '#171717',
+        toolbarBorderColor: '#000',
         flowItemErrorColor: 'red',
         commentTextColor: 'white',
         backgroundType: 'dotted',
@@ -19,6 +21,7 @@ export const ConfigurationsStore = atom<IFlowEditorConfigs>({
         disableSelection: false,
         typesAllowedToDrop: [],
         commentColor: 'green',
+        toolbarItemWidth: 30,
         disableOpacity: 0.5,
         dotColor: '#484848',
         linesColor: 'gray',

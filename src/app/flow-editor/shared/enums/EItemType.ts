@@ -1,11 +1,11 @@
 /** Tipos de items existentes na toolbar. */
 export enum EItemType {
-    COMMENT = "COMMENT",
-    FOREACH = "FOREACH",
-    SWITCH = "SWITCH",
-    ASSIGN = "ASSIGN",
-    ACTION = "ACTION",
-    START = "START",
-    END = "END",
-    IF = "IF",
+    COMMENT = "Comment",
+    FOREACH = "Foreach",
+    SWITCH = "Switch",
+    ASSIGN = "Assign",
+    ACTION = "Action",
+    START = "Start",
+    END = "End",
+    IF = "If",
 }

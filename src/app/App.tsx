@@ -1,7 +1,7 @@
 import React from 'react';
 
+import { ItemsLogical, ToolItems, AllowedsInDrop } from './Mock';
 import { FlowEditor } from './flow-editor';
-import { ItemsLogical } from './Mock';
 import './App.css';
 
 const App: React.FC = () => {
@@ -11,7 +11,8 @@ const App: React.FC = () => {
                 id="FlowEditor"
                 items={ItemsLogical.map(item => ({ ...item/* , id: Utils.getUUID() */ }))}
                 showToolbar={true}
-                toolItems={ItemsLogical}
+                toolItems={ToolItems}
+                onDropItem={(oldId, newId, item) => { console.log(oldId, newId, item); return {...item, isEnabledNewConnetion:true}; }}
                 breadcrumbs={[
                     { label: 'Routes', onClick: console.log },
                     { label: 'authenticate1', onClick: console.log },
@@ -38,8 +39,8 @@ const App: React.FC = () => {
                     flowItemWarningColor: 'var(--main-warning-color)',
                     flowItemSelectedColor: 'var(--color-botton-bar)',
                     flowItemErrorColor: 'var(--main-error-color)',
+                    typesAllowedToDrop: AllowedsInDrop,
                     commentTextColor: '#fff000',
-                    typesAllowedToDrop: ['START'],
 
                     // linesColor: '',
                     // commentColor: '',
@@ -48,6 +49,10 @@ const App: React.FC = () => {
                     // typesAllowedToDrop: [],
                     // flowItemTextColor: 'white',
                     // snapGridWhileDragging: true,
+
+                    // toolbarBackgroundColor:'darkred',
+                    // toolbarBorderColor:'yellow',
+                    // toolbarItemWidth:100,
 
                     selectionBorderColor: 'var(--color-botton-bar)',
                     selectionBackgroundColor: '#ffffff11',

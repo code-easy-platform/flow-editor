@@ -85,10 +85,26 @@ export interface IFlowEditorConfigs {
      * This property is used only when the background type is set to "dotted"
      */
     dotColor?: string,
+    /**
+     * Toolbar border color
+     */
+    toolbarBorderColor?: string,
+    /**
+     * Toolbar background color
+     */
+    toolbarBackgroundColor?: string,
+    /**
+     * Toolbar item width
+     */
+    toolbarItemWidth?: number;
 }
 
 /** Set of events used by FlowEditorBoard */
 export interface IFlowEditorBoardEvents {
+    /**
+     * Function - Fired when an item is dropped in the editor expects the same item, but the item may undergo additional changes
+     */
+    onDropItem?(oldItemId: string | undefined, newItemId: string, newItem: IFlowItem): IFlowItem | undefined;
     onChangeItems?(items: IFlowItem[]): void;
     onContextMenu?(event: React.MouseEvent<any, MouseEvent>): void;
     onMouseEnter?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;

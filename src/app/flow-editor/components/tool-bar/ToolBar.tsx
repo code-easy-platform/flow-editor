@@ -4,15 +4,23 @@ import { ListItemDraggable } from './components/ListItemDraggable';
 import { IFlowItem } from '../../shared/interfaces';
 import './Toolbar.css';
 
-export const Toolbar: React.FC<{ itemsLogica: IFlowItem[], isShow: boolean }> = memo(({ itemsLogica, isShow }) => {
+interface ToolbarProps {
+    itemsLogica: IFlowItem[];
+    backgroundColor?: string;
+    borderColor?: string;
+    itemWidth?: number;
+    isShow: boolean;
+}
+export const Toolbar: React.FC<ToolbarProps> = memo(({ itemsLogica, isShow, itemWidth, backgroundColor, borderColor }) => {
     return (
         isShow
-            ? <div className="mini-scroll-bar toolbar">
+            ? <div className="toolbar" style={{ backgroundColor, borderColor }}>
                 {itemsLogica.map((item: IFlowItem) => {
                     return <ListItemDraggable
                         flowItemType={item.flowItemType}
                         itemType={item.itemType}
                         label={item.label}
+                        width={itemWidth}
                         icon={item.icon}
                         key={item.id}
                     />;

@@ -41,7 +41,6 @@ export const Acorn: React.FC<FlowComponentProps> = memo(({ item, onContextMenu, 
 
     return (
         <g
-            id={item.id}
             role={item.flowItemType}
             onContextMenu={contextMenu}
         >
