@@ -12,6 +12,7 @@ import { FlowItem } from './components/flow-item/FlowItem';
 import { Lines } from './components/flow-item/line/Lines';
 import { ICoords, IFlowItem } from './shared/interfaces';
 import { BreandCamps } from './components/breadcamps/BreandCamps';
+import { Toolbar } from './components/tool-bar/ToolBar';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const {
@@ -19,7 +20,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         dottedSize, dotColor, typesAllowedToDrop, backgroundType,
         selectionBackgroundColor, selectionBorderColor, selectionBorderType,
     } = useConfigs();
-    const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [] } = props;
+    const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [], toolItems = [], showToolbar = true } = props;
     const { onMouseEnter, onMouseLeave, onContextMenu, onChangeItems } = props;
     const pasteSelectedItems = usePasteSelecteds();
     const copySelectedItems = useCopySelecteds();
@@ -167,6 +168,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
 
     return (
         <div style={{ width: '100%', height: '100%' }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+            <Toolbar itemsLogica={toolItems} isShow={((toolItems.length > 0) && showToolbar)} />
             <main key={id} style={{ width: '100%', height: '100%', flex: 1, overflow: 'auto' }}>
                 <BreandCamps breadcrumbs={breadcrumbs} />
                 <EditorPanel
@@ -183,6 +185,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     onArrowKeyDown={handleArrowKeyDown}
                     onKeyDownCtrlA={handleSelecteAllFlowItems}
                     onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
+                    onDropItem={console.log}
                     onKeyDownCtrlD={e => {
                         e.preventDefault();
                         copySelectedItems();

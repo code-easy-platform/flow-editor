@@ -10,6 +10,8 @@ const App: React.FC = () => {
             <FlowEditor
                 id="FlowEditor"
                 items={ItemsLogical.map(item => ({ ...item/* , id: Utils.getUUID() */ }))}
+                showToolbar={true}
+                toolItems={ItemsLogical}
                 breadcrumbs={[
                     { label: 'Routes', onClick: console.log },
                     { label: 'authenticate1', onClick: console.log },
@@ -37,6 +39,7 @@ const App: React.FC = () => {
                     flowItemSelectedColor: 'var(--color-botton-bar)',
                     flowItemErrorColor: 'var(--main-error-color)',
                     commentTextColor: '#fff000',
+                    typesAllowedToDrop: ['START'],
 
                     // linesColor: '',
                     // commentColor: '',

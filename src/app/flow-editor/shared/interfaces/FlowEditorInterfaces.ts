@@ -109,6 +109,14 @@ export interface IFlowEditorBoardProps extends IFlowEditorBoardEvents {
      * 
      */
     breadcrumbs?: IBreadCampButton[];
+    /**
+     * 
+     */
+    toolItems?: IFlowItem[];
+    /**
+     * 
+     */
+    showToolbar?: boolean;
 }
 
 /** Set of all properties used in FlowEditor component */
