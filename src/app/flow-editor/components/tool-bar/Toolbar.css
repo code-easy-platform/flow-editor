@@ -21,6 +21,6 @@
 }
 
 .toolbar-item:hover {
-  filter: brightness(1.8);
-  transform: scale(1.1);
+  filter: brightness(1.2);
+  transform: scale(1.2);
 }

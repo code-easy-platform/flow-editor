@@ -15,14 +15,14 @@ export const Toolbar: React.FC<ToolbarProps> = memo(({ itemsLogica, isShow, item
     return (
         isShow
             ? <div className="toolbar" style={{ backgroundColor, borderColor }}>
-                {itemsLogica.map((item: IFlowItem) => {
+                {itemsLogica.map((item: IFlowItem, index) => {
                     return <ListItemDraggable
                         flowItemType={item.flowItemType}
                         itemType={item.itemType}
                         label={item.label}
                         width={itemWidth}
                         icon={item.icon}
-                        key={item.id}
+                        key={index}
                     />;
                 })}
             </div>

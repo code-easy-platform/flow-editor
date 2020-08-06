@@ -9,14 +9,14 @@ const App: React.FC = () => {
         <div className="App">
             <FlowEditor
                 id="FlowEditor"
-                items={ItemsLogical.map(item => ({ ...item/* , id: Utils.getUUID() */ }))}
                 showToolbar={true}
                 toolItems={ToolItems}
+                items={ItemsLogical.map(item => ({ ...item }))}
                 onDropItem={(oldId, newId, item) => { console.log(oldId, newId, item); return { ...item, isEnabledNewConnetion: true }; }}
                 breadcrumbs={[
                     { label: 'Routes', onClick: console.log },
-                    { label: 'authenticate1', onClick: console.log },
-                    { label: 'authenticate2', onClick: console.log },
+                    { label: 'authenticate', onClick: console.log },
+                    /* { label: 'authenticate2', onClick: console.log },
                     { label: 'authenticate3', onClick: console.log },
                     { label: 'authenticate4', onClick: console.log },
                     { label: 'authenticate5', onClick: console.log },
@@ -28,47 +28,56 @@ const App: React.FC = () => {
                     { label: 'authenticate11', onClick: console.log },
                     { label: 'authenticate12', onClick: console.log },
                     { label: 'authenticate13', onClick: console.log },
-                    { label: 'authenticate14', onClick: console.log },
+                    { label: 'authenticate14', onClick: console.log }, */
                 ]}
                 // onContextMenu={console.log}
                 // onMouseEnter={console.log}
                 // onMouseLeave={console.log}
                 // onChange={console.log}
                 configs={{
-                    // disableSelection: true,
+
+                    /** FLOW ITEMS */
                     flowItemWarningColor: 'var(--main-warning-color)',
                     flowItemSelectedColor: 'var(--color-botton-bar)',
                     flowItemErrorColor: 'var(--main-error-color)',
-                    typesAllowedToDrop: AllowedsInDrop,
-
-                    commentTextColor: '#fff000',
-                    // commentColor: '',
-
-                    elevationColor: 'black',
-                    useElevation: true,
-
-                    lineWidth: 2,
-                    // linesColor: '',
-                    // disableOpacity: 0.5,
-                    // disableSelection: true,
-                    // typesAllowedToDrop: [],
                     // flowItemTextColor: 'white',
-                    // snapGridWhileDragging: true,
+                    commentTextColor: '#ffffff',
+                    // disableOpacity: 0.5,
+                    // commentColor: '',
+                    // linesColor: '',
+                    lineWidth: 2,
 
-                    // toolbarBackgroundColor:'darkred',
-                    // toolbarBorderColor:'yellow',
+                    /** EDITOR */
+                    typesAllowedToDrop: AllowedsInDrop,
+                    // snapGridWhileDragging: true,
+                    // backgroundColor: '#ffffff',
+                    // elevationColor: '#d2d2d2',
+                    backgroundType: "dotted",
+                    // useElevation: true,
+                    // dotColor: 'black',
+                    dottedSize: 15,
+
+                    /** BREADCRUMB */
+                    // breadcrumbBackgroundColor:'#d2d2d2',
+                    // breadcrumbBorderColor: '#a7a7a7',
+                    // breadcrumbTextColor: '#a8a8a8',
+
+                    /** TOOLBAR */
+                    // toolbarBackgroundColor:'#d2d2d2',
+                    // toolbarBorderColor:'#a7a7a7',
                     // toolbarItemWidth:100,
 
+                    /** SELECTION */
                     selectionBorderColor: 'var(--color-botton-bar)',
                     selectionBackgroundColor: '#ffffff11',
                     // selectionBorderType: 'dash',
                     // selectionBorderWidth: 1,
-
-                    backgroundType: "dotted",
-                    dottedSize: 15,
+                    // disableSelection: true,
                 }}
                 childrenWhenItemsEmpty={<>
-                    <h1>Drag and drop something here to start</h1>
+                    <div style={{ height: '-webkit-fill-available', width: '-webkit-fill-available', justifyContent: 'center', alignItems: 'center', opacity: 0.5 }}>
+                        <h1>Drag and drop something here to start</h1>
+                    </div>
                 </>}
             />
         </div>

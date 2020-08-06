@@ -3,7 +3,7 @@
 ul.breadcrumb {
     padding: 4px;
     max-width: 70%;
-    overflow-x: auto;
+    overflow-x: hidden;
     list-style: none;
     text-align: start;
     font-size: smaller;
@@ -12,6 +12,7 @@ ul.breadcrumb {
     border-width: thin;
     white-space: nowrap;
     padding-right: 32px;
+    scroll-behavior: smooth;
     border-right-style: solid;
     border-bottom-style: solid;
     border-bottom-right-radius: 8px;
@@ -23,6 +24,10 @@ ul.breadcrumb::-webkit-scrollbar {
 
 ul.breadcrumb::-webkit-scrollbar-thumb {
     height: 4px;
+}
+
+ul.breadcrumb::-webkit-scrollbar-thumb:active {
+    filter: brightness(0.6);
 }
 
 /* Display list items side by side */
@@ -47,7 +52,7 @@ ul.breadcrumb li+li:before {
     filter: brightness(0.6);
 }
 
-.breadcrump-item :checked+label {
-    filter: brightness(1.2);
-    transform: scale(1.2);
+.breadcrump-item :checked:focus+label {
+    outline-color: currentcolor;
+    outline: thin solid;
 }

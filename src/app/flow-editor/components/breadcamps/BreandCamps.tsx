@@ -40,13 +40,20 @@ export const BreandCamps: React.FC<BreandCampsProps> = memo(({ breadcrumbs = [],
                             id={String(index)}
                             name={"breadcrumb"}
                             disabled={disabled}
+                            onFocus={e=> ulRef.current.scrollTo(e.currentTarget.offsetLeft - 100, 0)}
                             onKeyDown={e => {
                                 if (!disabled && (e.keyCode === 13 || e.keyCode === 32)) {
                                     onClick(e);
                                 }
                             }}
                         />
-                        <label /*  role="breadcrumpitem" */ htmlFor={String(index)} onClick={disabled ? undefined : onClick}>{label}</label>
+                        <label
+                            htmlFor={String(index)}
+                            onClick={disabled ? undefined : e => {
+                                ulRef.current.scrollTo(e.currentTarget.offsetLeft - 100, 0);
+                                onClick(e);
+                            }}
+                        >{label}</label>
                     </li>
                 );
             })}
