@@ -6,6 +6,8 @@ import { useBoardSize } from '../../shared/hooks';
 type EditorPanelProps = Omit<{
     dotColor?: string;
     dottedSize?: number;
+    useElevation?: boolean;
+    elevationColor?: string;
     backgroundColor?: string;
     allowedsInDrop?: string[];
     onChangeZoom?(zoom: number): void;
@@ -28,7 +30,7 @@ type EditorPanelProps = Omit<{
  * @param onDropItem - **Function** - Função executada quando um elemento for dropado no painel
  * @param backgroundType - **'dotted'** | **'checkered'** | **'custom'** - Parâmetro que controla o estilo do background do painel
  */
-export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, onChangeZoom, dotColor = '', backgroundColor = '', dottedSize = 15, backgroundType = 'dotted', onArrowKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV, onKeyDownCtrlA, onKeyDownDelete, onAnyKeyDown, ...props }: EditorPanelProps, ref: any) => {
+export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, onChangeZoom, dotColor = '', elevationColor = 'black', useElevation = false, backgroundColor = '', dottedSize = 15, backgroundType = 'dotted', onArrowKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV, onKeyDownCtrlA, onKeyDownDelete, onAnyKeyDown, ...props }: EditorPanelProps, ref: any) => {
     const { height, width } = useBoardSize();
 
     const [zoom, setZoom] = React.useState(1);
@@ -79,7 +81,7 @@ export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, 
     const [, dropRef] = useDrop({
         accept: [...allowedsInDrop || []], // Especifica quem pode ser dropado na editor
         drop: onDropItem,
-        
+
     });
 
     /** Agrupa as referências do drop com as da ref. */
@@ -100,6 +102,7 @@ export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, 
                 minHeight: '100%',
                 backgroundImage: background,
                 backgroundSize: `${dottedSize}px ${dottedSize}px`,
+                boxShadow: useElevation ? `inset 0 0 14px 0px ${elevationColor}` : 'unset',
             }}
         />
     );

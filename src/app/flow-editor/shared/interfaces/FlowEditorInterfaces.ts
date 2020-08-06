@@ -97,6 +97,26 @@ export interface IFlowEditorConfigs {
      * Toolbar item width
      */
     toolbarItemWidth?: number;
+    /**
+     * Breadcrumb text color
+     */
+    breadcrumbTextColor?: string;
+    /**
+     * Breadcrumb border color
+     */
+    breadcrumbBorderColor?: string;
+    /**
+     * Breadcrumb background color
+     */
+    breadcrumbBackgroundColor?: string;
+    /**
+     * Used to display an elevation of the toolbar and breadcrumb relative to the board
+     */
+    useElevation?: boolean;
+    /**
+     * Elevation color
+     */
+    elevationColor?: string;
 }
 
 /** Set of events used by FlowEditorBoard */

@@ -1,23 +1,55 @@
-import React, { Fragment, memo } from 'react';
+import React, { memo, useRef, useEffect } from 'react';
 
 import { IBreadCampButton } from '../../shared/interfaces';
 import './BreandCamps.css';
 
 interface BreandCampsProps {
     breadcrumbs?: IBreadCampButton[];
+    backgroundColor?: string;
+    elevationColor?: string;
+    useElevation?: boolean;
+    borderColor?: string;
+    textColor?: string;
 }
-export const BreandCamps: React.FC<BreandCampsProps> = memo(({ breadcrumbs = [] }) => {
-    if (breadcrumbs.length === 0) return <></>;
+export const BreandCamps: React.FC<BreandCampsProps> = memo(({ breadcrumbs = [], backgroundColor, textColor, borderColor, useElevation = false, elevationColor = 'black' }) => {
+
+    const ulRef = useRef<any>(null);
+    useEffect(() => {
+        if (ulRef.current) {
+            ulRef.current.scrollTo(10000, 0);
+        }
+    }, []);
+
+    if (breadcrumbs.length === 0) return null;
+
     return (
-        <div className="background-panels breadcrump-base absolute padding-xs padding-right-m text-ellipsis" >
+        <ul
+            ref={ulRef}
+            className="breadcrumb"
+            style={{
+                backgroundColor,
+                color: textColor, borderColor,
+                boxShadow: useElevation ? `5px 0px 6px 0px ${elevationColor}` : 'unset',
+            }}>
             {breadcrumbs.map(({ label, onClick, disabled }, index) => {
                 return (
-                    <Fragment key={index}>
-                        <button key={index} disabled={disabled} className="breadcrump-button" onClick={!disabled ? onClick : undefined} children={label} />
-                        {((index + 1) !== breadcrumbs.length ? '/' : '')}
-                    </Fragment>
+                    <li key={index} className="breadcrump-item">
+                        <input
+                            tabIndex={0}
+                            type={"radio"}
+                            id={String(index)}
+                            name={"breadcrumb"}
+                            disabled={disabled}
+                            onKeyDown={e => {
+                                if (!disabled && (e.keyCode === 13 || e.keyCode === 32)) {
+                                    onClick(e);
+                                }
+                            }}
+                        />
+                        <label /*  role="breadcrumpitem" */ htmlFor={String(index)} onClick={disabled ? undefined : onClick}>{label}</label>
+                    </li>
                 );
             })}
-        </div>
+        </ul>
     );
 });

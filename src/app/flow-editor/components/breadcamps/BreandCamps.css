@@ -1,26 +1,53 @@
-.breadcrump-base {
-    color: var(--font-color-label-propertie-editor);
-    position: 'absolute';
-    max-width: 90%;
-    z-index: 1;
+/* Style the list */
+
+ul.breadcrumb {
+    padding: 4px;
+    max-width: 70%;
+    overflow-x: auto;
+    list-style: none;
+    text-align: start;
+    font-size: smaller;
+    position: absolute;
+    overflow-y: hidden;
+    border-width: thin;
+    white-space: nowrap;
+    padding-right: 32px;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-bottom-right-radius: 8px;
 }
 
-.breadcrump-button {
-    color: var(--font-color-label-propertie-editor);
-    background-color: var(--color-transparent);
-    border-width: var(--border-size-0);
-    cursor: pointer;
+ul.breadcrumb::-webkit-scrollbar {
+    height: 4px;
 }
 
-.breadcrump-button:hover {
-    color: var(--font-color-input-propertie-editor);
+ul.breadcrumb::-webkit-scrollbar-thumb {
+    height: 4px;
 }
 
-.breadcrump-button:active {
-    opacity: 0.5;
+/* Display list items side by side */
+ul.breadcrumb li {
+    display: inline;
 }
 
-.breadcrump-button:focus {
-    color: var(--font-color-input-propertie-editor);
-    outline: none;
+/* Add a slash symbol (/) before/behind each list item */
+ul.breadcrumb li+li:before {
+    filter: brightness(0.6);
+    padding: 4px;
+    content: "/";
+}
+
+.breadcrump-item input {
+    opacity: 0;
+    height: 0;
+    width: 0;
+}
+
+.breadcrump-item label {
+    filter: brightness(0.6);
+}
+
+.breadcrump-item :checked+label {
+    filter: brightness(1.2);
+    transform: scale(1.2);
 }

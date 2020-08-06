@@ -18,10 +18,12 @@ import { Utils } from 'code-easy-components';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const {
+        elevationColor, useElevation,
         selectionBorderWidth, backgroundColor, disableSelection,
         dottedSize, dotColor, typesAllowedToDrop, backgroundType,
         toolbarBackgroundColor, toolbarBorderColor, toolbarItemWidth,
         selectionBackgroundColor, selectionBorderColor, selectionBorderType,
+        breadcrumbBackgroundColor, breadcrumbTextColor, breadcrumbBorderColor,
     } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [], toolItems = [], showToolbar = true } = props;
     const { onMouseEnter, onMouseLeave, onContextMenu, onChangeItems, onDropItem } = props;
@@ -233,7 +235,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     }, [items, boardRef, onDropItem]);
 
     return (
-        <div style={{ width: '100%', height: '100%' }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+        <div style={{ width: '100%', height: '100%', display: 'flex' }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
             <Toolbar
                 itemsLogica={toolItems}
                 itemWidth={toolbarItemWidth}
@@ -241,16 +243,25 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                 backgroundColor={toolbarBackgroundColor}
                 isShow={((toolItems.length > 0) && showToolbar)}
             />
-            <main key={id} style={{ width: '100%', height: '100%', flex: 1, overflow: 'auto' }}>
-                <BreandCamps breadcrumbs={breadcrumbs} />
+            <main key={id} style={{ flex: 1, overflow: 'auto' }}>
+                <BreandCamps
+                    backgroundColor={breadcrumbBackgroundColor}
+                    borderColor={breadcrumbBorderColor}
+                    textColor={breadcrumbTextColor}
+                    elevationColor={elevationColor}
+                    useElevation={useElevation}
+                    breadcrumbs={breadcrumbs}
+                />
                 <EditorPanel
                     ref={boardRef}
                     id={`${id}_SVG`}
                     dotColor={dotColor}
                     dottedSize={dottedSize}
                     onDropItem={handleDroptem}
+                    useElevation={useElevation}
                     onContextMenu={onContextMenu}
                     onKeyDownDelete={handleDelte}
+                    elevationColor={elevationColor}
                     backgroundType={backgroundType}
                     backgroundColor={backgroundColor}
                     onKeyDownCtrlC={copySelectedItems}

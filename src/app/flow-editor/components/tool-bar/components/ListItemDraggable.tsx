@@ -21,8 +21,8 @@ export const ListItemDraggable: React.FC<ListItemProps> = ({ flowItemType, itemT
     return (
         <img
             className={"toolbar-item"}
+            title={label || itemType}
             ref={dragRef}
-            title={label}
             alt={label}
             src={icon}
             style={{

@@ -12,7 +12,7 @@ const App: React.FC = () => {
                 items={ItemsLogical.map(item => ({ ...item/* , id: Utils.getUUID() */ }))}
                 showToolbar={true}
                 toolItems={ToolItems}
-                onDropItem={(oldId, newId, item) => { console.log(oldId, newId, item); return {...item, isEnabledNewConnetion:true}; }}
+                onDropItem={(oldId, newId, item) => { console.log(oldId, newId, item); return { ...item, isEnabledNewConnetion: true }; }}
                 breadcrumbs={[
                     { label: 'Routes', onClick: console.log },
                     { label: 'authenticate1', onClick: console.log },
@@ -40,10 +40,15 @@ const App: React.FC = () => {
                     flowItemSelectedColor: 'var(--color-botton-bar)',
                     flowItemErrorColor: 'var(--main-error-color)',
                     typesAllowedToDrop: AllowedsInDrop,
-                    commentTextColor: '#fff000',
 
-                    // linesColor: '',
+                    commentTextColor: '#fff000',
                     // commentColor: '',
+
+                    elevationColor: 'black',
+                    useElevation: true,
+
+                    lineWidth: 2,
+                    // linesColor: '',
                     // disableOpacity: 0.5,
                     // disableSelection: true,
                     // typesAllowedToDrop: [],
@@ -61,7 +66,6 @@ const App: React.FC = () => {
 
                     backgroundType: "dotted",
                     dottedSize: 15,
-                    lineWidth: 2,
                 }}
                 childrenWhenItemsEmpty={<>
                     <h1>Drag and drop something here to start</h1>
