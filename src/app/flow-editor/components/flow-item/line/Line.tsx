@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Utils } from 'code-easy-components';
 import { useRecoilValue } from 'recoil';
 
@@ -38,7 +38,7 @@ interface LineProps {
      */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, newConnectionBoxRef, onContextMenu, onMouseDown }) => {
+export const Line: React.FC<LineProps> = ({ id, originId, targetId, newConnectionBoxRef, onContextMenu, onMouseDown }) => {
     const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor, flowItemTextColor } = useConfigs();
     const createOrUpdateConnection = useCreateOrUpdateConnection();
     const selectItemById = useSelectItemById();
@@ -203,4 +203,4 @@ export const Line: React.FC<LineProps> = memo(({ id, originId, targetId, newConn
             {connection?.connectionDescription && <title>{connection.connectionDescription}</title>}
         </g>
     );
-});
+};

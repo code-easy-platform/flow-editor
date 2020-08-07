@@ -45,13 +45,10 @@ export interface IBasicFlowItem {
 /**
  * 
  */
-export interface ILine extends IBasicFlowItem {
-    top2?: number;
-    left2?: number;
-    radius?: number;
+export interface ILine {
+    id: string;
     originId?: string;
-    isCurved?: boolean;
-    lineType?: 'dotted' | 'normal';
+    targetId?: string | undefined;
 }
 /**
  * 

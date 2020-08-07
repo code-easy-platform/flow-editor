@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, memo } from 'react';
 
 import { useFlowItem, useDragAllElements, useSelectItemById } from '../../shared/hooks';
 import { EFlowItemType } from '../../shared/enums';
@@ -9,7 +9,7 @@ interface FlowProps {
     id: string;
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const FlowItem: React.FC<FlowProps> = ({ id, onContextMenu }) => {
+export const FlowItem: React.FC<FlowProps> = memo(({ id, onContextMenu }) => {
     const dragAllFlowItems = useDragAllElements();
     const selectItemById = useSelectItemById();
     const [flowItem] = useFlowItem(id);
@@ -76,4 +76,4 @@ export const FlowItem: React.FC<FlowProps> = ({ id, onContextMenu }) => {
         default:
             return <></>;
     }
-}
+});

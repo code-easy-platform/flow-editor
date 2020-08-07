@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useFlowItemsConnetioncSelector } from '../../../shared/hooks';
+import { useFlowItemsConnetionsSelector } from '../../../shared/hooks';
 import { Line } from './Line';
 
 interface LinesProp {
@@ -10,7 +10,7 @@ interface LinesProp {
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
 export const Lines: React.FC<LinesProp> = ({ onContextMenu }) => {
-    const lines = useFlowItemsConnetioncSelector();
+    const lines = useFlowItemsConnetionsSelector();
 
     return <>
         {lines.map(({ id, originId, targetId }, index) => <Line

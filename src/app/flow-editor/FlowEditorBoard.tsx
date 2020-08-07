@@ -1,8 +1,8 @@
 import React, { useCallback, useRef } from 'react';
 import { useRecoilCallback } from 'recoil';
 
-import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector } from './shared/stores';
-import { useFlowItems, useConfigs, useSelectItemById, useCopySelecteds, usePasteSelecteds } from './shared/hooks';
+import { useFlowItems, useConfigs, useSelectItemById, useCopySelecteds, usePasteSelecteds, useFlowItemsConnetionsSelector } from './shared/hooks';
+import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector, FlowLinesStore } from './shared/stores';
 import { OnChangeEmitter } from './components/on-change-emitter/OnChangeEmitter';
 import { IFlowEditorBoardProps } from './shared/interfaces/FlowEditorInterfaces';
 import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
@@ -10,24 +10,25 @@ import { SelectorArea } from './components/area-selector/SelectorArea';
 import { EditorPanel } from './components/editor-panel/EditorPanel';
 import { BreandCamps } from './components/breadcamps/BreandCamps';
 import { FlowItem } from './components/flow-item/FlowItem';
-import { Lines } from './components/flow-item/line/Lines';
 import { ICoords, IFlowItem } from './shared/interfaces';
+import { Line } from './components/flow-item/line/Line';
 import { Toolbar } from './components/tool-bar/ToolBar';
 import { DropTargetMonitor } from 'react-dnd';
 import { Utils } from 'code-easy-components';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const {
-        elevationColor, useElevation,
-        selectionBorderWidth, backgroundColor, disableSelection,
+        breadcrumbBackgroundColor, breadcrumbTextColor,
+        elevationColor, breadcrumbBorderColor, disableSelection,
         dottedSize, dotColor, typesAllowedToDrop, backgroundType,
+        selectionBorderWidth, backgroundColor, selectionBorderType,
         toolbarBackgroundColor, toolbarBorderColor, toolbarItemWidth,
-        selectionBackgroundColor, selectionBorderColor, selectionBorderType,
-        breadcrumbBackgroundColor, breadcrumbTextColor, breadcrumbBorderColor,
+        selectionBackgroundColor, selectionBorderColor, useElevation,
     } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [], toolItems = [], showToolbar = true } = props;
     const { onMouseEnter, onMouseLeave, onContextMenu, onChangeItems, onDropItem } = props;
     const pasteSelectedItems = usePasteSelecteds();
+    const lines = useFlowItemsConnetionsSelector();
     const boardRef = useRef<SVGSVGElement>(null);
     const copySelectedItems = useCopySelecteds();
     const selectItemById = useSelectItemById();
@@ -94,12 +95,23 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         });
     }, [items]);
 
-    const handleDelte = useRecoilCallback(({ set, snapshot }) => async () => {
+    const handleDelete = useRecoilCallback(({ set, snapshot }) => async () => {
         let itemsCompleteSelecteds = await snapshot.getPromise(GetSelectedFlowItemsSelector);
         const itemsComplete = await snapshot.getPromise(GetFlowItemsSelector);
+        let oldLines = await snapshot.getPromise(FlowLinesStore);
 
         // Remove all lines selecteds
         itemsCompleteSelecteds = itemsCompleteSelecteds.map(itemSelected => {
+
+            const connectionIdToBeRemoved = (itemSelected.connections || [])
+                .filter(connection => connection.isSelected)
+                .map(connection => connection.id);
+
+            oldLines = [
+                ...oldLines.filter(oldLine => !connectionIdToBeRemoved.includes(oldLine.id))
+            ];
+
+
             const res = {
                 ...itemSelected,
                 connections: (itemSelected.connections || []).filter(connection => !connection.isSelected),
@@ -113,27 +125,40 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
 
         // Remove all dependencies with the selecteds items
         itemsCompleteSelecteds.forEach(itemSelected => {
-            itemsComplete.forEach(dependentItem => {
+            if (itemSelected.isSelected) {
+                itemsComplete.forEach(dependentItem => {
+                    const hasDependencies = (dependentItem.connections || []).some(connection => (connection.targetId === itemSelected.id));
 
-                // Remove old connections
-                if ((dependentItem.connections || []).some(connection => (connection.targetId === itemSelected.id && itemSelected.isSelected))) {
-                    dependentItem = {
-                        ...dependentItem,
-                        connections: [
-                            ...(dependentItem.connections || []).filter(connection => connection.targetId !== itemSelected.id)
-                        ]
-                    };
+                    // Remove old connections
+                    if (hasDependencies) {
+                        const connectionsIdToBeRemoved = (dependentItem.connections || [])
+                            .filter(connection => connection.targetId === itemSelected.id)
+                            .map(connection => connection.id);
 
-                    // Save in the state
-                    set(FlowItemStore(String(dependentItem.id)), dependentItem);
-                }
-            });
+                        oldLines = [
+                            ...oldLines.filter(oldLine => !connectionsIdToBeRemoved.includes(oldLine.id) && !(oldLine.originId === itemSelected.id))
+                        ];
+
+
+                        dependentItem = {
+                            ...dependentItem,
+                            connections: [
+                                ...(dependentItem.connections || []).filter(connection => connection.targetId !== itemSelected.id)
+                            ]
+                        };
+
+                        // Save in the state
+                        set(FlowItemStore(String(dependentItem.id)), dependentItem);
+                    }
+                });
+            }
         });
 
         // Save a new list
-        set(FlowItemsStore, itemsComplete.filter(item => !item.isSelected).map(item => {
-            return String(item.id);
-        }));
+        set(FlowItemsStore, itemsComplete.filter(item => !item.isSelected).map(item => String(item.id)));
+
+        // Update lines
+        set(FlowLinesStore, oldLines);
     });
 
     const handleArrowKeyDown = useRecoilCallback(({ set, snapshot }) => async (direction: "ArrowUp" | "ArrowDown" | "ArrowLeft" | "ArrowRight") => {
@@ -260,7 +285,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     onDropItem={handleDroptem}
                     useElevation={useElevation}
                     onContextMenu={onContextMenu}
-                    onKeyDownDelete={handleDelte}
+                    onKeyDownDelete={handleDelete}
                     elevationColor={elevationColor}
                     backgroundType={backgroundType}
                     backgroundColor={backgroundColor}
@@ -276,7 +301,13 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                         pasteSelectedItems();
                     }}
                 >
-                    <Lines />
+                    {lines.map(({ id, originId, targetId }, index) => <Line
+                        id={id}
+                        key={index}
+                        originId={originId}
+                        targetId={targetId}
+                        onContextMenu={onContextMenu}
+                    />)}
                     {items.map(id => (
                         <FlowItem
                             id={id}

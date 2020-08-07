@@ -1,8 +1,8 @@
 import { useRecoilValue, useRecoilState, useRecoilCallback } from "recoil";
 import { Utils } from "code-easy-components";
 
-import { FlowItemsStore, FlowItemStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector, ConfigurationsStore, GetBoardSize, GetFlowItemsConnections } from "../stores";
-import { IConnection, IFlowItem } from "../interfaces";
+import { FlowItemsStore, FlowItemStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector, ConfigurationsStore, GetBoardSizeSelector, FlowLinesStore } from "../stores";
+import { IConnection, IFlowItem, ILine } from "../interfaces";
 
 export const useFlowItems = () => {
     return useRecoilValue(FlowItemsStore);
@@ -16,8 +16,8 @@ export const useFlowItemsCompleteSelector = () => {
     return useRecoilValue(GetFlowItemsSelector);
 }
 
-export const useFlowItemsConnetioncSelector = () => {
-    return useRecoilValue(GetFlowItemsConnections);
+export const useFlowItemsConnetionsSelector = () => {
+    return useRecoilValue(FlowLinesStore);
 }
 
 export const useSelectedFlowItemsSelector = () => {
@@ -25,7 +25,7 @@ export const useSelectedFlowItemsSelector = () => {
 }
 
 export const useBoardSize = () => {
-    return useRecoilValue(GetBoardSize);
+    return useRecoilValue(GetBoardSizeSelector);
 }
 
 export const useDragAllElements = () => useRecoilCallback(({ snapshot, set }) => async (targetId: string | undefined, top: number, left: number) => {
@@ -212,6 +212,17 @@ export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, 
                 }
                 return connection;
             });
+
+            set(FlowLinesStore, oldLinesState => {
+                return [
+                    ...oldLinesState.map(line =>
+                        (line.id === connectionId)
+                            ? ({ ...line, targetId: String(targetItemId) })
+                            : line
+                    ),
+                ];
+            });
+
         } else {
             connections = [
                 ...connections,
@@ -224,6 +235,18 @@ export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, 
                     isSelected: false,
                 }
             ];
+
+            set(FlowLinesStore, oldLinesState => {
+                return [
+                    ...oldLinesState,
+                    {
+                        id: Utils.getUUID(),
+                        originId: String(originItemId),
+                        targetId: String(targetItemId),
+                    }
+                ];
+            });
+
         }
 
         return { ...itemCurrent, connections };
@@ -246,33 +269,61 @@ export const usePasteSelecteds = () => useRecoilCallback(({ snapshot, set }) => 
             .clipboard
             .readText()
             .then(async text => {
-
                 try {
+                    // Transforma clipboard text in IFlowItems
                     const components: IFlowItem[] = JSON.parse(text || '[]');
-                    let itemIds = await snapshot.getPromise(FlowItemsStore);
 
+                    // Used to add all new lines
+                    let newLines: ILine[] = [];
+
+                    // Getting older ids
+                    let itemIds = await snapshot.getPromise(FlowItemsStore);
                     itemIds.forEach(id => {
+
+                        // Deselects all items that were already in the flow
                         set(FlowItemStore(String(id)), oldState => ({ ...oldState, isSelected: false }));
                     });
 
-                    components.forEach(item => {
+                    // For each component that was on the clipboard
+                    components.forEach((item, index) => {
                         item.top = item.top + 50;
                         item.id = Utils.getUUID();
                         item.left = item.left + 100;
 
+                        // Complete state for the new item
                         item = {
                             ...item,
-                            connections: (item.connections || []).map(connection => ({ ...connection, originId: String(item.id) })),
+                            connections: (item.connections || []).map(connection => {
+
+                                // Add new lines
+                                if (connection.id && connection.targetId) {
+                                    newLines = [
+                                        ...newLines,
+                                        {
+                                            id: connection.id,
+                                            originId: String(item.id),
+                                            targetId: connection.targetId,
+                                        }
+                                    ];
+                                }
+
+                                return {
+                                    ...connection,
+                                    originId: String(item.id),
+                                };
+                            }),
                         };
 
                         itemIds = [
                             ...itemIds,
                             String(item.id),
                         ];
+
                         set(FlowItemStore(String(item.id)), item);
                     });
 
                     set(FlowItemsStore, itemIds);
+                    set(FlowLinesStore, oldLinesState => ([...oldLinesState, ...newLines]));
                 } catch (_) { }
             });
     } catch (e) { console.log(e) }

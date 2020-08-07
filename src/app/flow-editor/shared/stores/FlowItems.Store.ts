@@ -12,6 +12,7 @@ export const FlowItemStore = atomFamily<IFlowItem, string>({
     default: {} as IFlowItem,
 });
 
+
 export const GetFlowItemsSelector = selector<IFlowItem[]>({
     key: 'get-flow-items',
     get: ({ get }) => get(FlowItemsStore).map((id) => get(FlowItemStore(id))),
@@ -29,7 +30,7 @@ export const GetSelectedFlowItemsSelector = selector<IFlowItem[]>({
     },
 });
 
-export const GetBoardSize = selector<{ width: number, height: number }>({
+export const GetBoardSizeSelector = selector<{ width: number, height: number }>({
     key: 'get-board-size',
     get: ({ get }) => {
         const flowItems = get(GetFlowItemsSelector).map(item => item);
@@ -46,19 +47,5 @@ export const GetBoardSize = selector<{ width: number, height: number }>({
                 height: 0,
             }
         }
-    }
-});
-
-export const GetFlowItemsConnections = selector<{ id: string | undefined, originId: string | undefined, targetId: string | undefined }[]>({
-    key: 'get-flow-items-connection',
-    get: ({ get }) => {
-        let res: any[] = [];
-        get(GetFlowItemsSelector).forEach(({ connections }) => {
-            res = [
-                ...res,
-                ...(connections || []).map(({ id, originId, targetId }) => ({ id, originId, targetId, })),
-            ];
-        });
-        return res;
     }
 });
