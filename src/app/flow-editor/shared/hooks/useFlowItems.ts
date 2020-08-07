@@ -1,7 +1,7 @@
 import { useRecoilValue, useRecoilState, useRecoilCallback } from "recoil";
 import { Utils } from "code-easy-components";
 
-import { FlowItemsStore, FlowItemStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector, ConfigurationsStore, GetBoardSizeSelector, FlowLinesStore } from "../stores";
+import { FlowItemsStore, FlowItemStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector, GetBoardSizeSelector, FlowLinesStore } from "../stores";
 import { IConnection, IFlowItem, ILine } from "../interfaces";
 
 export const useFlowItems = () => {
@@ -28,8 +28,7 @@ export const useBoardSize = () => {
     return useRecoilValue(GetBoardSizeSelector);
 }
 
-export const useDragAllElements = () => useRecoilCallback(({ snapshot, set }) => async (targetId: string | undefined, top: number, left: number) => {
-    const { snapGridWhileDragging } = await snapshot.getPromise(ConfigurationsStore);
+export const useDragAllElements = () => useRecoilCallback(({ snapshot, set }) => async (targetId: string | undefined, top: number, left: number, snapGridWhileDragging: boolean | undefined) => {
 
     // Pega do selector todos os selecionados
     const selectedItems = await snapshot.getPromise(GetSelectedFlowItemsSelector);

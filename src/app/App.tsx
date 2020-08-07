@@ -11,6 +11,10 @@ const App: React.FC = () => {
                 id="FlowEditor"
                 showToolbar={true}
                 toolItems={ToolItems}
+                // onChange={console.log}
+                // onMouseEnter={console.log}
+                // onMouseLeave={console.log}
+                // onContextMenu={console.log}
                 items={ItemsLogical.map(item => ({ ...item }))}
                 onDropItem={(oldId, newId, item) => { console.log(oldId, newId, item); return { ...item, isEnabledNewConnetion: true }; }}
                 breadcrumbs={[
@@ -30,10 +34,6 @@ const App: React.FC = () => {
                     { label: 'authenticate13', onClick: console.log },
                     { label: 'authenticate14', onClick: console.log }, */
                 ]}
-                // onContextMenu={console.log}
-                // onMouseEnter={console.log}
-                // onMouseLeave={console.log}
-                // onChange={console.log}
                 configs={{
 
                     /** FLOW ITEMS */

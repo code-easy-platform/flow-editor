@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, memo } from 'react';
 
-import { useFlowItem, useDragAllElements, useSelectItemById } from '../../shared/hooks';
+import { useFlowItem, useDragAllElements, useSelectItemById, useConfigs } from '../../shared/hooks';
 import { EFlowItemType } from '../../shared/enums';
 import { Acorn } from './acorn/Acorn';
 import { Comment } from './Comment';
@@ -10,6 +10,7 @@ interface FlowProps {
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
 export const FlowItem: React.FC<FlowProps> = memo(({ id, onContextMenu }) => {
+    const { snapGridWhileDragging } = useConfigs();
     const dragAllFlowItems = useDragAllElements();
     const selectItemById = useSelectItemById();
     const [flowItem] = useFlowItem(id);
@@ -36,8 +37,8 @@ export const FlowItem: React.FC<FlowProps> = memo(({ id, onContextMenu }) => {
         const top = e.offsetY - cliquedLocationFlowItem.current.top;
         const left = e.offsetX - cliquedLocationFlowItem.current.left;
 
-        dragAllFlowItems(flowItem.id, top, left)
-    }, [flowItem, dragAllFlowItems]);
+        dragAllFlowItems(flowItem.id, top, left, snapGridWhileDragging);
+    }, [flowItem, snapGridWhileDragging, dragAllFlowItems]);
 
     /** Declara a fun no ref da svg para que o item atual possa ser arrastado na tela. */
     const mouseDown = useCallback((e: React.MouseEvent<SVGGElement, MouseEvent>) => {

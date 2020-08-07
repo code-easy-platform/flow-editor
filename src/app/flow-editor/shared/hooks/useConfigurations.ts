@@ -1,7 +1,5 @@
-import { useRecoilValue } from "recoil";
+import { useContext } from "react";
 
-import { ConfigurationsStore } from "../stores";
+import { ConfigurationContext } from "../contexts/Configurations";
 
-export const useConfigs = () => {
-    return useRecoilValue(ConfigurationsStore);
-}
+export const useConfigs = () => useContext(ConfigurationContext).configs;
