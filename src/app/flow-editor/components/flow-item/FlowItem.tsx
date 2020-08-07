@@ -9,7 +9,7 @@ interface FlowProps {
     id: string;
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const FlowItem: React.FC<FlowProps> = memo(({ id, onContextMenu }) => {
+const FlowItem: React.FC<FlowProps> = ({ id, onContextMenu }) => {
     const { snapGridWhileDragging } = useConfigs();
     const dragAllFlowItems = useDragAllElements();
     const selectItemById = useSelectItemById();
@@ -77,4 +77,6 @@ export const FlowItem: React.FC<FlowProps> = memo(({ id, onContextMenu }) => {
         default:
             return <></>;
     }
-});
+};
+
+export default memo(FlowItem);

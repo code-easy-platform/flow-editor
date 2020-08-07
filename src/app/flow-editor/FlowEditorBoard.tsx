@@ -3,16 +3,16 @@ import { useRecoilCallback } from 'recoil';
 
 import { useFlowItems, useConfigs, useSelectItemById, useCopySelecteds, usePasteSelecteds, useFlowItemsConnetionsSelector } from './shared/hooks';
 import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector, FlowLinesStore } from './shared/stores';
-import { OnChangeEmitter } from './components/on-change-emitter/OnChangeEmitter';
 import { IFlowEditorBoardProps } from './shared/interfaces/FlowEditorInterfaces';
+import OnChangeEmitter from './components/on-change-emitter/OnChangeEmitter';
 import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
 import { SelectorArea } from './components/area-selector/SelectorArea';
-import { EditorPanel } from './components/editor-panel/EditorPanel';
 import { BreandCamps } from './components/breadcamps/BreandCamps';
-import { FlowItem } from './components/flow-item/FlowItem';
+import EditorPanel from './components/editor-panel/EditorPanel';
 import { ICoords, IFlowItem } from './shared/interfaces';
 import { Line } from './components/flow-item/line/Line';
-import { Toolbar } from './components/tool-bar/ToolBar';
+import FlowItem from './components/flow-item/FlowItem';
+import Toolbar from './components/tool-bar/ToolBar';
 import { DropTargetMonitor } from 'react-dnd';
 import { Utils } from 'code-easy-components';
 

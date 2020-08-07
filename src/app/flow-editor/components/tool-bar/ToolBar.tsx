@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 
-import { ListItemDraggable } from './components/ListItemDraggable';
+import ListItemDraggable from './components/ListItemDraggable';
 import { IFlowItem } from '../../shared/interfaces';
 import './Toolbar.css';
 
@@ -11,7 +11,7 @@ interface ToolbarProps {
     itemWidth?: number;
     isShow: boolean;
 }
-export const Toolbar: React.FC<ToolbarProps> = memo(({ itemsLogica, isShow, itemWidth, backgroundColor, borderColor }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ itemsLogica, isShow, itemWidth, backgroundColor, borderColor }) => {
     return (
         isShow
             ? <div className="toolbar" style={{ backgroundColor, borderColor }}>
@@ -28,4 +28,6 @@ export const Toolbar: React.FC<ToolbarProps> = memo(({ itemsLogica, isShow, item
             </div>
             : null
     );
-});
+};
+
+export default memo(Toolbar);

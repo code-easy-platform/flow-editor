@@ -15,7 +15,7 @@ interface INewConnectionBoxProps {
     onContextMenu?(e: React.MouseEvent<SVGRectElement, MouseEvent>): void;
 }
 /** Allow create a new connection */
-export const NewConnectionBox: React.FC<INewConnectionBoxProps> = memo(({ originId, left = 0, top = 0, height = 0, width = 0, isRounded = false, lineWidth = 1, cursor = 'crosshair', onMouseDown, onContextMenu }) => {
+const NewConnectionBox: React.FC<INewConnectionBoxProps> = ({ originId, left = 0, top = 0, height = 0, width = 0, isRounded = false, lineWidth = 1, cursor = 'crosshair', onMouseDown, onContextMenu }) => {
 
     const ref = useRef<SVGRectElement | null>(null);
 
@@ -56,4 +56,6 @@ export const NewConnectionBox: React.FC<INewConnectionBoxProps> = memo(({ origin
             />
         </>
     );
-});
+};
+
+export default memo(NewConnectionBox);

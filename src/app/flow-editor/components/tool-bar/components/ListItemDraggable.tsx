@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useDrag } from 'react-dnd';
 
 import { EFlowItemType } from '../../../shared/enums';
@@ -10,7 +10,7 @@ interface ListItemProps {
     itemType?: string;
     flowItemType: EFlowItemType;
 }
-export const ListItemDraggable: React.FC<ListItemProps> = ({ flowItemType, itemType, label, icon, width = 30 }) => {
+const ListItemDraggable: React.FC<ListItemProps> = ({ flowItemType, itemType, label, icon, width = 30 }) => {
 
     /** Permite que uym elemento seja arrastado e adicionado dentro do editor de fluxo. */
     const [, dragRef] = useDrag({
@@ -36,3 +36,5 @@ export const ListItemDraggable: React.FC<ListItemProps> = ({ flowItemType, itemT
         />
     );
 }
+
+export default memo(ListItemDraggable);

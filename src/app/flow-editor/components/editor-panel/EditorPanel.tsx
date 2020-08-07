@@ -30,7 +30,7 @@ type EditorPanelProps = Omit<{
  * @param onDropItem - **Function** - Função executada quando um elemento for dropado no painel
  * @param backgroundType - **'dotted'** | **'checkered'** | **'custom'** - Parâmetro que controla o estilo do background do painel
  */
-export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, onChangeZoom, dotColor = '', elevationColor = 'black', useElevation = false, backgroundColor = '', dottedSize = 15, backgroundType = 'dotted', onArrowKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV, onKeyDownCtrlA, onKeyDownDelete, onAnyKeyDown, ...props }: EditorPanelProps, ref: any) => {
+const EditorPanel = React.forwardRef(({ allowedsInDrop, onDropItem, onChangeZoom, dotColor = '', elevationColor = 'black', useElevation = false, backgroundColor = '', dottedSize = 15, backgroundType = 'dotted', onArrowKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV, onKeyDownCtrlA, onKeyDownDelete, onAnyKeyDown, ...props }: EditorPanelProps, ref: any) => {
     const { height, width } = useBoardSize();
 
     const [zoom, setZoom] = React.useState(1);
@@ -107,4 +107,6 @@ export const EditorPanel = memo(React.forwardRef(({ allowedsInDrop, onDropItem, 
         />
     );
 
-}));
+});
+
+export default memo(EditorPanel);

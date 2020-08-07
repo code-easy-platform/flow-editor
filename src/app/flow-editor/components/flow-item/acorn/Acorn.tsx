@@ -1,10 +1,10 @@
-import React, { memo, useCallback } from 'react';
+import React, { useCallback } from 'react';
 
 import { IFlowItem } from '../../../shared/interfaces/FlowItemInterfaces';
 import { useConfigs, useSelectItemById } from '../../../shared/hooks';
-import { NewConnectionBox } from '../line/NewConnectionBox';
 import { SelectionBox } from './components/SelectionBox';
 import { TextOverItem } from './components/TextOverItem';
+import NewConnectionBox from '../line/NewConnectionBox';
 import { ImageView } from './components/Image';
 
 interface FlowComponentProps {
@@ -15,7 +15,7 @@ interface FlowComponentProps {
     /** Used to start the context menu for this específic component */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const Acorn: React.FC<FlowComponentProps> = memo(({ item, onContextMenu, onMouseDown }) => {
+export const Acorn: React.FC<FlowComponentProps> = ({ item, onContextMenu, onMouseDown }) => {
     const { flowItemErrorColor, flowItemTextColor, flowItemWarningColor, flowItemSelectedColor, lineWidth, backgroundColor } = useConfigs();
     const selectItemById = useSelectItemById();
 
@@ -81,4 +81,4 @@ export const Acorn: React.FC<FlowComponentProps> = memo(({ item, onContextMenu, 
             <title>{item.description}</title>
         </g>
     );
-});
+};

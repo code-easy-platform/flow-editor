@@ -159,6 +159,9 @@ export const Line: React.FC<LineProps> = ({ id, originId, targetId, newConnectio
         onMouseDown && onMouseDown(e);
     }, [onMouseDown, selectItemById, id]);
 
+    // Validates whether you really need to render the component
+    if (!basicPosition.showNewLine && newConnectionBoxRef) return null;
+
     return (
         <g role={EFlowItemType.line} style={(isDisabled ? { opacity: disableOpacity } : {})}>
             <TextOverLine

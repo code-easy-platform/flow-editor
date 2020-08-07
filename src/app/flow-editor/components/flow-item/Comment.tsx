@@ -1,8 +1,8 @@
-import React, { memo } from 'react';
+import React from 'react';
 
 import { IFlowItem } from '../../shared/interfaces/FlowItemInterfaces';
 import { useConfigs, useSizeByText } from '../../shared/hooks';
-import { NewConnectionBox } from './line/NewConnectionBox';
+import NewConnectionBox from './line/NewConnectionBox';
 
 interface CommentProps {
     item: IFlowItem;
@@ -12,7 +12,7 @@ interface CommentProps {
     /** Used to start the context menu for this específic component */
     onContextMenu?(event: React.MouseEvent<SVGGElement | HTMLDivElement, MouseEvent>): void;
 }
-export const Comment: React.FC<CommentProps> = memo(({ item, onMouseDown, onContextMenu }) => {
+export const Comment: React.FC<CommentProps> = ({ item, onMouseDown, onContextMenu }) => {
     const { flowItemSelectedColor, commentColor, lineWidth, flowItemErrorColor, flowItemWarningColor, commentTextColor } = useConfigs();
     const getSizeByText = useSizeByText();
 
@@ -81,4 +81,4 @@ export const Comment: React.FC<CommentProps> = memo(({ item, onMouseDown, onCont
             </foreignObject>
         </>
     );
-});
+};
