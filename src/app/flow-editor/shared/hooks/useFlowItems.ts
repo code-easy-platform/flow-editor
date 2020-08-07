@@ -110,7 +110,7 @@ export const useSelectItemById = () => useRecoilCallback(({ snapshot, set }) => 
 
     if (keepSelecteds) {
         items.forEach(_item => {
-            let hasChange = false;
+            let hasChange = false;  
 
             if (_item.id === id) {
 
@@ -223,6 +223,7 @@ export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, 
             });
 
         } else {
+            const newConnectionId = Utils.getUUID();
             connections = [
                 ...connections,
                 {
@@ -230,7 +231,7 @@ export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, 
                     targetId: String(targetItemId),
                     connectionDescription: '',
                     connectionLabel: '',
-                    id: Utils.getUUID(),
+                    id: newConnectionId,
                     isSelected: false,
                 }
             ];
@@ -239,13 +240,12 @@ export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, 
                 return [
                     ...oldLinesState,
                     {
-                        id: Utils.getUUID(),
+                        id: newConnectionId,
                         originId: String(originItemId),
                         targetId: String(targetItemId),
                     }
                 ];
             });
-
         }
 
         return { ...itemCurrent, connections };
