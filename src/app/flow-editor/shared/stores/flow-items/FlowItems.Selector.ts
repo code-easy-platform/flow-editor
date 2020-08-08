@@ -1,17 +1,7 @@
-import { atom, atomFamily, selector } from "recoil";
+import { selector } from "recoil";
 
-import { IFlowItem } from "../interfaces/FlowItemInterfaces";
-
-export const FlowItemsStore = atom<string[]>({
-    key: 'flow-items',
-    default: []
-});
-
-export const FlowItemStore = atomFamily<IFlowItem, string>({
-    key: 'flow-item',
-    default: {} as IFlowItem,
-});
-
+import { FlowItemsStore, FlowItemStore } from "./FlowItems.Store";
+import { IFlowItem } from "../../interfaces";
 
 export const GetFlowItemsSelector = selector<IFlowItem[]>({
     key: 'get-flow-items',

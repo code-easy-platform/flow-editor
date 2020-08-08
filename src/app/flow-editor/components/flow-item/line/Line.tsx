@@ -2,9 +2,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Utils } from 'code-easy-components';
 import { useRecoilValue } from 'recoil';
 
-import { useConfigs, useSelectItemById, useCreateOrUpdateConnection, useSizeByText } from '../../../shared/hooks';
+import { useConfigs, useSelectItemById, useCreateOrUpdateConnection } from '../../../shared/hooks';
+import { GetConnectionPropsSelector } from '../../../shared/stores';
 import { TextOverLine, Arrow, SingleLine } from './components';
-import { FlowItemStore } from '../../../shared/stores';
 import { EFlowItemType } from '../../../shared/enums';
 
 interface LineProps {
@@ -36,42 +36,19 @@ interface LineProps {
      */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const Line: React.FC<LineProps> = ({ id, originId, targetId, newConnectionBoxRef, onContextMenu, onMouseDown }) => {
+export const Line: React.FC<LineProps> = ({ id, originId, newConnectionBoxRef, onContextMenu, onMouseDown }) => {
     const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor, flowItemTextColor } = useConfigs();
     const createOrUpdateConnection = useCreateOrUpdateConnection();
     const selectItemById = useSelectItemById();
-    const getSizeByText = useSizeByText();
 
-    // Find the origin component
-    const { connections = [], isDisabled, ...originItem } = useRecoilValue(FlowItemStore(String(originId)));
-    const isComment = originItem.flowItemType === EFlowItemType.comment;
-    const lineType = isComment ? 'dotted' : 'normal';
-    let { width, height, top, left } = originItem;
-
-    if (isComment) {
-        const commentSizes = getSizeByText(originItem.description || '');
-        width = commentSizes.width;
-        height = commentSizes.height;
-    }
-
-    // Find the current connection in their item
-    const connection = connections.find(connection => connection.id === id);
-
-    // Find the target component
-    const { connections: targetConnections = [], ...targetItem } = useRecoilValue(FlowItemStore(String(targetId)));
-    const isCurved = targetConnections.some(connection => connection.targetId === originId);
-
-    // Calc the correct positions of the line arrow
-    top = top + ((width || 0) / 2);
-    left = left + ((height || 0) / 2);
-    const top2 = id !== undefined ? targetItem.top + ((targetItem.height || 0) / 2) : top + ((height || 0) / 2);
-    const left2 = id !== undefined ? targetItem.left + ((targetItem.width || 0) / 2) : left + ((width || 0) / 2);
-
-    /** Used to guide the line arrow when connected */
-    let radius: number = (targetItem.width || 0) - ((targetItem.width || 0) / 4);
+    const {
+        left, left2, top, isSelected, top2,
+        isCurved, radius, isDisabled, lineType,
+        connectionLabel, connectionDescription,
+    } = useRecoilValue(GetConnectionPropsSelector({ id: id, originId }));
 
     // Sets the color of the line when selected
-    const strokeColor: string = connection?.isSelected ? `${flowItemSelectedColor}` : `${linesColor}`;
+    const strokeColor: string = isSelected ? `${flowItemSelectedColor}` : `${linesColor}`;
 
     const [basicPosition, setBasicPosition] = useState({
         isCurved,
@@ -163,6 +140,7 @@ export const Line: React.FC<LineProps> = ({ id, originId, targetId, newConnectio
     return (
         <g role={EFlowItemType.line} style={(isDisabled ? { opacity: disableOpacity } : {})}>
             <TextOverLine
+                text={connectionLabel}
                 top={basicPosition.top1}
                 left={basicPosition.left1}
                 onContextMenu={onContextMenu}
@@ -170,7 +148,6 @@ export const Line: React.FC<LineProps> = ({ id, originId, targetId, newConnectio
                 rotate={basicPosition.rotate}
                 onMouseDown={handleSelectLine}
                 isCurved={basicPosition.isCurved}
-                text={connection?.connectionLabel}
                 lineDistance={basicPosition.lineDistance}
                 isLeftToRight={basicPosition.isLeftToRight}
             />
@@ -201,7 +178,7 @@ export const Line: React.FC<LineProps> = ({ id, originId, targetId, newConnectio
                 useEvents={!!!newConnectionBoxRef}
                 visible={!basicPosition.showNewLine && id === undefined}
             />
-            {connection?.connectionDescription && <title>{connection.connectionDescription}</title>}
+            {connectionDescription && <title>{connectionDescription}</title>}
         </g>
     );
 };

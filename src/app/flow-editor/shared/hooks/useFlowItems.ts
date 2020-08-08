@@ -388,21 +388,26 @@ export const usePasteSelecteds = () => useRecoilCallback(({ snapshot, set }) => 
     } catch (e) { console.log(e) }
 });
 
-export const useSizeByText = () => useRecoilCallback(() => (text: string) => {
-    var span = document.createElement("span");
+export const useSizeByText = () => (text: string) => {
+
+    const span = document.createElement("div");
     document.body.appendChild(span);
     span.style.whiteSpace = 'pre-line';
     span.style.position = 'absolute';
+    span.style.lineHeight = '14px';
     span.style.textAlign = 'start';
     span.style.fontSize = 'small';
     span.style.height = 'auto';
     span.style.width = 'auto';
     span.innerText = text;
-    var formattedWidth = Math.ceil(span.clientWidth);
-    var formattedHeight = Math.ceil(span.clientHeight);
+
+    const formattedWidth = span.clientWidth;
+    const formattedHeight = span.clientHeight;
+
     document.body.removeChild(span);
+
     return {
-        width: (formattedWidth < 100 ? 100 : formattedWidth) + 10,
-        height: (formattedHeight < 70 ? 70 : formattedHeight) + 10,
+        width: formattedWidth,
+        height: formattedHeight,
     };
-});
+};

@@ -1,9 +1,8 @@
 import React from 'react';
 import { MutableSnapshot, RecoilRoot } from 'recoil';
 
-import { FlowItemStore, FlowItemsStore } from './FlowItems.Store';
-import { FlowLinesStore } from './FlowLines.Store';
-import { ILine, IFlowItem } from '../interfaces';
+import { FlowItemStore, FlowItemsStore, FlowLinesStore } from './';
+import { ILine, IFlowItem } from './../interfaces';
 
 interface RecoilContainerProps {
     items: IFlowItem[];
