@@ -32,8 +32,8 @@ export const SingleLine: React.FC<SingleLineProps> = memo(({ id, left1 = 0, top1
         <path
             fill={"none"}
             id={"line_" + id}
-            key={"line_" + id}
             stroke={strokeColor}
+            strokeWidth={lineWidth}
             onMouseDown={handleOnMouseDown}
             onContextMenu={handleOnContextMenu}
             style={{
@@ -48,7 +48,6 @@ export const SingleLine: React.FC<SingleLineProps> = memo(({ id, left1 = 0, top1
             fill={"none"}
             strokeWidth={14}
             id={"line_" + id}
-            key={"line_" + id}
             stroke={"transparent"}
             onMouseDown={handleOnMouseDown}
             onContextMenu={handleOnContextMenu}

@@ -73,7 +73,7 @@ export const Line: React.FC<LineProps> = ({ id, originId, newConnectionBoxRef, o
             rotate: Utils.getAngle(left2, top2, left, top),
             lineDistance: Math.hypot((top2 - top), (left2 - left)),
         }));
-    }, [left, left2, top, top2, isCurved, radius]);
+    }, [left, left2, top, top2, isCurved]);
 
     const mouseMove = useCallback((event: MouseEvent) => {
         setBasicPosition(oldBasicPosition => ({
@@ -139,7 +139,7 @@ export const Line: React.FC<LineProps> = ({ id, originId, newConnectionBoxRef, o
 
     return (
         <g role={EFlowItemType.line} style={(isDisabled ? { opacity: disableOpacity } : {})}>
-            <TextOverLine
+            {connectionLabel && <TextOverLine
                 text={connectionLabel}
                 top={basicPosition.top1}
                 left={basicPosition.left1}
@@ -150,7 +150,7 @@ export const Line: React.FC<LineProps> = ({ id, originId, newConnectionBoxRef, o
                 isCurved={basicPosition.isCurved}
                 lineDistance={basicPosition.lineDistance}
                 isLeftToRight={basicPosition.isLeftToRight}
-            />
+            />}
             <SingleLine
                 id={String(id)}
                 lineType={lineType}

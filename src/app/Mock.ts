@@ -10,7 +10,7 @@ export const ItemsLogical: IFlowItem[] = [
     { id: '3', hasWarning: true, itemType: EItemType.FOREACH, isEnabledNewConnetion: true, connections: [{ id: '112', targetId: '4', isSelected: false, originId: '3' }], icon: IconFlowForeach, label: 'Foreach', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 400, height: 40, width: 40 },
     { id: '4', hasWarning: true, itemType: EItemType.ACTION, isEnabledNewConnetion: true, connections: [{ id: '113', targetId: '5', originId: '4', isSelected: false }], icon: IconFlowAction, label: 'Action', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 550, height: 40, width: 40 },
     { id: '5', hasWarning: true, itemType: EItemType.ASSIGN, isEnabledNewConnetion: true, connections: [{ id: '114', targetId: '4', originId: '5', isSelected: false, connectionLabel: 'Linha 05', connectionDescription: 'Descrição da linha 01' }], icon: IconFlowAssign, label: 'Assign', description: 'Minha descrição legal', flowItemType: EFlowItemType.acorn, left: 105, top: 700, height: 40, width: 40 },
-    { id: '6', itemType: EItemType.COMMENT, isEnabledNewConnetion: true, connections: [], description: 'Write here \n\n\n\n\n\n your commmmmmmmmmmmm\nmmmmmmmmmmmmmmmmmm mmmmmmmmment', flowItemType: EFlowItemType.comment, left: 210, top: 200 },
+    { id: '6', itemType: EItemType.COMMENT, isEnabledNewConnetion: true, connections: [], description: 'Write here', flowItemType: EFlowItemType.comment, left: 210, top: 200 },
 ]
 
 export const ToolItems: IFlowItem[] = [

@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { IFlowItem } from '../../shared/interfaces/FlowItemInterfaces';
-import { useConfigs, useSizeByText } from '../../shared/hooks';
 import NewConnectionBox from './line/NewConnectionBox';
+import { useConfigs } from '../../shared/hooks';
 
 interface CommentProps {
     item: IFlowItem;
@@ -14,7 +14,6 @@ interface CommentProps {
 }
 export const Comment: React.FC<CommentProps> = ({ item, onMouseDown, onContextMenu }) => {
     const { flowItemSelectedColor, commentColor, lineWidth, flowItemErrorColor, flowItemWarningColor, commentTextColor } = useConfigs();
-    const getSizeByText = useSizeByText();
 
     const strokeColor: string = item.isSelected
         ? `${flowItemSelectedColor}`
@@ -23,9 +22,6 @@ export const Comment: React.FC<CommentProps> = ({ item, onMouseDown, onContextMe
             : item.hasWarning
                 ? `${flowItemWarningColor}`
                 : "transparent";
-
-    const { height, width } = getSizeByText(item.description || '');
-    item = { ...item, height, width };
 
     const handleOnContextMenu = (e: React.MouseEvent<SVGRectElement, MouseEvent>) => {
         e.stopPropagation();
@@ -43,8 +39,9 @@ export const Comment: React.FC<CommentProps> = ({ item, onMouseDown, onContextMe
         <>
             <NewConnectionBox
                 height={(item.height || 0) + ((lineWidth || 0) * 2) + 36}
-                width={(item.width || 0) + ((lineWidth || 0) * 2) + 40}
+                width={(item.width || 0) + ((lineWidth || 0) * 2) + 38}
                 originId={String(item.id)}
+                lineWidth={lineWidth}
                 left={item.left - 10}
                 top={item.top - 10}
             />

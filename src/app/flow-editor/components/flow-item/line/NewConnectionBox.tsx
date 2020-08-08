@@ -38,10 +38,10 @@ const NewConnectionBox: React.FC<INewConnectionBoxProps> = ({ originId, left = 0
                 originId={originId}
                 targetId={undefined}
                 newConnectionBoxRef={ref}
+                onMouseDown={handleOnMouseDown}
+                onContextMenu={handleOnContextMenu}
             />
             <rect
-                onContextMenu={handleOnContextMenu}
-                onMouseDown={handleOnMouseDown}
                 style={{ cursor, zIndex: 3 }}
                 strokeWidth={lineWidth}
                 rx={isRounded ? 50 : 0}

@@ -1,7 +1,6 @@
 import { selectorFamily } from "recoil";
 
 import { EFlowItemType } from "../../enums";
-import { useSizeByText } from "../../hooks";
 import { FlowItemStore } from "./../";
 
 interface IConnectionLinePros {
@@ -23,19 +22,12 @@ interface IConnectionLinePros {
 export const GetConnectionPropsSelector = selectorFamily<IConnectionLinePros, { id: string | undefined, originId: string | undefined }>({
     key: 'get-connection-props-selection',
     get: ({ id, originId }) => ({ get }) => {
-        const getSizeByText = useSizeByText();
 
         // Find the origin component
         const { connections = [], isDisabled, flowItemType, ...originItem } = get(FlowItemStore(String(originId)));
         const isComment = flowItemType === EFlowItemType.comment;
         const lineType = isComment ? 'dotted' : 'normal';
         let { width, height, top, left } = originItem;
-
-        if (isComment) {
-            const commentSizes = getSizeByText(originItem.description || '');
-            height = commentSizes.height;
-            width = commentSizes.width;
-        }
 
         // Find the current connection in their item
         const connection = connections.find(connection => connection.id === id);
@@ -51,7 +43,7 @@ export const GetConnectionPropsSelector = selectorFamily<IConnectionLinePros, { 
         const left2 = id !== undefined ? targetItem.left + ((targetItem.width || 0) / 2) : left + ((width || 0) / 2);
 
         /** Used to guide the line arrow when connected */
-        let radius: number = (targetItem.width || 0) - ((targetItem.width || 0) / 4);
+        const radius = (targetItem.width || 0) - ((targetItem.width || 0) / 4);
 
         return {
             connectionDescription: connection?.connectionDescription,
