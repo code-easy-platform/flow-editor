@@ -27,7 +27,7 @@ export const GetConnectionPropsSelector = selectorFamily<IConnectionLinePros, { 
         const { connections = [], isDisabled, flowItemType, ...originItem } = get(FlowItemStore(String(originId)));
         const isComment = flowItemType === EFlowItemType.comment;
         const lineType = isComment ? 'dotted' : 'normal';
-        let { width, height, top, left } = originItem;
+        let { top, left } = originItem;
 
         // Find the current connection in their item
         const connection = connections.find(connection => connection.id === id);
@@ -37,10 +37,10 @@ export const GetConnectionPropsSelector = selectorFamily<IConnectionLinePros, { 
         const isCurved = targetConnections.some(connection => connection.targetId === originId);
 
         // Calc the correct positions of the line arrow
-        top = top + ((height || 0) / 2);
-        left = left + ((width || 0) / 2);
-        const top2 = id !== undefined ? targetItem.top + ((targetItem.height || 0) / 2) : top + ((height || 0) / 2);
-        const left2 = id !== undefined ? targetItem.left + ((targetItem.width || 0) / 2) : left + ((width || 0) / 2);
+        top = top + ((originItem.height || 0) / 2);
+        left = left + ((originItem.width || 0) / 2);
+        const top2 = id !== undefined ? targetItem.top + ((targetItem.height || 0) / 2) : top + ((originItem.height || 0) / 2);
+        const left2 = id !== undefined ? targetItem.left + ((targetItem.width || 0) / 2) : left + ((originItem.width || 0) / 2);
 
         /** Used to guide the line arrow when connected */
         const radius = (targetItem.width || 0) - ((targetItem.width || 0) / 4);
@@ -54,8 +54,6 @@ export const GetConnectionPropsSelector = selectorFamily<IConnectionLinePros, { 
             lineType,
             isCurved,
             radius,
-            height,
-            width,
             left2,
             top2,
             left,

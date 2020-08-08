@@ -42,13 +42,13 @@ export const Comment: React.FC<CommentProps> = ({ item, onMouseDown, onContextMe
                 width={(item.width || 0) + ((lineWidth || 0) * 2) + 38}
                 originId={String(item.id)}
                 lineWidth={lineWidth}
-                left={item.left - 10}
-                top={item.top - 10}
+                left={item.left - 20}
+                top={item.top - 20}
             />
             <foreignObject
                 id={item.id}
-                y={item.top}
-                x={item.left}
+                y={item.top - 10}
+                x={item.left - 10}
                 style={{ cursor: 'move' }}
                 onMouseDown={handleOnMouseDown}
                 onContextMenu={handleOnContextMenu}

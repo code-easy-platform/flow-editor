@@ -44,7 +44,7 @@ export const Line: React.FC<LineProps> = ({ id, originId, newConnectionBoxRef, o
     const {
         left, left2, top, isSelected, top2,
         isCurved, radius, isDisabled, lineType,
-        connectionLabel, connectionDescription,
+        connectionLabel, connectionDescription, isComment,
     } = useRecoilValue(GetConnectionPropsSelector({ id: id, originId }));
 
     // Sets the color of the line when selected

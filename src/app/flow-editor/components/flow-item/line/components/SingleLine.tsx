@@ -42,7 +42,7 @@ export const SingleLine: React.FC<SingleLineProps> = memo(({ id, left1 = 0, top1
                 transformOrigin: `${left1}px ${top1}px`,
             }}
             strokeDasharray={lineType === 'normal' ? undefined : "5,5"}
-            d={`M${left1} ${top1 + 30} Q${left1 - (isCurved ? 50 : 0)} ${top1 + (lineDistance / 2)} ${left1} ${top1 + lineDistance}`}
+            d={`M${left1} ${top1} Q${left1 - (isCurved ? 50 : 0)} ${top1 + (lineDistance / 2)} ${left1} ${top1 + lineDistance}`}
         />
         <path
             fill={"none"}
@@ -53,11 +53,10 @@ export const SingleLine: React.FC<SingleLineProps> = memo(({ id, left1 = 0, top1
             onContextMenu={handleOnContextMenu}
             style={{
                 transform: `rotate(${rotate}deg)`,
-                display: visible ? 'none' : 'unset',
                 transformOrigin: `${left1}px ${top1}px`,
             }}
             strokeDasharray={lineType === 'normal' ? undefined : "5,5"}
-            d={`M${left1} ${top1 + 30} Q${left1 - (isCurved ? 50 : 0)} ${top1 + (lineDistance / 2)} ${left1} ${top1 + lineDistance}`}
+            d={`M${left1} ${top1} Q${left1 - (isCurved ? 50 : 0)} ${top1 + (lineDistance / 2)} ${left1} ${top1 + lineDistance}`}
         />
     </>);
 });
