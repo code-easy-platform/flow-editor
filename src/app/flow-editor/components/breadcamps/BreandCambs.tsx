@@ -1,9 +1,9 @@
 import React, { memo, useRef, useEffect } from 'react';
 
 import { IBreadCampButton } from '../../shared/interfaces';
-import './BreandCamps.css';
+import './BreandCambs.css';
 
-interface BreandCampsProps {
+interface BreandCambsProps {
     breadcrumbs?: IBreadCampButton[];
     backgroundColor?: string;
     elevationColor?: string;
@@ -11,7 +11,7 @@ interface BreandCampsProps {
     borderColor?: string;
     textColor?: string;
 }
-const BreandCamps: React.FC<BreandCampsProps> = ({ breadcrumbs = [], backgroundColor, textColor, borderColor, useElevation = false, elevationColor = 'black' }) => {
+const BreandCambs: React.FC<BreandCambsProps> = ({ breadcrumbs = [], backgroundColor, textColor, borderColor, useElevation = false, elevationColor = 'black' }) => {
 
     const ulRef = useRef<any>(null);
     useEffect(() => {
@@ -61,4 +61,4 @@ const BreandCamps: React.FC<BreandCampsProps> = ({ breadcrumbs = [], backgroundC
     );
 };
 
-export default memo(BreandCamps);
+export default memo(BreandCambs);

@@ -3,15 +3,15 @@
 ul.breadcrumb {
     padding: 4px;
     max-width: 70%;
-    overflow-x: hidden;
     list-style: none;
     text-align: start;
+    overflow-x: hidden;
     font-size: smaller;
     position: absolute;
     overflow-y: hidden;
     border-width: thin;
+    padding-right: 8px;
     white-space: nowrap;
-    padding-right: 32px;
     scroll-behavior: smooth;
     border-right-style: solid;
     border-bottom-style: solid;

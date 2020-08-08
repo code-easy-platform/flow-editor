@@ -8,7 +8,7 @@ import OnChangeEmitter from './components/on-change-emitter/OnChangeEmitter';
 import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
 import SelectorArea from './components/area-selector/SelectorArea';
 import EditorPanel from './components/editor-panel/EditorPanel';
-import BreandCamps from './components/breadcamps/BreandCamps';
+import BreandCambs from './components/breadcamps/BreandCambs';
 import { ICoords, IFlowItem } from './shared/interfaces';
 import { Line } from './components/flow-item/line/Line';
 import FlowItem from './components/flow-item/FlowItem';
@@ -270,7 +270,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                 isShow={((toolItems.length > 0) && showToolbar)}
             />
             <main key={id} style={{ flex: 1, overflow: 'auto' }}>
-                <BreandCamps
+                <BreandCambs
                     backgroundColor={breadcrumbBackgroundColor}
                     borderColor={breadcrumbBorderColor}
                     textColor={breadcrumbTextColor}
