@@ -122,13 +122,29 @@ export interface IFlowEditorConfigs {
 /** Set of events used by FlowEditorBoard */
 export interface IFlowEditorBoardEvents {
     /**
+     * Executed whenever there is a change in the base structure of the flow items
+     * @param items New item structure modified
+     */
+    onChangeItems?(items: IFlowItem[]): void;
+    /**
+     * Event executed when the context menu is triggered, by keyboard or by the mouse event
+     * @param event React event
+     */
+    onContextMenu?(event: React.MouseEvent<any, MouseEvent>): void;
+    /**
+     * Event executed when the mouse enters the board area
+     * @param event React event
+     */
+    onMouseEnter?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
+    /**
+     * Event executed when the mouse leaves the board area
+     * @param event React event
+     */
+    onMouseLeave?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
+    /**
      * Function - Fired when an item is dropped in the editor expects the same item, but the item may undergo additional changes
      */
     onDropItem?(oldItemId: string | undefined, newItemId: string, newItem: IFlowItem): IFlowItem | undefined;
-    onChangeItems?(items: IFlowItem[]): void;
-    onContextMenu?(event: React.MouseEvent<any, MouseEvent>): void;
-    onMouseEnter?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
-    onMouseLeave?(event: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
 }
 
 /** Set of properties used by FlowEditorBoard */

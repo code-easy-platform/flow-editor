@@ -3,11 +3,9 @@ import { Utils } from 'code-easy-components';
 import { useRecoilValue } from 'recoil';
 
 import { useConfigs, useSelectItemById, useCreateOrUpdateConnection, useSizeByText } from '../../../shared/hooks';
-import { TextOverLine } from './components/TextOverLine';
+import { TextOverLine, Arrow, SingleLine } from './components';
 import { FlowItemStore } from '../../../shared/stores';
 import { EFlowItemType } from '../../../shared/enums';
-import { SingleLine } from './components/SingleLine';
-import { Arrow } from './components/Arrow';
 
 interface LineProps {
     /**

@@ -2,10 +2,8 @@ import React, { useCallback } from 'react';
 
 import { IFlowItem } from '../../../shared/interfaces/FlowItemInterfaces';
 import { useConfigs, useSelectItemById } from '../../../shared/hooks';
-import { SelectionBox } from './components/SelectionBox';
-import { TextOverItem } from './components/TextOverItem';
+import { SelectionBox, TextOverItem, ImageView} from './components';
 import NewConnectionBox from '../line/NewConnectionBox';
-import { ImageView } from './components/Image';
 
 interface FlowComponentProps {
     item: IFlowItem;

@@ -39,6 +39,9 @@ export interface IBasicFlowItem {
     isSelected?: boolean;
     description?: string;
     isDisabled?: boolean;
+    /**
+     * Unique id to identify the element
+     */
     id: string | undefined;
     flowItemType: EFlowItemType;
 }
@@ -46,6 +49,9 @@ export interface IBasicFlowItem {
  * 
  */
 export interface ILine {
+    /**
+     * Unique id to identify the element
+     */
     id: string;
     originId?: string;
     targetId?: string | undefined;

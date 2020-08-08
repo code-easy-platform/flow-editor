@@ -1,5 +1,5 @@
 .toolbar {
-  border: var(--size-none) solid;
+  border: 0 solid;
   border-right-width: thin;
   flex-direction: column;
   align-items: center;

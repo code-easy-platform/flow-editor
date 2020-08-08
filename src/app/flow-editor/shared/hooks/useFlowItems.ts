@@ -110,7 +110,7 @@ export const useSelectItemById = () => useRecoilCallback(({ snapshot, set }) => 
 
     if (keepSelecteds) {
         items.forEach(_item => {
-            let hasChange = false;  
+            let hasChange = false;
 
             if (_item.id === id) {
 
@@ -259,6 +259,63 @@ export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, 
 export const useCopySelecteds = () => useRecoilCallback(({ snapshot }) => async () => {
     const selectedFlowItems = await snapshot.getPromise(GetSelectedFlowItemsSelector);
     navigator.clipboard.writeText(JSON.stringify(selectedFlowItems));
+});
+
+/** Duplicate selected flow items */
+export const useDuplicateSelecteds = () => useRecoilCallback(({ snapshot, set }) => async () => {
+    const components = await snapshot.getPromise(GetSelectedFlowItemsSelector);
+
+    // Used to add all new lines
+    let newLines: ILine[] = [];
+
+    // Getting older ids
+    let itemIds = await snapshot.getPromise(FlowItemsStore);
+    itemIds.forEach(id => {
+
+        // Deselects all items that were already in the flow
+        set(FlowItemStore(String(id)), oldState => ({ ...oldState, isSelected: false }));
+    });
+
+    // For each component that was on the clipboard
+    components.forEach((item, index) => {
+        item.top = item.top + 50;
+        item.id = Utils.getUUID();
+        item.left = item.left + 100;
+
+        // Complete state for the new item
+        item = {
+            ...item,
+            connections: (item.connections || []).map(connection => {
+
+                // Add new lines
+                if (connection.id && connection.targetId) {
+                    newLines = [
+                        ...newLines,
+                        {
+                            id: connection.id,
+                            originId: String(item.id),
+                            targetId: connection.targetId,
+                        }
+                    ];
+                }
+
+                return {
+                    ...connection,
+                    originId: String(item.id),
+                };
+            }),
+        };
+
+        itemIds = [
+            ...itemIds,
+            String(item.id),
+        ];
+
+        set(FlowItemStore(String(item.id)), item);
+    });
+
+    set(FlowItemsStore, itemIds);
+    set(FlowLinesStore, oldLinesState => ([...oldLinesState, ...newLines]));
 });
 
 /** Paste selected flow items */

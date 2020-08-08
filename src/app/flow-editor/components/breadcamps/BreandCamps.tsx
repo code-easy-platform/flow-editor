@@ -11,7 +11,7 @@ interface BreandCampsProps {
     borderColor?: string;
     textColor?: string;
 }
-export const BreandCamps: React.FC<BreandCampsProps> = memo(({ breadcrumbs = [], backgroundColor, textColor, borderColor, useElevation = false, elevationColor = 'black' }) => {
+const BreandCamps: React.FC<BreandCampsProps> = ({ breadcrumbs = [], backgroundColor, textColor, borderColor, useElevation = false, elevationColor = 'black' }) => {
 
     const ulRef = useRef<any>(null);
     useEffect(() => {
@@ -40,7 +40,7 @@ export const BreandCamps: React.FC<BreandCampsProps> = memo(({ breadcrumbs = [],
                             id={String(index)}
                             name={"breadcrumb"}
                             disabled={disabled}
-                            onFocus={e=> ulRef.current.scrollTo(e.currentTarget.offsetLeft - 100, 0)}
+                            onFocus={e => ulRef.current.scrollTo(e.currentTarget.offsetLeft - 100, 0)}
                             onKeyDown={e => {
                                 if (!disabled && (e.keyCode === 13 || e.keyCode === 32)) {
                                     onClick(e);
@@ -59,4 +59,6 @@ export const BreandCamps: React.FC<BreandCampsProps> = memo(({ breadcrumbs = [],
             })}
         </ul>
     );
-});
+};
+
+export default memo(BreandCamps);

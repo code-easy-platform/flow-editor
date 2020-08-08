@@ -6,9 +6,9 @@ import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector, GetSelectedFlowIte
 import { IFlowEditorBoardProps } from './shared/interfaces/FlowEditorInterfaces';
 import OnChangeEmitter from './components/on-change-emitter/OnChangeEmitter';
 import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
-import { SelectorArea } from './components/area-selector/SelectorArea';
-import { BreandCamps } from './components/breadcamps/BreandCamps';
+import SelectorArea from './components/area-selector/SelectorArea';
 import EditorPanel from './components/editor-panel/EditorPanel';
+import BreandCamps from './components/breadcamps/BreandCamps';
 import { ICoords, IFlowItem } from './shared/interfaces';
 import { Line } from './components/flow-item/line/Line';
 import FlowItem from './components/flow-item/FlowItem';

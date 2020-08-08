@@ -18,7 +18,7 @@ const App: React.FC = () => {
                 items={ItemsLogical.map(item => ({ ...item }))}
                 onDropItem={(oldId, newId, item) => { console.log(oldId, newId, item); return { ...item, isEnabledNewConnetion: true }; }}
                 breadcrumbs={[
-                    { label: 'Routes', onClick: console.log },
+                    { label: 'Routes', onClick: console.log, disabled: true },
                     { label: 'authenticate', onClick: console.log },
                     /* { label: 'authenticate2', onClick: console.log },
                     { label: 'authenticate3', onClick: console.log },

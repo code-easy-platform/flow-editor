@@ -13,7 +13,7 @@ interface SelectorAreaProps {
     onCoordsChange?(coords: ICoords): void;
 }
 /** Reinderiza a área de seleção na tela, para que seja possível selecionar diversos items de uma vez. */
-export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd, onSelectionStart, borderType, backgroundColor = "#ffffff11", borderColor = "#999fff", borderWidth = 1, isDisabled = false, onCoordsChange }) => {
+const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSelectionStart, borderType, backgroundColor = "#ffffff11", borderColor = "#999fff", borderWidth = 1, isDisabled = false, onCoordsChange }) => {
 
     const selectorAreaRef = useRef<any>(null);
     const selectionStarted = useRef(false);
@@ -113,4 +113,6 @@ export const SelectorArea: React.FC<SelectorAreaProps> = memo(({ onSelectionEnd,
         />
     );
 
-})
+}
+
+export default memo(SelectorArea);

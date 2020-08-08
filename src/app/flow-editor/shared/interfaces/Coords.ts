@@ -1,4 +1,6 @@
-/** Usado para mapear um quadrado de coordenadas */
+/**
+ * Usado para mapear um quadrado de coordenadas
+ */
 export interface ICoords {
     startY: number,
     startX: number,
