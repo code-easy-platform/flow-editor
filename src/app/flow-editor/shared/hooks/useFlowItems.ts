@@ -277,10 +277,13 @@ export const useDuplicateSelecteds = () => useRecoilCallback(({ snapshot, set })
     });
 
     // For each component that was on the clipboard
-    components.forEach((item, index) => {
-        item.top = item.top + 50;
-        item.id = Utils.getUUID();
-        item.left = item.left + 100;
+    components.forEach(item => {
+        item = {
+            ...item,
+            top: item.top + 50,
+            id: Utils.getUUID(),
+            left: item.left + 100,
+        }
 
         // Complete state for the new item
         item = {

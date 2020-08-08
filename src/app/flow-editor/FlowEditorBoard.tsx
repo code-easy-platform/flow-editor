@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from 'react';
 import { useRecoilCallback } from 'recoil';
 
-import { useFlowItems, useConfigs, useSelectItemById, useCopySelecteds, usePasteSelecteds, useFlowItemsConnetionsSelector } from './shared/hooks';
+import { useFlowItems, useConfigs, useSelectItemById, useCopySelecteds, usePasteSelecteds, useFlowItemsConnetionsSelector, useDuplicateSelecteds } from './shared/hooks';
 import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector, FlowLinesStore } from './shared/stores';
 import { IFlowEditorBoardProps } from './shared/interfaces/FlowEditorInterfaces';
 import OnChangeEmitter from './components/on-change-emitter/OnChangeEmitter';
@@ -27,6 +27,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [], toolItems = [], showToolbar = true } = props;
     const { onMouseEnter, onMouseLeave, onContextMenu, onChangeItems, onDropItem } = props;
+    const duplicateSelectedItems = useDuplicateSelecteds();
     const pasteSelectedItems = usePasteSelecteds();
     const lines = useFlowItemsConnetionsSelector();
     const boardRef = useRef<SVGSVGElement>(null);
@@ -293,13 +294,12 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     onKeyDownCtrlV={pasteSelectedItems}
                     allowedsInDrop={typesAllowedToDrop}
                     onArrowKeyDown={handleArrowKeyDown}
-                    onKeyDownCtrlA={handleSelecteAllFlowItems}
-                    onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                     onKeyDownCtrlD={e => {
                         e.preventDefault();
-                        copySelectedItems();
-                        pasteSelectedItems();
+                        duplicateSelectedItems();
                     }}
+                    onKeyDownCtrlA={handleSelecteAllFlowItems}
+                    onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                 >
                     {lines.map(({ id, originId, targetId }, index) => <Line
                         id={id}
