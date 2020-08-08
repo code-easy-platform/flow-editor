@@ -33,8 +33,8 @@ export const GetConnectionPropsSelector = selectorFamily<IConnectionLinePros, { 
 
         if (isComment) {
             const commentSizes = getSizeByText(originItem.description || '');
-            width = commentSizes.width + 8;
-            height = commentSizes.height + 4;   
+            height = commentSizes.height;
+            width = commentSizes.width;
         }
 
         // Find the current connection in their item

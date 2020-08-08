@@ -42,8 +42,8 @@ export const Comment: React.FC<CommentProps> = ({ item, onMouseDown, onContextMe
     return (
         <>
             <NewConnectionBox
-                height={(item.height || 0) + 40}
-                width={(item.width || 0) + 44}
+                height={(item.height || 0) + ((lineWidth || 0) * 2) + 36}
+                width={(item.width || 0) + ((lineWidth || 0) * 2) + 40}
                 originId={String(item.id)}
                 left={item.left - 10}
                 top={item.top - 10}
@@ -53,10 +53,10 @@ export const Comment: React.FC<CommentProps> = ({ item, onMouseDown, onContextMe
                 y={item.top}
                 x={item.left}
                 style={{ cursor: 'move' }}
-                width={(item.width || 0) + 22}
                 onMouseDown={handleOnMouseDown}
-                height={(item.height || 0) + 20}
                 onContextMenu={handleOnContextMenu}
+                width={(item.width || 0) + ((lineWidth || 0) * 2) + 18}
+                height={(item.height || 0) + ((lineWidth || 0) * 2) + 16}
             >
                 <div
                     children={item.description}

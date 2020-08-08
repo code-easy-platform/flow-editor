@@ -154,6 +154,7 @@ export const Line: React.FC<LineProps> = ({ id, originId, newConnectionBoxRef, o
             <SingleLine
                 id={String(id)}
                 lineType={lineType}
+                lineWidth={lineWidth}
                 top1={basicPosition.top1}
                 strokeColor={strokeColor}
                 left1={basicPosition.left1}
