@@ -11,10 +11,10 @@ const App: React.FC = () => {
                 id="FlowEditor"
                 showToolbar={true}
                 toolItems={ToolItems}
-                // onChange={console.log}
-                // onMouseEnter={console.log}
-                // onMouseLeave={console.log}
-                // onContextMenu={console.log}
+                onMouseEnter={console.log}
+                onMouseLeave={console.log}
+                onChangeItems={console.log}
+                onContextMenu={console.log}
                 items={ItemsLogical.map(item => ({ ...item }))}
                 onDropItem={(oldId, newId, item) => { console.log(oldId, newId, item); return { ...item, isEnabledNewConnetion: true }; }}
                 breadcrumbs={[
@@ -45,7 +45,7 @@ const App: React.FC = () => {
                     // disableOpacity: 0.5,
                     // commentColor: '',
                     // linesColor: '',
-                    lineWidth: 2,
+                    lineWidth: 1,
 
                     /** EDITOR */
                     typesAllowedToDrop: AllowedsInDrop,

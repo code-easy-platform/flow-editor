@@ -178,7 +178,22 @@ export const useSelectItemById = () => useRecoilCallback(({ snapshot, set }) => 
     }
 });
 
-export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, set }) => async (connectionId: string | undefined, originItemId: string | undefined, targetItemId: string | undefined) => {
+export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, set }) => async (
+    /**
+     * Id on the line being changed.
+     * 
+     * If creating a new line, this property will be empty 
+     */
+    connectionId: string | undefined,
+    /**
+     * Line source item identifier
+     */
+    originItemId: string,
+    /**
+     * Line target item identifier
+     */
+    targetItemId: string
+) => {
 
     /**
      *
@@ -198,58 +213,60 @@ export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, 
     // Validates that the source item is already connected
     if (items.some(item => item.id === originItemId && (item.connections || []).some(connection => connection.targetId === targetItemId))) return false;
 
-    set(FlowItemStore(String(originItemId)), ({ connections = [], ...itemCurrent }) => {
+    let lines = await snapshot.getPromise(FlowLinesStore);
+
+    set(FlowItemStore(originItemId), ({ connections = [], ...itemCurrent }) => {
 
         // Validates whether you are creating a new connection or just editing an existing one
         if (connectionId) {
-            connections = connections.map(connection => {
-                if (connection.id === connectionId) {
-                    connection = {
-                        ...connection,
-                        targetId: String(targetItemId)
-                    };
-                }
-                return connection;
-            });
 
-            set(FlowLinesStore, oldLinesState => {
-                return [
-                    ...oldLinesState.map(line =>
-                        (line.id === connectionId)
-                            ? ({ ...line, targetId: String(targetItemId) })
-                            : line
-                    ),
-                ];
-            });
+            lines = [
+                ...lines.map(line =>
+                    (line.id === connectionId)
+                        ? ({ ...line, targetId: targetItemId })
+                        : line
+                ),
+            ];
 
+            return {
+                ...itemCurrent,
+                connections: connections.map(connection => {
+                    if (connection.id === connectionId) {
+                        connection = {
+                            ...connection,
+                            targetId: targetItemId
+                        };
+                    }
+                    return connection;
+                }),
+            };
         } else {
             const newConnectionId = Utils.getUUID();
-            connections = [
-                ...connections,
+            lines = [
+                ...lines,
                 {
-                    originId: String(originItemId),
-                    targetId: String(targetItemId),
-                    connectionDescription: '',
-                    connectionLabel: '',
                     id: newConnectionId,
-                    isSelected: false,
+                    originId: originItemId,
+                    targetId: targetItemId,
                 }
             ];
 
-            set(FlowLinesStore, oldLinesState => {
-                return [
-                    ...oldLinesState,
+            return {
+                ...itemCurrent,
+                connections: [
+                    ...connections,
                     {
+                        originId: originItemId,
+                        targetId: targetItemId,
                         id: newConnectionId,
-                        originId: String(originItemId),
-                        targetId: String(targetItemId),
+                        isSelected: false,
                     }
-                ];
-            });
+                ]
+            };
         }
-
-        return { ...itemCurrent, connections };
     });
+
+    set(FlowLinesStore, lines);
 
     // If has changed connection or create
     return true;

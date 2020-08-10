@@ -26,7 +26,7 @@ export const RecoilContainer: React.FC<RecoilContainerProps> = ({ items, childre
                     ...item,
                     ...(
                         isComment
-                            ? getSizeByText(String(item.description))
+                            ? getSizeByText(item.description || '')
                             : {}
                     )
                 });

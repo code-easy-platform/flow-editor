@@ -15,6 +15,7 @@ import FlowItem from './components/flow-item/FlowItem';
 import Toolbar from './components/tool-bar/ToolBar';
 import { DropTargetMonitor } from 'react-dnd';
 import { Utils } from 'code-easy-components';
+import { AllowedsInDrop } from '../Mock';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const {
@@ -199,22 +200,22 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     });
 
     /** Essa função é executada sempre um item(aceito como item soltável) é sortado no painel */
-    const handleDroptem = useRecoilCallback(({ snapshot, set }) => async (item: any, monitor: DropTargetMonitor) => {
+    const handleDroptem = useRecoilCallback(({ snapshot, set }) => async (item: any, monitor: DropTargetMonitor, connectionTargetId?: string | undefined) => {
 
         const target = boardRef.current;
         const draggedOffSet = monitor.getClientOffset();
         if (!target || !draggedOffSet) return;
 
         const targetSize = target.getBoundingClientRect();
-        const targetOffsetY: number = (draggedOffSet.y + (targetSize.top - targetSize.top - targetSize.top) - 25);
-        const targetOffsetX: number = (draggedOffSet.x + (targetSize.left - targetSize.left - targetSize.left) - 25);
+        const targetOffsetY = (draggedOffSet.y + (targetSize.top - targetSize.top - targetSize.top) - 25);
+        const targetOffsetX = (draggedOffSet.x + (targetSize.left - targetSize.left - targetSize.left) - 25);
 
-        let newItem = {
-            id: Utils.getUUID().toString(),
+        let newItem: IFlowItem = {
             flowItemType: item.itemProps.flowItemType,
             left: Math.round(targetOffsetX / 15) * 15,
             top: Math.round(targetOffsetY / 15) * 15,
             itemType: item.itemProps.itemType,
+            id: Utils.getUUID().toString(),
             height: item.itemProps.height,
             width: item.itemProps.width,
             label: item.itemProps.label,
@@ -222,43 +223,91 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
             isSelected: true,
         };
 
-        // Get current items to deselect
-        const itemsComplete = await snapshot.getPromise(GetFlowItemsSelector);
+        // Are your dropping in a line
+        if (connectionTargetId) {
+            const lineTarget = (await snapshot.getPromise(FlowLinesStore)).find(line => line.id === connectionTargetId);
 
-        /** Espera o retorno para inserir o item, se receber undefined só insere, se for diferente de undefined insere o resultado do event se existir algo */
-        const onDropRes = onDropItem ? onDropItem(item.id, (newItem.id || Utils.getUUID()), newItem) : undefined;
-        if (onDropRes === undefined) {
+            if (!lineTarget?.originId) return;
 
-            // Add a new item in array state
-            set(FlowItemsStore, [...items, newItem.id]);
+            // New connection to be used
+            const newConnection = {
+                id: Utils.getUUID(),
+                originId: String(newItem.id),
+                targetId: String(lineTarget.targetId),
+            };
 
-            // Creates the state for the item
-            set(FlowItemStore(newItem.id), newItem);
+            // Update lines and added the new line
+            set(FlowLinesStore, oldLines => {
+                return [
+                    newConnection,
+                    ...oldLines.map(line => {
+                        if (line.id !== lineTarget.id) return line;
+                        return {
+                            ...line,
+                            targetId: String(newItem.id)
+                        };
+                    })
+                ]
+            });
 
-            itemsComplete.forEach(itemComplete => {
-                if (itemComplete.id && itemComplete.isSelected) {
-                    set(FlowItemStore(itemComplete.id), { ...itemComplete, isSelected: false })
+            // Updates the source item that was previously linked to the new item as a destination
+            set(FlowItemStore(lineTarget.originId), oldItemState => {
+                return {
+                    ...oldItemState,
+                    connections: [
+                        ...(oldItemState.connections || []).map(connection => {
+                            if (connection.id !== lineTarget.id) return connection;
+                            return {
+                                ...connection,
+                                targetId: String(newItem.id)
+                            };
+                        })
+                    ]
                 }
             });
 
+            // Add first connection
+            newItem = {
+                ...newItem,
+                connections: [
+                    {
+                        ...newConnection,
+                        isSelected: false,
+                    }
+                ]
+            };
+        }
+
+        /** Wait for the return to insert the item, if you receive undefined just insert, if different from undefined insert the result of the event if there is something */
+        const onDropRes = onDropItem ? onDropItem(item.id, String(newItem.id), newItem) : undefined;
+        if (!onDropRes) {
+
+            // Add a new item in array state
+            set(FlowItemsStore, [...items, String(newItem.id)]);
+
+            // Creates the state for the item
+            set(FlowItemStore(String(newItem.id)), newItem);
         } else if (onDropRes) {
 
             // Add a new item in array state
-            set(FlowItemsStore, [...items, (onDropRes.id || Utils.getUUID())]);
+            set(FlowItemsStore, [...items, String(onDropRes.id)]);
 
             // Creates the state for the item
-            set(FlowItemStore(onDropRes.id || Utils.getUUID()), onDropRes);
+            set(FlowItemStore(String(onDropRes.id)), onDropRes);
+        }
 
-            itemsComplete.forEach(itemComplete => {
+        // Deselect all items selecteds
+        /* (await snapshot.getPromise(GetFlowItemsSelector))
+            .forEach(itemComplete => {
                 if (itemComplete.id && itemComplete.isSelected) {
                     set(FlowItemStore(itemComplete.id), { ...itemComplete, isSelected: false })
                 }
-            });
-        }
+            }); */
+
+        selectItemById(newItem.id, false);
 
         target.focus();
-
-    }, [items, boardRef, onDropItem]);
+    });
 
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex' }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
@@ -306,7 +355,9 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                         key={index}
                         originId={originId}
                         targetId={targetId}
+                        onDropItem={handleDroptem}
                         onContextMenu={onContextMenu}
+                        allowedsInDrop={AllowedsInDrop}
                     />)}
                     {items.map(id => (
                         <FlowItem

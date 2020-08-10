@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useDrop, DropTargetMonitor } from 'react-dnd';
 import { Utils } from 'code-easy-components';
 import { useRecoilValue } from 'recoil';
 
@@ -12,6 +13,10 @@ interface LineProps {
      * Identifier
      */
     id: string | undefined;
+    /**
+     * 
+     */
+    allowedsInDrop?: string[];
     /**
      * Source flow item
      */
@@ -28,6 +33,13 @@ interface LineProps {
      */
     newConnectionBoxRef?: React.MutableRefObject<SVGRectElement | null>;
     /**
+     * Executed when a item is dropped in the line
+     * @param item Item dropped
+     * @param monitor Dnd current monitor
+     * @param connectionId Used to idicate the line target  
+     */
+    onDropItem?(item: any, monitor: DropTargetMonitor, connectionId: string | undefined): void;
+    /**
      * Used in parent component to move this element in the screen
      */
     onMouseDown?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
@@ -36,7 +48,7 @@ interface LineProps {
      */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const Line: React.FC<LineProps> = ({ id, originId, newConnectionBoxRef, onContextMenu, onMouseDown }) => {
+export const Line: React.FC<LineProps> = ({ id, originId, allowedsInDrop, newConnectionBoxRef, onContextMenu, onMouseDown, onDropItem }) => {
     const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor, flowItemTextColor } = useConfigs();
     const createOrUpdateConnection = useCreateOrUpdateConnection();
     const selectItemById = useSelectItemById();
@@ -91,7 +103,7 @@ export const Line: React.FC<LineProps> = ({ id, originId, newConnectionBoxRef, o
     const onMouseUp = useCallback(async (e: any) => {
         e.stopPropagation();
 
-        const hasChange = await createOrUpdateConnection(id, originId, e.target.id);
+        const hasChange = await createOrUpdateConnection(id, String(originId), e.target.id);
 
         window.onmouseup = null;
         window.onmousemove = null;
@@ -134,11 +146,20 @@ export const Line: React.FC<LineProps> = ({ id, originId, newConnectionBoxRef, o
         onMouseDown && onMouseDown(e);
     }, [onMouseDown, selectItemById, id]);
 
+    /** Used to make it possible to drop items on the line. */
+    const [{ isDraggingOver }, dropRef] = useDrop({
+        accept: !isComment && allowedsInDrop ? allowedsInDrop : [], // Especifica quem pode ser dropado na editor
+        drop: (item, monitor) => onDropItem && onDropItem(item, monitor, id),
+        collect: (monitor) => ({
+            isDraggingOver: monitor.isOver(),
+        }),
+    });
+
     // Validates whether you really need to render the component
     if (!basicPosition.showNewLine && newConnectionBoxRef) return null;
 
     return (
-        <g role={EFlowItemType.line} style={(isDisabled ? { opacity: disableOpacity } : {})}>
+        <g ref={dropRef} role={EFlowItemType.line} style={(isDisabled ? { opacity: disableOpacity } : {})}>
             {connectionLabel && <TextOverLine
                 text={connectionLabel}
                 top={basicPosition.top1}
@@ -156,7 +177,6 @@ export const Line: React.FC<LineProps> = ({ id, originId, newConnectionBoxRef, o
                 lineType={lineType}
                 lineWidth={lineWidth}
                 top1={basicPosition.top1}
-                strokeColor={strokeColor}
                 left1={basicPosition.left1}
                 onContextMenu={onContextMenu}
                 rotate={basicPosition.rotate}
@@ -164,6 +184,7 @@ export const Line: React.FC<LineProps> = ({ id, originId, newConnectionBoxRef, o
                 isCurved={basicPosition.isCurved}
                 lineDistance={basicPosition.lineDistance - (radius + 5)}
                 visible={!basicPosition.showNewLine && id === undefined}
+                strokeColor={isDraggingOver ? flowItemSelectedColor : strokeColor}
             />
             <Arrow
                 id={String(id)}
