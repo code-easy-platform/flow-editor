@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { ItemsLogical, ToolItems, AllowedsInDrop } from './Mock';
-import { FlowEditor } from './flow-editor';
+import { FlowEditor,  } from './flow-editor';
 import './App.css';
 
 const App: React.FC = () => {
@@ -9,7 +9,6 @@ const App: React.FC = () => {
         <div className="App">
             <FlowEditor
                 id="FlowEditor"
-                showToolbar={true}
                 toolItems={ToolItems}
                 onMouseEnter={console.log}
                 onMouseLeave={console.log}
@@ -66,6 +65,7 @@ const App: React.FC = () => {
                     // toolbarBackgroundColor:'#d2d2d2',
                     // toolbarBorderColor:'#a7a7a7',
                     // toolbarItemWidth:100,
+                    showToolbar: true,
 
                     /** SELECTION */
                     selectionBorderColor: 'var(--color-botton-bar)',

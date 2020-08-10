@@ -7,8 +7,8 @@ import { IFlowEditorBoardProps } from './shared/interfaces/FlowEditorInterfaces'
 import OnChangeEmitter from './components/on-change-emitter/OnChangeEmitter';
 import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
 import SelectorArea from './components/area-selector/SelectorArea';
+import BreandCrumbs from './components/breadcrumbs/BreandCrumbs';
 import EditorPanel from './components/editor-panel/EditorPanel';
-import BreandCambs from './components/breadcamps/BreandCambs';
 import { ICoords, IFlowItem } from './shared/interfaces';
 import { Line } from './components/flow-item/line/Line';
 import FlowItem from './components/flow-item/FlowItem';
@@ -19,14 +19,14 @@ import { AllowedsInDrop } from '../Mock';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const {
-        breadcrumbBackgroundColor, breadcrumbTextColor,
         elevationColor, breadcrumbBorderColor, disableSelection,
         dottedSize, dotColor, typesAllowedToDrop, backgroundType,
         selectionBorderWidth, backgroundColor, selectionBorderType,
+        breadcrumbBackgroundColor, breadcrumbTextColor, showToolbar,
         toolbarBackgroundColor, toolbarBorderColor, toolbarItemWidth,
         selectionBackgroundColor, selectionBorderColor, useElevation,
     } = useConfigs();
-    const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [], toolItems = [], showToolbar = true } = props;
+    const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [], toolItems = [] } = props;
     const { onMouseEnter, onMouseLeave, onContextMenu, onChangeItems, onDropItem } = props;
     const duplicateSelectedItems = useDuplicateSelecteds();
     const pasteSelectedItems = usePasteSelecteds();
@@ -206,6 +206,15 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         const draggedOffSet = monitor.getClientOffset();
         if (!target || !draggedOffSet) return;
 
+
+        // Deselect all items selecteds
+        (await snapshot.getPromise(GetFlowItemsSelector))
+            .forEach(itemComplete => {
+                if (itemComplete.id && itemComplete.isSelected) {
+                    set(FlowItemStore(itemComplete.id), { ...itemComplete, isSelected: false })
+                }
+            });
+
         const targetSize = target.getBoundingClientRect();
         const targetOffsetY = (draggedOffSet.y + (targetSize.top - targetSize.top - targetSize.top) - 25);
         const targetOffsetX = (draggedOffSet.x + (targetSize.left - targetSize.left - targetSize.left) - 25);
@@ -296,16 +305,6 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
             set(FlowItemStore(String(onDropRes.id)), onDropRes);
         }
 
-        // Deselect all items selecteds
-        /* (await snapshot.getPromise(GetFlowItemsSelector))
-            .forEach(itemComplete => {
-                if (itemComplete.id && itemComplete.isSelected) {
-                    set(FlowItemStore(itemComplete.id), { ...itemComplete, isSelected: false })
-                }
-            }); */
-
-        selectItemById(newItem.id, false);
-
         target.focus();
     });
 
@@ -316,10 +315,10 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                 itemWidth={toolbarItemWidth}
                 borderColor={toolbarBorderColor}
                 backgroundColor={toolbarBackgroundColor}
-                isShow={((toolItems.length > 0) && showToolbar)}
+                isShow={(showToolbar === undefined ? true : showToolbar) && (toolItems.length > 0)}
             />
             <main key={id} style={{ flex: 1, overflow: 'auto' }}>
-                <BreandCambs
+                <BreandCrumbs
                     backgroundColor={breadcrumbBackgroundColor}
                     borderColor={breadcrumbBorderColor}
                     textColor={breadcrumbTextColor}

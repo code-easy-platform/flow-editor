@@ -18,6 +18,7 @@ export const ConfigurationProvider: React.FC<{ configs: IFlowEditorConfigs }> = 
     configs.backgroundType = configs.backgroundType ? configs.backgroundType : 'dotted';
     configs.elevationColor = configs.elevationColor ? configs.elevationColor : 'black';
     configs.useElevation = configs.useElevation ? configs.useElevation : false;
+    configs.showToolbar = configs.showToolbar ? configs.showToolbar : true;
     configs.dotColor = configs.dotColor ? configs.dotColor : '#484848';
     configs.dottedSize = configs.dottedSize ? configs.dottedSize : 15;
 

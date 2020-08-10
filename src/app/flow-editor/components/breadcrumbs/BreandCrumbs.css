@@ -42,17 +42,17 @@ ul.breadcrumb li+li:before {
     content: "/";
 }
 
-.breadcrump-item input {
+.breadcrumb-item input {
     opacity: 0;
     height: 0;
     width: 0;
 }
 
-.breadcrump-item label {
+.breadcrumb-item label {
     filter: brightness(0.6);
 }
 
-.breadcrump-item :checked:focus+label {
+.breadcrumb-item :checked:focus+label {
     outline-color: currentcolor;
     outline: thin solid;
 }

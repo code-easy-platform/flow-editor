@@ -3,7 +3,7 @@ import { MouseEvent, KeyboardEvent } from "react";
 /**
  * Used to define a Breadcrumb button
  */
-export interface IBreadCampButton {
+export interface IBreadCrumbButton {
     /**
      * Text of the button
      */

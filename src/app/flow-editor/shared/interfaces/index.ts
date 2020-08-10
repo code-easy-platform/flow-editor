@@ -1,4 +1,4 @@
 export * from './FlowEditorInterfaces';
 export * from './FlowItemInterfaces';
-export * from './BreadCampButton';
+export * from './BreadCrumbButton';
 export * from './Coords';

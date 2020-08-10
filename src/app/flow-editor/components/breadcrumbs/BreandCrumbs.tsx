@@ -1,17 +1,17 @@
 import React, { memo, useRef, useEffect } from 'react';
 
-import { IBreadCampButton } from '../../shared/interfaces';
-import './BreandCambs.css';
+import { IBreadCrumbButton } from '../../shared/interfaces';
+import './BreandCrumbs.css';
 
-interface BreandCambsProps {
-    breadcrumbs?: IBreadCampButton[];
+interface BreandCrumbsProps {
+    breadcrumbs?: IBreadCrumbButton[];
     backgroundColor?: string;
     elevationColor?: string;
     useElevation?: boolean;
     borderColor?: string;
     textColor?: string;
 }
-const BreandCambs: React.FC<BreandCambsProps> = ({ breadcrumbs = [], backgroundColor, textColor, borderColor, useElevation = false, elevationColor = 'black' }) => {
+const BreandCrumbs: React.FC<BreandCrumbsProps> = ({ breadcrumbs = [], backgroundColor, textColor, borderColor, useElevation = false, elevationColor = 'black' }) => {
 
     const ulRef = useRef<any>(null);
     useEffect(() => {
@@ -33,7 +33,7 @@ const BreandCambs: React.FC<BreandCambsProps> = ({ breadcrumbs = [], backgroundC
             }}>
             {breadcrumbs.map(({ label, onClick, disabled }, index) => {
                 return (
-                    <li key={index} className="breadcrump-item">
+                    <li key={index} className="breadcrumb-item">
                         <input
                             tabIndex={0}
                             type={"radio"}
@@ -61,4 +61,4 @@ const BreandCambs: React.FC<BreandCambsProps> = ({ breadcrumbs = [], backgroundC
     );
 };
 
-export default memo(BreandCambs);
+export default memo(BreandCrumbs);

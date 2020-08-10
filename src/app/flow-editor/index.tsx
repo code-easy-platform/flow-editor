@@ -18,3 +18,6 @@ export const FlowEditor = ({ configs, items, ...rest }: IFlowEditorProps) => {
         </ConfigurationProvider>
     );
 }
+
+export * from './shared/interfaces';
+export * from './shared/enums';

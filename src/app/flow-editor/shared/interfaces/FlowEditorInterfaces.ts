@@ -1,5 +1,5 @@
 import { IFlowItem } from "./FlowItemInterfaces";
-import { IBreadCampButton } from "./BreadCampButton";
+import { IBreadCrumbButton } from "./BreadCrumbButton";
 
 /** Specific set of settings used in the flow editor */
 export interface IFlowEditorConfigs {
@@ -53,14 +53,20 @@ export interface IFlowEditorConfigs {
     commentColor?: string;
     /**
      * Color used in lines in the flow
+     * 
+     * Default value: **gray**
      */
     linesColor?: string;
     /**
      * Stroke width used in lines in the flow
+     * 
+     * Default value: **1**
      */
     lineWidth?: number;
     /**
      * Selection border type
+     * 
+     * Default value: **normal**
      */
     selectionBorderType?: 'dash' | 'normal',
     /**
@@ -83,10 +89,14 @@ export interface IFlowEditorConfigs {
      * Dot color
      * 
      * This property is used only when the background type is set to "dotted"
+     * 
+     * Default value: **#484848**
      */
     dotColor?: string,
     /**
      * Toolbar border color
+     * 
+     * Default value: **#000**
      */
     toolbarBorderColor?: string,
     /**
@@ -97,6 +107,12 @@ export interface IFlowEditorConfigs {
      * Toolbar item width
      */
     toolbarItemWidth?: number;
+    /**
+     * When true show the tool bar in left side
+     * 
+     * Default value: **True**
+     */
+    showToolbar?: boolean;
     /**
      * Breadcrumb text color
      */
@@ -111,10 +127,14 @@ export interface IFlowEditorConfigs {
     breadcrumbBackgroundColor?: string;
     /**
      * Used to display an elevation of the toolbar and breadcrumb relative to the board
+     * 
+     * Default value: **False**
      */
     useElevation?: boolean;
     /**
      * Elevation color
+     * 
+     * Default value: **#000**
      */
     elevationColor?: string;
 }
@@ -160,15 +180,11 @@ export interface IFlowEditorBoardProps extends IFlowEditorBoardEvents {
     /**
      * 
      */
-    breadcrumbs?: IBreadCampButton[];
+    breadcrumbs?: IBreadCrumbButton[];
     /**
      * 
      */
     toolItems?: IFlowItem[];
-    /**
-     * 
-     */
-    showToolbar?: boolean;
 }
 
 /** Set of all properties used in FlowEditor component */
