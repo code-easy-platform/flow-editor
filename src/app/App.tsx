@@ -10,8 +10,8 @@ const App: React.FC = () => {
             <FlowEditor
                 id="FlowEditor"
                 toolItems={ToolItems}
-                onMouseEnter={console.log}
-                onMouseLeave={console.log}
+                // onMouseEnter={console.log}
+                // onMouseLeave={console.log}
                 onChangeItems={console.log}
                 onContextMenu={console.log}
                 items={ItemsLogical.map(item => ({ ...item }))}
@@ -39,8 +39,8 @@ const App: React.FC = () => {
                     flowItemWarningColor: 'var(--main-warning-color)',
                     flowItemSelectedColor: 'var(--color-botton-bar)',
                     flowItemErrorColor: 'var(--main-error-color)',
-                    // flowItemTextColor: 'white',
                     commentTextColor: '#ffffff',
+                    // flowItemTextColor: 'white',
                     // disableOpacity: 0.5,
                     // commentColor: '',
                     // linesColor: '',
