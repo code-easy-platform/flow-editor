@@ -7,11 +7,11 @@ import { useFlowItems, useConfigs, useSelectItemById, useCopySelecteds, usePaste
 import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector, FlowLinesStore } from './shared/stores';
 import { IFlowEditorBoardProps } from './shared/interfaces/FlowEditorInterfaces';
 import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
+import { ICoords, IFlowItem, IDroppableItem } from './shared/interfaces';
 import SelectorArea from './components/area-selector/SelectorArea';
 import BreandCrumbs from './components/breadcrumbs/BreandCrumbs';
 import EditorPanel from './components/editor-panel/EditorPanel';
 import { emitOnChange } from './components/on-change-emitter';
-import { ICoords, IFlowItem } from './shared/interfaces';
 import { Line } from './components/flow-item/line/Line';
 import FlowItem from './components/flow-item/FlowItem';
 import Toolbar from './components/tool-bar/ToolBar';
@@ -207,7 +207,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     });
 
     /** Essa função é executada sempre um item(aceito como item soltável) é sortado no painel */
-    const handleDroptem = useRecoilCallback(({ snapshot, set }) => async (item: any, monitor: DropTargetMonitor, connectionTargetId?: string | undefined) => {
+    const handleDroptem = useRecoilCallback(({ snapshot, set }) => async (item: IDroppableItem, monitor: DropTargetMonitor, connectionTargetId?: string | undefined) => {
 
         const target = boardRef.current;
         const draggedOffSet = monitor.getClientOffset();
