@@ -14,6 +14,7 @@ const App: React.FC = () => {
                 // onMouseLeave={console.log}
                 onChangeItems={console.log}
                 onContextMenu={console.log}
+                onFocus={console.log}
                 items={ItemsLogical.map(item => ({ ...item }))}
                 onDropItem={(oldId, newId, item) => { console.log(oldId, newId, item); return { ...item, isEnabledNewConnetion: true }; }}
                 breadcrumbs={[

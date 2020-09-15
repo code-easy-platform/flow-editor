@@ -26,7 +26,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         selectionBackgroundColor, selectionBorderColor, useElevation,
     } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [], toolItems = [] } = props;
-    const { onMouseEnter, onMouseLeave, onContextMenu, onDropItem } = props;
+    const { onMouseEnter, onMouseLeave, onContextMenu, onDropItem, onFocus } = props;
     const duplicateSelectedItems = useDuplicateSelecteds();
     const pasteSelectedItems = usePasteSelecteds();
     const lines = useFlowItemsConnetionsSelector();
@@ -340,6 +340,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                 <EditorPanel
                     ref={boardRef}
                     id={`${id}_SVG`}
+                    onFocus={onFocus}
                     dotColor={dotColor}
                     dottedSize={dottedSize}
                     onDropItem={handleDroptem}
