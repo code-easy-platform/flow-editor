@@ -319,14 +319,16 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         target.focus();
     });
 
+    console.log(showToolbar)
+
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex' }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
             <Toolbar
-                itemsLogica={toolItems}
+                items={toolItems}
                 itemWidth={toolbarItemWidth}
+                isShow={Boolean(showToolbar)}
                 borderColor={toolbarBorderColor}
                 backgroundColor={toolbarBackgroundColor}
-                isShow={(showToolbar === undefined ? true : showToolbar) && (toolItems.length > 0)}
             />
             <main key={id} style={{ flex: 1, overflow: 'auto' }}>
                 <BreandCrumbs
