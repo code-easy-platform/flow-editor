@@ -12,6 +12,10 @@ const App: React.FC = () => {
                 toolItems={ToolItems}
                 // onMouseEnter={console.log}
                 // onMouseLeave={console.log}
+                // onAnyKeyDown={console.log}
+                // onKeyDownCtrlC={console.log}
+                // onKeyDownCtrlD={console.log}
+                // onKeyDownCtrlV={console.log}
                 onChangeItems={console.log}
                 onContextMenu={console.log}
                 onFocus={console.log}
