@@ -53,7 +53,7 @@ const App: React.FC = () => {
 
                     /** EDITOR */
                     typesAllowedToDrop: AllowedsInDrop,
-                    // snapGridWhileDragging: true,
+                    snapGridWhileDragging: false,
                     // backgroundColor: '#ffffff',
                     // elevationColor: '#d2d2d2',
                     backgroundType: "dotted",
