@@ -11,8 +11,11 @@ import { useSizeByText } from '../hooks';
 export const InitializeState: React.FC<{ items: IFlowItem[] }> = ({ items }) => {
     const getSizeByText = useSizeByText();
 
-    const handleInitialize = useRecoilCallback(({ set }) => () => {
+    const handleInitialize = useRecoilCallback(({ set, reset }) => () => {
         let lines: ILine[] = [];
+
+        // Reset old state
+        reset(FlowItemsStore)
 
         // Set items ids
         set(FlowItemsStore, items.map(item => String(item.id)));
@@ -21,6 +24,10 @@ export const InitializeState: React.FC<{ items: IFlowItem[] }> = ({ items }) => 
         items.forEach(item => {
             if (item.id) {
                 const isComment = item.flowItemType === EFlowItemType.comment;
+
+                // Reset old state
+                reset(FlowItemStore(item.id));
+
                 set(FlowItemStore(item.id), {
                     ...item,
                     ...(
@@ -37,6 +44,10 @@ export const InitializeState: React.FC<{ items: IFlowItem[] }> = ({ items }) => 
             }
         });
 
+        // Reset old state
+        reset(FlowLinesStore)
+
+        // Set new state
         set(FlowLinesStore, lines);
     }, [items]);
 
