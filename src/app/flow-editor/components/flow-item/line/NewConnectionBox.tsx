@@ -1,6 +1,6 @@
 import React, { memo, useRef } from 'react';
 
-import { Line } from './Line';
+// import { Line } from './Line';
 
 interface INewConnectionBoxProps {
     top?: number;
@@ -20,7 +20,7 @@ const NewConnectionBox: React.FC<INewConnectionBoxProps> = ({ originId, parentRe
 
     const ref = useRef<SVGRectElement | null>(null);
 
-    const handleOnContextMenu = (e: React.MouseEvent<SVGRectElement, MouseEvent>) => {
+    /* const handleOnContextMenu = (e: React.MouseEvent<SVGRectElement, MouseEvent>) => {
         e.stopPropagation();
         e.preventDefault();
         onContextMenu && onContextMenu(e);
@@ -30,11 +30,11 @@ const NewConnectionBox: React.FC<INewConnectionBoxProps> = ({ originId, parentRe
         e.stopPropagation();
         e.preventDefault();
         onMouseDown && onMouseDown(e);
-    }
+    } */
 
     return (
         <>
-            <Line
+            {/* <Line
                 id={undefined}
                 originId={originId}
                 targetId={undefined}
@@ -42,7 +42,7 @@ const NewConnectionBox: React.FC<INewConnectionBoxProps> = ({ originId, parentRe
                 newConnectionBoxRef={ref}
                 onMouseDown={handleOnMouseDown}
                 onContextMenu={handleOnContextMenu}
-            />
+            /> */}
             <rect
                 style={{ cursor, zIndex: 3 }}
                 strokeWidth={lineWidth}

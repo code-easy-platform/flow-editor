@@ -17,11 +17,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ items, isShow, itemWidth, backgroundC
             ? <div className="toolbar" style={{ backgroundColor, borderColor }}>
                 {items.map((item: IFlowItem, index) => {
                     return <ListItemDraggable
-                        flowItemType={item.flowItemType}
-                        itemType={item.itemType}
-                        label={item.label}
+                        flowItemType={item.flowItemType.value}
+                        itemType={item.itemType?.value}
+                        label={item.label?.value}
+                        icon={item.icon?.value}
                         width={itemWidth}
-                        icon={item.icon}
                         key={index}
                     />;
                 })}

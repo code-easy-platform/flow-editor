@@ -1,45 +1,19 @@
-import { useRecoilValue, useRecoilState, useRecoilCallback } from "recoil";
-import { Utils } from "code-easy-components";
+import { set, useObserverValue } from "react-observing";
 
-import { FlowItemsStore, FlowItemStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector, GetBoardSizeSelector, FlowLinesStore } from "../stores";
-import { emitOnChange } from "../../components";
-import { IConnection } from "../interfaces";
-
-export const useFlowItems = () => {
-    return useRecoilValue(FlowItemsStore);
-}
-
-export const useFlowItem = (id: string) => {
-    return useRecoilState(FlowItemStore(id));
-}
-
-export const useFlowItemsCompleteSelector = () => {
-    return useRecoilValue(GetFlowItemsSelector);
-}
-
-export const useFlowItemsConnetionsSelector = () => {
-    return useRecoilValue(FlowLinesStore);
-}
-
-export const useSelectedFlowItemsSelector = () => {
-    return useRecoilValue(GetSelectedFlowItemsSelector);
-}
-
-export const useBoardSize = () => {
-    return useRecoilValue(GetBoardSizeSelector);
-}
-
+import { FlowItemsState } from "../stores";
 
 /**
  * DragAll allow you drag all elements selecteds in the board.
  */
-export const useDragAllElements = () => useRecoilCallback(({ snapshot, set }) => async (targetId: string | undefined, top: number, left: number, snapGridWhileDragging: boolean | undefined) => {
+export const useDragAllElements = () => (targetId: string | undefined, top: number, left: number, snapGridWhileDragging: boolean | undefined) => {
 
     // Pega do selector todos os selecionados
-    const selectedItems = await snapshot.getPromise(GetSelectedFlowItemsSelector);
+    const selectedItems = FlowItemsState.value.filter(item => item.isSelected?.value);
+    console.log(selectedItems)
+    console.log(top, left)
 
     // Encontra o item alvo do mouse
-    const targetItem = selectedItems.find(selectedItem => selectedItem.id === targetId);
+    const targetItem = selectedItems.find(selectedItem => selectedItem.id.value === targetId);
     if (!targetItem) return;
 
     // Valida se o usuário optou pela ajuda no encaixe na grid
@@ -48,7 +22,7 @@ export const useDragAllElements = () => useRecoilCallback(({ snapshot, set }) =>
         left = Math.round(left / 15) * 15;
 
         // Valida se realmente houve alguma mudança
-        if (targetItem.top === top && targetItem.left === left) return;
+        if (targetItem.top.value === top && targetItem.left.value === left) return;
     }
 
     /** Evita esses valores sejam alterados pela referência entre as variáveis */
@@ -68,8 +42,8 @@ export const useDragAllElements = () => useRecoilCallback(({ snapshot, set }) =>
         const oldCompLeft = comp.left;
         const oldCompTop = comp.top;
 
-        let newCompLeft = !stop.left ? comp.left + (left - old.left) : comp.left;
-        let newCompTop = !stop.top ? comp.top + (top - old.top) : comp.top;
+        let newCompLeft = !stop.left ? comp.left.value + (left - old.left.value) : comp.left;
+        let newCompTop = !stop.top ? comp.top.value + (top - old.top.value) : comp.top;
 
         // Garante que um item não seja arrastado para posições negativas
         if (newCompTop < 0) {
@@ -82,110 +56,63 @@ export const useDragAllElements = () => useRecoilCallback(({ snapshot, set }) =>
             stop.left = true;
         }
 
-        set(FlowItemStore(`${comp.id}`), { ...comp, left: newCompLeft, top: newCompTop });
+        set(comp.top, newCompTop);
+        set(comp.left, newCompLeft);
     });
-});
+};
 
-export const useSelectItemById = () => useRecoilCallback(({ snapshot, set }) => async (id: string | undefined, keepSelecteds: boolean) => {
+export const useSelectItemById = () => (id: string | undefined, keepSelecteds: boolean) => {
 
     // Get all selecteds items
-    const items = await snapshot.getPromise(GetFlowItemsSelector);
-
-    const selectConnection = (connections: IConnection[], hasChange: boolean) => {
-        connections = [
-            ...connections.map(conection => {
-                if (conection.id === id) {
-                    hasChange = conection.isSelected !== true;
-                    conection = {
-                        ...conection,
-                        isSelected: true,
-                    }
-                } else {
-                    hasChange = (conection.isSelected !== false && conection.isSelected !== undefined) || hasChange;
-                    conection = {
-                        ...conection,
-                        isSelected: false,
-                    }
-                }
-                return conection;
-            }),
-        ];
-        return { connections, hasChange };
-    }
+    const items = FlowItemsState.value;
 
     if (keepSelecteds) {
         items.forEach(_item => {
-            let hasChange = false;
+            if (_item.id.value === id) {
+                if (_item.isSelected) {
+                    set(_item.isSelected, true);
+                }
 
-            if (_item.id === id) {
-
-                hasChange = true;
-                _item = { ..._item, isSelected: !_item.isSelected };
-
-            } else {
-                _item = {
-                    ..._item,
-                    connections: (_item.connections || []).map(connection => {
-                        if (connection.id === id) {
-                            hasChange = true;
-                            connection = { ...connection, isSelected: !connection.isSelected };
-                        }
-                        return connection;
-                    })
-                };
-            }
-
-            if (hasChange) {
-                set(FlowItemStore(String(_item.id)), _item);
+            } else if (_item.connections) {
+                _item.connections.value.forEach(connection => {
+                    if (connection.id.value === id) {
+                        set(connection.isSelected, !connection.isSelected.value);
+                    }
+                });
             }
         });
     } else {
         // Serve para o caso de você clicar em um item que que já está selecionado, deve ser mantida a seleção de todos
-        const keepMULTselect = items.filter(item => item.isSelected).some(item => item.id === id);
+        const keepMULTselect = items.filter(item => item.isSelected.value).some(item => item.id.value === id);
 
         if (!keepMULTselect) {
 
             items.forEach(item => {
-                let hasChange = false;
 
-                if (item.id === id) {
-                    hasChange = item.isSelected !== true;
-                    item = { ...item, isSelected: true };
-
-                    item = {
-                        ...item,
-                        connections: (item.connections || []).map(conection => {
-                            hasChange = (conection.isSelected !== false) || hasChange;
-                            return {
-                                ...conection,
-                                isSelected: false
-                            };
-                        }),
-                    };
+                if (item.isSelected && item.id.value === id) {
+                    set(item.isSelected, true);
+                    item.connections?.value.forEach(conection => {
+                        set(conection.isSelected, true);
+                    });
                 } else {
-                    hasChange = item.isSelected !== false;
+                    item.connections?.value.forEach(connection => {
+                        if (connection.id.value === id) {
+                            set(connection.isSelected, true);
+                        } else {
+                            set(connection.isSelected, false);
+                        }
+                    });
 
-                    const { connections, hasChange: change } = selectConnection(item.connections || [], hasChange);
-                    hasChange = change || hasChange;
-
-                    item = {
-                        ...item,
-                        connections,
-                        isSelected: false,
-                    };
-                }
-
-                if (hasChange) {
-                    set(FlowItemStore(String(item.id)), item);
+                    if (item.isSelected) {
+                        set(item.isSelected, false);
+                    }
                 }
             });
         }
     }
+};
 
-    emitOnChange();
-});
-
-export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, set }) => async (
+export const useCreateOrUpdateConnection = () => (
     /**
      * Id on the line being changed.
      * 
@@ -212,74 +139,70 @@ export const useCreateOrUpdateConnection = () => useRecoilCallback(({ snapshot, 
     if (originItemId === targetItemId) return false;
 
     // Find all items from the board
-    const items = await snapshot.getPromise(GetFlowItemsSelector);
+    const items = FlowItemsState.value;
 
     /** Validates that the target item does exist */
-    if (!items.some(item => item.id === targetItemId)) return false;
+    if (!items.some(item => item.id.value === targetItemId)) return false;
 
     // Validates that the source item is already connected
-    if (items.some(item => item.id === originItemId && (item.connections || []).some(connection => connection.targetId === targetItemId))) return false;
+    if (items.some(item => item.id.value === originItemId && (item.connections?.value || []).some(connection => connection.targetId.value === targetItemId))) return false;
 
-    let lines = await snapshot.getPromise(FlowLinesStore);
-
-    set(FlowItemStore(originItemId), ({ connections = [], ...itemCurrent }) => {
-
-        // Validates whether you are creating a new connection or just editing an existing one
-        if (connectionId) {
-
-            lines = [
-                ...lines.map(line =>
-                    (line.id === connectionId)
-                        ? ({ ...line, targetId: targetItemId })
-                        : line
-                ),
-            ];
-
-            return {
-                ...itemCurrent,
-                connections: connections.map(connection => {
-                    if (connection.id === connectionId) {
-                        connection = {
-                            ...connection,
-                            targetId: targetItemId
-                        };
-                    }
-                    return connection;
-                }),
-            };
-        } else {
-            const newConnectionId = Utils.getUUID();
-            lines = [
-                ...lines,
-                {
-                    id: newConnectionId,
-                    originId: originItemId,
-                    targetId: targetItemId,
-                }
-            ];
-
-            return {
-                ...itemCurrent,
-                connections: [
-                    ...connections,
+    /*     let lines = await snapshot.getPromise(FlowLinesStore);
+    
+        set(FlowItemStore(originItemId), ({ connections = [], ...itemCurrent }) => {
+    
+            // Validates whether you are creating a new connection or just editing an existing one
+            if (connectionId) {
+    
+                lines = [
+                    ...lines.map(line =>
+                        (line.id === connectionId)
+                            ? ({ ...line, targetId: targetItemId })
+                            : line
+                    ),
+                ];
+    
+                return {
+                    ...itemCurrent,
+                    connections: connections.map(connection => {
+                        if (connection.id === connectionId) {
+                            connection = {
+                                ...connection,
+                                targetId: targetItemId
+                            };
+                        }
+                        return connection;
+                    }),
+                };
+            } else {
+                const newConnectionId = Utils.getUUID();
+                lines = [
+                    ...lines,
                     {
+                        id: newConnectionId,
                         originId: originItemId,
                         targetId: targetItemId,
-                        id: newConnectionId,
-                        isSelected: false,
                     }
-                ]
-            };
-        }
-    });
-
-    set(FlowLinesStore, lines);
-
-    emitOnChange();
+                ];
+    
+                return {
+                    ...itemCurrent,
+                    connections: [
+                        ...connections,
+                        {
+                            originId: originItemId,
+                            targetId: targetItemId,
+                            id: newConnectionId,
+                            isSelected: false,
+                        }
+                    ]
+                };
+            }
+        }); */
 
     // If has changed connection or create
     return true;
-});
+};
 
 export const useSizeByText = () => (text: string) => {
 
@@ -303,4 +226,21 @@ export const useSizeByText = () => (text: string) => {
         width: formattedWidth,
         height: formattedHeight,
     };
+};
+
+export const useBoardSize = () => {
+    const flowItems = useObserverValue(FlowItemsState);
+
+    try {
+        return {
+            width: flowItems.length > 0 ? flowItems.sort((a, b) => b.left.value - a.left.value)[0].left.value + 200 : 0,
+            height: flowItems.length > 0 ? flowItems.sort((a, b) => b.top.value - a.top.value)[0].top.value + 300 : 0,
+        }
+    } catch (e) {
+        console.log(e)
+        return {
+            width: 0,
+            height: 0,
+        }
+    }
 };

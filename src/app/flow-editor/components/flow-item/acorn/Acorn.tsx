@@ -4,6 +4,7 @@ import { IFlowItem } from '../../../shared/interfaces/FlowItemInterfaces';
 import { useConfigs, useSelectItemById } from '../../../shared/hooks';
 import { SelectionBox, TextOverItem, ImageView } from './components';
 import NewConnectionBox from '../line/NewConnectionBox';
+import { useObserverValue } from 'react-observing';
 
 interface FlowComponentProps {
     item: IFlowItem;
@@ -20,16 +21,30 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
     const { flowItemErrorColor, flowItemTextColor, flowItemWarningColor, flowItemSelectedColor, lineWidth, backgroundColor } = useConfigs();
     const selectItemById = useSelectItemById();
 
-    const strokeColor: string = item.isSelected
+    const isEnabledNewConnetion = useObserverValue(item.isEnabledNewConnetion);
+    const description = useObserverValue(item.description);
+    const isDisabled = useObserverValue(item.isDisabled);
+    const isSelected = useObserverValue(item.isSelected);
+    const hasWarning = useObserverValue(item.hasWarning);
+    const hasError = useObserverValue(item.hasError);
+    const height = useObserverValue(item.height);
+    const width = useObserverValue(item.width);
+    const label = useObserverValue(item.label);
+    const left = useObserverValue(item.left);
+    const icon = useObserverValue(item.icon);
+    const top = useObserverValue(item.top);
+
+
+    const strokeColor: string = isSelected
         ? `${flowItemSelectedColor}`
-        : item.hasError
+        : hasError
             ? `${flowItemErrorColor}`
-            : item.hasWarning
+            : hasWarning
                 ? `${flowItemWarningColor}`
                 : "transparent";
 
     const mouseDownMove = (e: React.MouseEvent<SVGGElement, MouseEvent>) => {
-        if (item.isDisabled) return;
+        if (isDisabled) return;
         e.stopPropagation();
         onMouseDown && onMouseDown(e);
     }
@@ -42,46 +57,46 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
 
     return (
         <g
-            role={item.flowItemType}
             onContextMenu={contextMenu}
+            role={item.flowItemType.value}
             style={{ pointerEvents: (useEvents === undefined || useEvents) ? undefined : 'none' }}
         >
-            {item.isEnabledNewConnetion && <NewConnectionBox
-                onMouseDown={e => selectItemById(item.id, e.ctrlKey)}
-                height={(item.height || 0) + 20}
-                width={(item.width || 0) + 20}
-                originId={String(item.id)}
-                left={item.left - 10}
+            {isEnabledNewConnetion && <NewConnectionBox
+                onMouseDown={e => selectItemById(item.id.value, e.ctrlKey)}
+                originId={String(item.id.value)}
+                height={(height || 0) + 20}
+                width={(width || 0) + 20}
                 parentRef={parentRef}
-                top={item.top - 10}
+                left={left - 10}
                 isRounded={true}
+                top={top - 10}
             />}
             <TextOverItem
-                left={item.left + ((item.width || 0) / 2)}
+                left={left + ((width || 0) / 2)}
                 textColor={flowItemTextColor}
-                label={item.label}
-                top={item.top}
+                label={label}
+                top={top}
             />
             <SelectionBox
-                fullDraggable={!item.isEnabledNewConnetion}
+                fullDraggable={!isEnabledNewConnetion}
                 backgroundColor={backgroundColor}
                 onMouseDown={mouseDownMove}
+                id={String(item.id.value)}
                 strokeColor={strokeColor}
-                height={item.height || 0}
                 strokeWidth={lineWidth}
-                width={item.width || 0}
-                id={String(item.id)}
-                left={item.left}
-                top={item.top}
+                height={height || 0}
+                width={width || 0}
+                left={left}
+                top={top}
             />
             <ImageView
-                imageSrc={item.icon}
-                height={item.height}
-                width={item.width}
-                left={item.left}
-                top={item.top}
+                imageSrc={icon}
+                height={height}
+                width={width}
+                left={left}
+                top={top}
             />
-            <title>{item.description}</title>
+            <title>{description}</title>
         </g>
     );
 };

@@ -1,13 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { IObservable, useObserverValue } from 'react-observing';
 import { useDrop, DropTargetMonitor } from 'react-dnd';
 import { Utils } from 'code-easy-components';
-import { useRecoilValue } from 'recoil';
 
 import { useConfigs, useSelectItemById, useCreateOrUpdateConnection } from '../../../shared/hooks';
-import { GetConnectionPropsSelector } from '../../../shared/stores';
 import { TextOverLine, Arrow, SingleLine } from './components';
 import { IDroppableItem } from '../../../shared/interfaces';
-import { emitOnChange } from '../../on-change-emitter';
 import { EFlowItemType } from '../../../shared/enums';
 
 interface LineProps {
@@ -19,14 +17,21 @@ interface LineProps {
      * 
      */
     allowedsInDrop?: string[];
-    /**
-     * Source flow item
-     */
-    originId: string | undefined;
-    /**
-     * Target flow item
-     */
-    targetId: string | undefined;
+
+
+    radius?: number;
+    isCurved?: boolean;
+    isComment?: boolean;
+    isDisabled?: boolean;
+    lineType?: "dotted" | "normal";
+    topStore: IObservable<number>;
+    leftStore: IObservable<number>;
+    top2Store: IObservable<number>;
+    left2Store: IObservable<number>;
+    isSelectedStore: IObservable<boolean>;
+    connectionLabelStore: IObservable<string>;
+    connectionDescriptionStore: IObservable<string>;
+
     parentRef: React.RefObject<SVGSVGElement>;
     /**
      * Reference to the element used to create new connections between items
@@ -51,16 +56,18 @@ interface LineProps {
      */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const Line: React.FC<LineProps> = ({ id, originId, parentRef, allowedsInDrop, newConnectionBoxRef, onContextMenu, onMouseDown, onDropItem }) => {
+export const Line: React.FC<LineProps> = ({ id, isDisabled, lineType, radius = 0, isSelectedStore, connectionDescriptionStore, connectionLabelStore, isComment, isCurved, leftStore, left2Store, topStore, top2Store, parentRef, allowedsInDrop, newConnectionBoxRef, onContextMenu, onMouseDown, onDropItem }) => {
     const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor, flowItemTextColor } = useConfigs();
     const createOrUpdateConnection = useCreateOrUpdateConnection();
     const selectItemById = useSelectItemById();
 
-    const {
-        left, left2, top, isSelected, top2,
-        isCurved, radius, isDisabled, lineType,
-        connectionLabel, connectionDescription, isComment,
-    } = useRecoilValue(GetConnectionPropsSelector({ id: id, originId }));
+    const top = useObserverValue(topStore);
+    const left = useObserverValue(leftStore);
+    const top2 = useObserverValue(top2Store);
+    const left2 = useObserverValue(left2Store);
+    const isSelected = useObserverValue(isSelectedStore);
+    const connectionLabel = useObserverValue(connectionLabelStore);
+    const connectionDescription = useObserverValue(connectionDescriptionStore);
 
     // Sets the color of the line when selected
     const strokeColor: string = isSelected ? `${flowItemSelectedColor}` : `${linesColor}`;
@@ -111,13 +118,13 @@ export const Line: React.FC<LineProps> = ({ id, originId, parentRef, allowedsInD
             parentRef.current.style.pointerEvents = 'auto';
         }
 
-        const hasChange = await createOrUpdateConnection(id, String(originId), e.target.id);
+        // const hasChange = await createOrUpdateConnection(id, String(originId), e.target.id);
 
         window.onmouseup = null;
         window.onmousemove = null;
         document.body.style.cursor = 'unset';
 
-        if (!hasChange || !!newConnectionBoxRef) {
+        if (/* !hasChange ||  */!!newConnectionBoxRef) {
             setBasicPosition({
                 isCurved,
                 top1: top,
@@ -130,9 +137,7 @@ export const Line: React.FC<LineProps> = ({ id, originId, parentRef, allowedsInD
                 lineDistance: Math.hypot((top2 - top), (left2 - left)),
             });
         }
-
-        emitOnChange();
-    }, [parentRef, createOrUpdateConnection, id, originId, newConnectionBoxRef, isCurved, top, top2, left, left2]);
+    }, [parentRef, createOrUpdateConnection, id, newConnectionBoxRef, isCurved, top, top2, left, left2]);
 
     const mouseDown = useCallback((e: any) => {
         e.stopPropagation();
@@ -148,8 +153,6 @@ export const Line: React.FC<LineProps> = ({ id, originId, parentRef, allowedsInD
 
         selectItemById(id, e.ctrlKey);
         onMouseDown && onMouseDown(e);
-
-        emitOnChange();
     }, [parentRef, mouseMove, onMouseUp, selectItemById, id, onMouseDown]);
 
     // Used when being used to create a new line
@@ -161,8 +164,6 @@ export const Line: React.FC<LineProps> = ({ id, originId, parentRef, allowedsInD
         e.stopPropagation();
         selectItemById(id, e.ctrlKey);
         onMouseDown && onMouseDown(e);
-
-        emitOnChange();
     }, [selectItemById, id, onMouseDown]);
 
     /** Used to make it possible to drop items on the line. */

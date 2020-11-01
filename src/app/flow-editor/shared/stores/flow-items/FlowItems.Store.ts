@@ -1,13 +1,5 @@
-import { atom, atomFamily } from "recoil";
+import { observe } from 'react-observing';
 
-import { IFlowItem } from "./../../interfaces/FlowItemInterfaces";
+import { IFlowItem } from "./../../interfaces";
 
-export const FlowItemsStore = atom<string[]>({
-    key: 'flow-items',
-    default: []
-});
-
-export const FlowItemStore = atomFamily<IFlowItem, string>({
-    key: 'flow-item',
-    default: {} as IFlowItem,
-});
+export const FlowItemsState = observe<IFlowItem[]>([]);

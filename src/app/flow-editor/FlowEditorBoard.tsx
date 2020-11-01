@@ -1,20 +1,16 @@
 import React, { useCallback, useRef } from 'react';
+import { observe, set, useObserver } from "react-observing";
 import { DropTargetMonitor } from 'react-dnd';
-import { useRecoilCallback } from 'recoil';
 import { Utils } from 'code-easy-components';
 
-import { FlowItemStore, FlowItemsStore, GetFlowItemsSelector, GetSelectedFlowItemsSelector, FlowLinesStore } from './shared/stores';
-import { useFlowItems, useConfigs, useSelectItemById, useFlowItemsConnetionsSelector } from './shared/hooks';
-import { IFlowEditorBoardProps } from './shared/interfaces/FlowEditorInterfaces';
-import { EmptyFeedback } from './components/empty-feedback/EmptyFeedback';
-import { ICoords, IFlowItem, IDroppableItem } from './shared/interfaces';
+import { ICoords, IFlowItem, IDroppableItem, IFlowEditorBoardProps } from './shared/interfaces';
 import SelectorArea from './components/area-selector/SelectorArea';
 import BreandCrumbs from './components/breadcrumbs/BreandCrumbs';
 import EditorPanel from './components/editor-panel/EditorPanel';
-import { emitOnChange } from './components/on-change-emitter';
-import { Line } from './components/flow-item/line/Line';
-import FlowItem from './components/flow-item/FlowItem';
+import { useConfigs, useSelectItemById } from './shared/hooks';
+import { EmptyFeedback, FlowItem } from './components';
 import Toolbar from './components/tool-bar/ToolBar';
+import { FlowItemsState } from './shared/stores';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const {
@@ -29,14 +25,14 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const { onMouseEnter, onMouseLeave, onContextMenu, onDropItem, onFocus } = props;
     const { onAnyKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV } = props;
 
-    const lines = useFlowItemsConnetionsSelector();
-    const boardRef = useRef<SVGSVGElement>(null);
+    const [items, setItems] = useObserver(FlowItemsState);
     const selectItemById = useSelectItemById();
-    const items = useFlowItems();
 
-    const selectItem = useCallback((item: IFlowItem, coords: ICoords) => {
-        const top2 = item.top + (item.height || 0);
-        const left2 = item.left + (item.width || 0);
+    const boardRef = useRef<SVGSVGElement>(null);
+
+    const selectItem = useCallback((item: IFlowItem, coords: ICoords): boolean => {
+        const top2 = item.top.value + (item.height?.value || 0);
+        const left2 = item.left.value + (item.width?.value || 0);
 
         const yGreaterThan0 = ((coords.endY - coords.startY) > 0);
         const xGreaterThan0 = ((coords.endX - coords.startX) > 0);
@@ -64,182 +60,100 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         return (
             (
                 yGreaterThan0
-                    ? greaterThan0Selected(item.top, top2, coords.startY, coords.endY)
-                    : lessThan0Selected(item.top, top2, coords.startY, coords.endY)
+                    ? greaterThan0Selected(item.top.value, top2, coords.startY, coords.endY)
+                    : lessThan0Selected(item.top.value, top2, coords.startY, coords.endY)
             )
             &&
             (
                 xGreaterThan0
-                    ? greaterThan0Selected(item.left, left2, coords.startX, coords.endX)
-                    : lessThan0Selected(item.left, left2, coords.startX, coords.endX)
+                    ? greaterThan0Selected(item.left.value, left2, coords.startX, coords.endX)
+                    : lessThan0Selected(item.left.value, left2, coords.startX, coords.endX)
             )
         );
     }, []);
 
-    const setSelectedFlowItem = useRecoilCallback(({ set, snapshot }) => (coords: ICoords) => {
-        items.forEach(async id => {
-            const item = await snapshot.getPromise(FlowItemStore(id));
+    const setSelectedFlowItem = useCallback((coords: ICoords) => {
+        items.forEach(item => {
             const mustSelect = selectItem(item, coords);
-            if (item.isSelected !== mustSelect) {
-                set(FlowItemStore(id), { ...item, isSelected: mustSelect });
-
-                emitOnChange();
+            if (item.isSelected && !item.isSelected?.value !== mustSelect) {
+                selectItemById(item.id.value, false);
             }
         });
-    });
+    }, [items, selectItem, selectItemById]);
 
-    const handleSelecteAllFlowItems = useRecoilCallback(({ set }) => () => {
-        items.forEach(id => {
-            set(FlowItemStore(String(id)), oldState => ({
-                ...oldState,
-                isSelected: true
-            }))
+    const handleSelecteAllFlowItems = useCallback(() => {
+        items.forEach(item => {
+            if (item.isSelected && !item.isSelected?.value) {
+                set(item.isSelected, true);
+            }
         });
-
-        emitOnChange();
     }, [items]);
 
-    const handleDelete = useRecoilCallback(({ set, snapshot }) => async () => {
-        let itemsCompleteSelecteds = await snapshot.getPromise(GetSelectedFlowItemsSelector);
-        const itemsComplete = await snapshot.getPromise(GetFlowItemsSelector);
-        let oldLines = await snapshot.getPromise(FlowLinesStore);
+    const handleDelete = useCallback(() => {
+        if (items.some(item => item.isSelected?.value)) {
+            setItems(items.filter(item => !item.isSelected?.value));
+        }
+    }, [items, setItems]);
 
-        // Remove all lines selecteds
-        itemsCompleteSelecteds = itemsCompleteSelecteds.map(itemSelected => {
-
-            const connectionIdToBeRemoved = (itemSelected.connections || [])
-                .filter(connection => connection.isSelected)
-                .map(connection => connection.id);
-
-            oldLines = [
-                ...oldLines.filter(oldLine => !connectionIdToBeRemoved.includes(oldLine.id))
-            ];
-
-
-            const res = {
-                ...itemSelected,
-                connections: (itemSelected.connections || []).filter(connection => !connection.isSelected),
-            };
-
-            // Save in the state
-            set(FlowItemStore(String(itemSelected.id)), res);
-
-            return res;
-        });
-
-        // Remove all dependencies with the selecteds items
-        itemsCompleteSelecteds.forEach(itemSelected => {
-            if (itemSelected.isSelected) {
-                itemsComplete.forEach(dependentItem => {
-                    const hasDependencies = (dependentItem.connections || []).some(connection => (connection.targetId === itemSelected.id));
-
-                    // Remove old connections
-                    if (hasDependencies) {
-                        const connectionsIdToBeRemoved = (dependentItem.connections || [])
-                            .filter(connection => connection.targetId === itemSelected.id)
-                            .map(connection => connection.id);
-
-                        oldLines = [
-                            ...oldLines.filter(oldLine => !connectionsIdToBeRemoved.includes(oldLine.id) && !(oldLine.originId === itemSelected.id))
-                        ];
-
-
-                        dependentItem = {
-                            ...dependentItem,
-                            connections: [
-                                ...(dependentItem.connections || []).filter(connection => connection.targetId !== itemSelected.id)
-                            ]
-                        };
-
-                        // Save in the state
-                        set(FlowItemStore(String(dependentItem.id)), dependentItem);
-                    }
-                });
-            }
-        });
-
-        // Save a new list
-        set(FlowItemsStore, itemsComplete.filter(item => !item.isSelected).map(item => String(item.id)));
-
-        // Update lines
-        set(FlowLinesStore, oldLines);
-
-        emitOnChange();
-    });
-
-    const handleArrowKeyDown = useRecoilCallback(({ set, snapshot }) => async (direction: "ArrowUp" | "ArrowDown" | "ArrowLeft" | "ArrowRight") => {
-        const items = await snapshot.getPromise(GetFlowItemsSelector);
-
+    const handleArrowKeyDown = useCallback((direction: "ArrowUp" | "ArrowDown" | "ArrowLeft" | "ArrowRight") => {
         items.forEach(item => {
-            if (item.isSelected) {
+            if (item.isSelected?.value) {
                 switch (direction) {
                     case 'ArrowDown':
-                        item = {
-                            ...item,
-                            top: item.top + 15
-                        };
+                        set(item.top, item.top.value + 15);
                         break;
                     case 'ArrowUp':
-                        item = {
-                            ...item,
-                            top: item.top - 15
-                        };
+                        set(item.top, item.top.value - 15);
                         break;
                     case 'ArrowLeft':
-                        item = {
-                            ...item,
-                            left: item.left - 15
-                        };
+                        set(item.left, item.left.value - 15);
                         break;
                     case 'ArrowRight':
-                        item = {
-                            ...item,
-                            left: item.left + 15
-                        };
+                        set(item.left, item.left.value + 15);
                         break;
                 }
-                set(FlowItemStore(String(item.id)), item);
             }
         });
-
-        emitOnChange();
-    });
+    }, [items]);
 
     /** Essa função é executada sempre um item(aceito como item soltável) é sortado no painel */
-    const handleDroptem = useRecoilCallback(({ snapshot, set }) => async (item: IDroppableItem, monitor: DropTargetMonitor, connectionTargetId?: string | undefined) => {
+    const handleDroptem = useCallback((item: IDroppableItem, monitor: DropTargetMonitor, connectionTargetId?: string | undefined) => {
 
         const target = boardRef.current;
         const draggedOffSet = monitor.getClientOffset();
         if (!target || !draggedOffSet) return;
 
-
         // Deselect all items selecteds
-        (await snapshot.getPromise(GetFlowItemsSelector))
-            .forEach(itemComplete => {
-                if (itemComplete.id && itemComplete.isSelected) {
-                    set(FlowItemStore(itemComplete.id), { ...itemComplete, isSelected: false })
-                }
-            });
+        items.forEach(item => {
+            if (item.isSelected && item.isSelected.value) {
+                set(item.isSelected, false);
+            }
+        });
 
         const targetSize = target.getBoundingClientRect();
         const targetOffsetY = (draggedOffSet.y + (targetSize.top - targetSize.top - targetSize.top) - 25);
         const targetOffsetX = (draggedOffSet.x + (targetSize.left - targetSize.left - targetSize.left) - 25);
 
         let newItem: IFlowItem = {
-            flowItemType: item.itemProps.flowItemType,
-            left: Math.round(targetOffsetX / 15) * 15,
-            top: Math.round(targetOffsetY / 15) * 15,
-            itemType: item.itemProps.itemType,
-            id: Utils.getUUID().toString(),
-            height: item.itemProps.height,
-            width: item.itemProps.width,
-            label: item.itemProps.label,
-            icon: item.itemProps.icon,
-            isSelected: true,
+            itemType: item.itemProps.itemType ? observe(item.itemProps.itemType) : undefined,
+            flowItemType: observe(item.itemProps.flowItemType),
+            left: observe(Math.round(targetOffsetX / 15) * 15),
+            top: observe(Math.round(targetOffsetY / 15) * 15),
+            label: observe(item.itemProps.label || ""),
+            id: observe(Utils.getUUID().toString()),
+            height: observe(item.itemProps.height),
+            width: observe(item.itemProps.width),
+            isEnabledNewConnetion: observe(true),
+            icon: observe(item.itemProps.icon),
+            hasWarning: observe(false),
+            isDisabled: observe(false),
+            isSelected: observe(true),
+            description: observe(""),
+            hasError: observe(false),
         };
 
         // Are your dropping in a line
-        if (connectionTargetId) {
+        /* if (connectionTargetId) {
             const lineTarget = (await snapshot.getPromise(FlowLinesStore)).find(line => line.id === connectionTargetId);
 
             if (!lineTarget?.originId) return;
@@ -291,32 +205,24 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     }
                 ]
             };
-        }
+        } */
 
         /** Wait for the return to insert the item, if you receive undefined just insert, if different from undefined insert the result of the event if there is something */
         const onDropRes = onDropItem ? onDropItem(item.itemProps.id, String(newItem.id), newItem) : undefined;
         if (!onDropRes) {
 
             // Add a new item in array state
-            set(FlowItemsStore, [...items, String(newItem.id)]);
+            setItems(oldItems => ([...oldItems, newItem]));
 
-            // Creates the state for the item
-            set(FlowItemStore(String(newItem.id)), newItem);
-
-            emitOnChange();
         } else if (onDropRes) {
 
             // Add a new item in array state
-            set(FlowItemsStore, [...items, String(onDropRes.id)]);
+            setItems(oldItems => ([...oldItems, onDropRes]));
 
-            // Creates the state for the item
-            set(FlowItemStore(String(onDropRes.id)), onDropRes);
-
-            emitOnChange();
         }
 
         target.focus();
-    });
+    }, [items, onDropItem, setItems]);
 
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex' }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
@@ -358,7 +264,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     onKeyDownCtrlA={handleSelecteAllFlowItems}
                     onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                 >
-                    {lines.map(({ id, originId, targetId }, index) => <Line
+                    {/* {lines.map(({ id, originId, targetId }, index) => <Line
                         id={id}
                         key={index}
                         originId={originId}
@@ -367,18 +273,17 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                         onDropItem={handleDroptem}
                         onContextMenu={onContextMenu}
                         allowedsInDrop={typesAllowedToDrop}
-                    />)}
-                    {items.map(id => (
+                    />)} */}
+                    {items.map((item, index) => (
                         <FlowItem
-                            id={id}
-                            key={id}
+                            item={item}
+                            key={index}
                             parentRef={boardRef}
                             onContextMenu={onContextMenu}
                         />
                     ))}
                     <SelectorArea
                         isDisabled={disableSelection}
-                        onSelectionEnd={emitOnChange}
                         borderType={selectionBorderType}
                         borderWidth={selectionBorderWidth}
                         borderColor={selectionBorderColor}

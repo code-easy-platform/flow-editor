@@ -1,8 +1,8 @@
 import React, { memo, useRef } from 'react';
 import { useDrop, DropTargetMonitor, XYCoord } from 'react-dnd';
 
-import { useBoardSize } from '../../shared/hooks';
 import { IDroppableItem } from '../../shared/interfaces';
+import { useBoardSize } from '../../shared/hooks';
 
 type EditorPanelProps = Omit<{
     dotColor?: string;
