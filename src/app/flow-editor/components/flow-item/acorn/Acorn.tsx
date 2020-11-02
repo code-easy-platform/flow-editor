@@ -34,22 +34,20 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
     const icon = useObserverValue(item.icon);
     const top = useObserverValue(item.top);
 
+    const strokeColor: string = (() => {
+        if (isSelected) return `${flowItemSelectedColor}`;
+        else if (hasError) return `${flowItemErrorColor}`;
+        else if (hasWarning) return `${flowItemWarningColor}`;
+        else return `transparent`;
+    })();
 
-    const strokeColor: string = isSelected
-        ? `${flowItemSelectedColor}`
-        : hasError
-            ? `${flowItemErrorColor}`
-            : hasWarning
-                ? `${flowItemWarningColor}`
-                : "transparent";
-
-    const mouseDownMove = (e: React.MouseEvent<SVGGElement, MouseEvent>) => {
+    const handleMouseDownMove = useCallback((e: React.MouseEvent<SVGGElement, MouseEvent>) => {
         if (isDisabled) return;
         e.stopPropagation();
         onMouseDown && onMouseDown(e);
-    }
+    }, [isDisabled, onMouseDown]);
 
-    const contextMenu = useCallback((e: React.MouseEvent<SVGGElement, MouseEvent>) => {
+    const handleContextMenu = useCallback((e: React.MouseEvent<SVGGElement, MouseEvent>) => {
         e.stopPropagation();
         e.preventDefault();
         onContextMenu && onContextMenu(e);
@@ -57,15 +55,15 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
 
     return (
         <g
-            onContextMenu={contextMenu}
             role={item.flowItemType.value}
+            onContextMenu={handleContextMenu}
             style={{ pointerEvents: (useEvents === undefined || useEvents) ? undefined : 'none' }}
         >
             {isEnabledNewConnetion && <NewConnectionBox
                 onMouseDown={e => selectItemById(item.id.value, e.ctrlKey)}
-                originId={String(item.id.value)}
                 height={(height || 0) + 20}
                 width={(width || 0) + 20}
+                originIdStore={item.id}
                 parentRef={parentRef}
                 left={left - 10}
                 isRounded={true}
@@ -80,7 +78,7 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
             <SelectionBox
                 fullDraggable={!isEnabledNewConnetion}
                 backgroundColor={backgroundColor}
-                onMouseDown={mouseDownMove}
+                onMouseDown={handleMouseDownMove}
                 id={String(item.id.value)}
                 strokeColor={strokeColor}
                 strokeWidth={lineWidth}

@@ -22,7 +22,7 @@ const App: React.FC = () => {
 
                     /** EDITOR */
                     typesAllowedToDrop: AllowedsInDrop,
-                    snapGridWhileDragging: false,
+                    snapGridWhileDragging: true,
                     backgroundType: "dotted",
                     dottedSize: 15,
 

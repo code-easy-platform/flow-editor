@@ -8,11 +8,11 @@ export interface IConnection {
     /**
      * This will apper in the line as a tooltip
      */
-    connectionDescription?: IObservable<string>;
+    connectionDescription: IObservable<string | undefined>;
     /**
      * This will apper in the line as a title
      */
-    connectionLabel?: IObservable<string>;
+    connectionLabel: IObservable<string | undefined>;
     /**
      * Unique id to identify the connection
      */
@@ -69,7 +69,7 @@ export interface IFlowItem extends IBasicFlowItem {
      * Ex: start, assign, foreach, etc...
      */
     itemType?: IObservable<string>;
-    connections?: IObservable<IConnection[]>;
+    connections: IObservable<IConnection[]>;
     hasError: IObservable<boolean | undefined>;
     hasWarning: IObservable<boolean | undefined>;
     /**

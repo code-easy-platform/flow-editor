@@ -1,1 +1,1 @@
-export * from './flow-items/FlowItems.Store';
+export * from './FlowItems.Store';

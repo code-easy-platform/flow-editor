@@ -58,12 +58,12 @@ export const FlowItem: React.FC<FlowProps> = ({ item: flowItem, parentRef, onCon
         cliquedLocationFlowItem.current = {
             top: e.nativeEvent.offsetY - flowItem.top.value,
             left: e.nativeEvent.offsetX - flowItem.left.value,
-        };
+        }
 
         // Select the item and emit OnChange event
-        if (!flowItem.isSelected.value) {
-            selectItemById(flowItem.id.value, e.ctrlKey);
-        }
+        selectItemById(flowItem.id.value, e.ctrlKey);
+        /* if (!flowItem.isSelected.value) {
+        } */
 
         window.onmousemove = handleMouseMove;
         window.onmouseup = handleMouseUp;
@@ -71,7 +71,6 @@ export const FlowItem: React.FC<FlowProps> = ({ item: flowItem, parentRef, onCon
 
     switch (flowItem.flowItemType.value) {
         case EFlowItemType.acorn:
-            if (!flowItem) return null;
             return (
                 <Acorn
                     item={flowItem}
@@ -81,7 +80,6 @@ export const FlowItem: React.FC<FlowProps> = ({ item: flowItem, parentRef, onCon
                 />
             );
         case EFlowItemType.comment:
-            if (!flowItem) return null;
             return (
                 <Comment
                     item={flowItem}
@@ -91,6 +89,6 @@ export const FlowItem: React.FC<FlowProps> = ({ item: flowItem, parentRef, onCon
                 />
             );
         default:
-            return <></>;
+            return null;
     }
 };

@@ -60,7 +60,7 @@ export const Comment: React.FC<CommentProps> = ({ item, parentRef, onMouseDown, 
             <NewConnectionBox
                 height={(height || 0) + ((lineWidth || 0) * 2) + 36}
                 width={(width || 0) + ((lineWidth || 0) * 2) + 38}
-                originId={String(item.id.value)}
+                originIdStore={item.id}
                 lineWidth={lineWidth}
                 parentRef={parentRef}
                 left={left - 20}

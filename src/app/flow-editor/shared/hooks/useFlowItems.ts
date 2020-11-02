@@ -1,5 +1,8 @@
-import { set, useObserverValue } from "react-observing";
+import { useEffect, useState } from "react";
+import { set, useObserverValue, observe } from "react-observing";
+import { Utils } from "code-easy-components";
 
+import { IConnection } from "../interfaces";
 import { FlowItemsState } from "../stores";
 
 /**
@@ -7,10 +10,8 @@ import { FlowItemsState } from "../stores";
  */
 export const useDragAllElements = () => (targetId: string | undefined, top: number, left: number, snapGridWhileDragging: boolean | undefined) => {
 
-    // Pega do selector todos os selecionados
+    // Encontra todos os item selecionados
     const selectedItems = FlowItemsState.value.filter(item => item.isSelected?.value);
-    console.log(selectedItems)
-    console.log(top, left)
 
     // Encontra o item alvo do mouse
     const targetItem = selectedItems.find(selectedItem => selectedItem.id.value === targetId);
@@ -25,13 +26,13 @@ export const useDragAllElements = () => (targetId: string | undefined, top: numb
         if (targetItem.top.value === top && targetItem.left.value === left) return;
     }
 
-    /** Evita esses valores sejam alterados pela referência entre as variáveis */
+    /** Evita que esses valores sejam alterados pela referência entre as variáveis */
     const old = {
-        left: targetItem.left,
-        top: targetItem.top,
+        left: targetItem.left.value,
+        top: targetItem.top.value,
     }
 
-    /** Ajuda a evitar que os item=ns seja amontuados quando arrastados para um dos cantos */
+    /** Ajuda a evitar que os items sejam amontuados quando arrastados para um dos cantos */
     let stop = {
         left: false,
         top: false,
@@ -39,11 +40,12 @@ export const useDragAllElements = () => (targetId: string | undefined, top: numb
 
     // Muda a posição de todos os items que estão selecionados
     selectedItems.forEach(comp => {
-        const oldCompLeft = comp.left;
-        const oldCompTop = comp.top;
+        const oldCompLeft = comp.left.value;
+        const oldCompTop = comp.top.value;
 
-        let newCompLeft = !stop.left ? comp.left.value + (left - old.left.value) : comp.left;
-        let newCompTop = !stop.top ? comp.top.value + (top - old.top.value) : comp.top;
+        // Find the new postions
+        let newCompLeft = !stop.left ? comp.left.value + (left - old.left) : comp.left.value;
+        let newCompTop = !stop.top ? comp.top.value + (top - old.top) : comp.top.value;
 
         // Garante que um item não seja arrastado para posições negativas
         if (newCompTop < 0) {
@@ -61,20 +63,18 @@ export const useDragAllElements = () => (targetId: string | undefined, top: numb
     });
 };
 
+// Se undefined desmarca todos
 export const useSelectItemById = () => (id: string | undefined, keepSelecteds: boolean) => {
 
     // Get all selecteds items
     const items = FlowItemsState.value;
 
     if (keepSelecteds) {
-        items.forEach(_item => {
-            if (_item.id.value === id) {
-                if (_item.isSelected) {
-                    set(_item.isSelected, true);
-                }
-
-            } else if (_item.connections) {
-                _item.connections.value.forEach(connection => {
+        items.forEach(item => {
+            if (item.id.value === id) {
+                set(item.isSelected, !item.isSelected.value);
+            } else {
+                item.connections.value.forEach(connection => {
                     if (connection.id.value === id) {
                         set(connection.isSelected, !connection.isSelected.value);
                     }
@@ -86,26 +86,13 @@ export const useSelectItemById = () => (id: string | undefined, keepSelecteds: b
         const keepMULTselect = items.filter(item => item.isSelected.value).some(item => item.id.value === id);
 
         if (!keepMULTselect) {
-
             items.forEach(item => {
-
-                if (item.isSelected && item.id.value === id) {
+                if (item.id.value === id) {
                     set(item.isSelected, true);
-                    item.connections?.value.forEach(conection => {
-                        set(conection.isSelected, true);
-                    });
+                    item.connections.value.forEach(connection => set(connection.isSelected, false));
                 } else {
-                    item.connections?.value.forEach(connection => {
-                        if (connection.id.value === id) {
-                            set(connection.isSelected, true);
-                        } else {
-                            set(connection.isSelected, false);
-                        }
-                    });
-
-                    if (item.isSelected) {
-                        set(item.isSelected, false);
-                    }
+                    item.connections.value.forEach(connection => set(connection.isSelected, connection.id.value === id));
+                    set(item.isSelected, false);
                 }
             });
         }
@@ -141,64 +128,40 @@ export const useCreateOrUpdateConnection = () => (
     // Find all items from the board
     const items = FlowItemsState.value;
 
-    /** Validates that the target item does exist */
+    /** Validates that the target item does exists */
     if (!items.some(item => item.id.value === targetItemId)) return false;
 
     // Validates that the source item is already connected
-    if (items.some(item => item.id.value === originItemId && (item.connections?.value || []).some(connection => connection.targetId.value === targetItemId))) return false;
+    if (items.some(item => item.id.value === originItemId && (item.connections.value || []).some(connection => connection.targetId.value === targetItemId))) return false;
 
-    /*     let lines = await snapshot.getPromise(FlowLinesStore);
-    
-        set(FlowItemStore(originItemId), ({ connections = [], ...itemCurrent }) => {
-    
-            // Validates whether you are creating a new connection or just editing an existing one
-            if (connectionId) {
-    
-                lines = [
-                    ...lines.map(line =>
-                        (line.id === connectionId)
-                            ? ({ ...line, targetId: targetItemId })
-                            : line
-                    ),
-                ];
-    
-                return {
-                    ...itemCurrent,
-                    connections: connections.map(connection => {
-                        if (connection.id === connectionId) {
-                            connection = {
-                                ...connection,
-                                targetId: targetItemId
-                            };
-                        }
-                        return connection;
-                    }),
-                };
-            } else {
-                const newConnectionId = Utils.getUUID();
-                lines = [
-                    ...lines,
-                    {
-                        id: newConnectionId,
-                        originId: originItemId,
-                        targetId: targetItemId,
-                    }
-                ];
-    
-                return {
-                    ...itemCurrent,
-                    connections: [
-                        ...connections,
-                        {
-                            originId: originItemId,
-                            targetId: targetItemId,
-                            id: newConnectionId,
-                            isSelected: false,
-                        }
-                    ]
-                };
+    // Validates whether you are creating a new connection or just editing an existing one
+    if (connectionId) {
+        const originItem = FlowItemsState.value.find(item => item.id.value === originItemId);
+        if (!originItem) return false;
+
+        originItem.connections.value.forEach(connection => {
+            if (connection.id.value === connectionId) {
+                set(connection.targetId, targetItemId);
             }
-        }); */
+        });
+
+        set(originItem.connections, originItem.connections.value);
+    } else {
+        const originItem = FlowItemsState.value.find(item => item.id.value === originItemId);
+        if (!originItem) return false;
+
+        set<IConnection[]>(originItem.connections, [
+            ...originItem.connections.value,
+            {
+                isSelected: observe(false),
+                id: observe(Utils.getUUID()),
+                connectionLabel: observe(''),
+                targetId: observe(targetItemId),
+                originId: observe(originItemId),
+                connectionDescription: observe(''),
+            }
+        ]);
+    }
 
     // If has changed connection or create
     return true;
@@ -229,18 +192,27 @@ export const useSizeByText = () => (text: string) => {
 };
 
 export const useBoardSize = () => {
-    const flowItems = useObserverValue(FlowItemsState);
+    const [coords, setCoords] = useState({ width: 0, height: 0 });
+    const items = useObserverValue(FlowItemsState);
 
-    try {
-        return {
-            width: flowItems.length > 0 ? flowItems.sort((a, b) => b.left.value - a.left.value)[0].left.value + 200 : 0,
-            height: flowItems.length > 0 ? flowItems.sort((a, b) => b.top.value - a.top.value)[0].top.value + 300 : 0,
-        }
-    } catch (e) {
-        console.log(e)
-        return {
-            width: 0,
-            height: 0,
-        }
-    }
+    useEffect(() => {
+        const subscriptions: any[] = [];
+
+        items.forEach(item => {
+            subscriptions.push(item.top.subscribe(top => {
+                if (!items.some(item => item.top.value > (top + 300))) {
+                    setCoords(_coords => ({ ..._coords, height: top + 300 }));
+                }
+            }));
+            subscriptions.push(item.left.subscribe(left => {
+                if (!items.some(item => item.left.value > (left + 200))) {
+                    setCoords(_coords => ({ ..._coords, width: left + 200 }));
+                }
+            }));
+        });
+
+        return () => subscriptions.forEach(subscrition => subscrition.unsubscribe());
+    }, [coords, items]);
+
+    return coords;
 };

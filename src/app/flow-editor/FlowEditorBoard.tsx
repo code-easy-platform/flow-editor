@@ -4,13 +4,12 @@ import { DropTargetMonitor } from 'react-dnd';
 import { Utils } from 'code-easy-components';
 
 import { ICoords, IFlowItem, IDroppableItem, IFlowEditorBoardProps } from './shared/interfaces';
-import SelectorArea from './components/area-selector/SelectorArea';
+import { EmptyFeedback, FlowItem, SelectorArea, EditorPanel } from './components';
 import BreandCrumbs from './components/breadcrumbs/BreandCrumbs';
-import EditorPanel from './components/editor-panel/EditorPanel';
-import { useConfigs, useSelectItemById } from './shared/hooks';
-import { EmptyFeedback, FlowItem } from './components';
+import { useConfigs, useLines, useSelectItemById } from './shared/hooks';
 import Toolbar from './components/tool-bar/ToolBar';
 import { FlowItemsState } from './shared/stores';
+import { Line } from './components/flow-item/line/Line';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const {
@@ -27,86 +26,93 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
 
     const [items, setItems] = useObserver(FlowItemsState);
     const selectItemById = useSelectItemById();
+    const lines = useLines(/* items */);
 
     const boardRef = useRef<SVGSVGElement>(null);
 
-    const selectItem = useCallback((item: IFlowItem, coords: ICoords): boolean => {
-        const top2 = item.top.value + (item.height?.value || 0);
-        const left2 = item.left.value + (item.width?.value || 0);
-
-        const yGreaterThan0 = ((coords.endY - coords.startY) > 0);
-        const xGreaterThan0 = ((coords.endX - coords.startX) > 0);
-
-        const lessThan0Selected = (_param1: number, _param2: number, _coordStart: number, _coordEnd: number) => {
-            return (
-                (
-                    (_param1 <= _coordStart) || (_param2 <= _coordStart)
-                ) && (
-                    (_param1 >= _coordEnd) || (_param2 >= _coordEnd)
-                )
-            );
-        }
-
-        const greaterThan0Selected = (_param1: number, _param2: number, _coordStart: number, _coordEnd: number) => {
-            return (
-                (
-                    (_param1 >= _coordStart) || (_param2 >= _coordStart)
-                ) && (
-                    (_param1 <= _coordEnd) || (_param2 <= _coordEnd)
-                )
-            );
-        }
-
-        return (
-            (
-                yGreaterThan0
-                    ? greaterThan0Selected(item.top.value, top2, coords.startY, coords.endY)
-                    : lessThan0Selected(item.top.value, top2, coords.startY, coords.endY)
-            )
-            &&
-            (
-                xGreaterThan0
-                    ? greaterThan0Selected(item.left.value, left2, coords.startX, coords.endX)
-                    : lessThan0Selected(item.left.value, left2, coords.startX, coords.endX)
-            )
-        );
-    }, []);
-
     const setSelectedFlowItem = useCallback((coords: ICoords) => {
+
+        const selectItemByCoords = (item: IFlowItem, coords: ICoords): boolean => {
+            const top2 = item.top.value + (item.height.value || 0);
+            const left2 = item.left.value + (item.width.value || 0);
+
+            const yGreaterThan0 = ((coords.endY - coords.startY) > 0);
+            const xGreaterThan0 = ((coords.endX - coords.startX) > 0);
+
+            const lessThan0Selected = (_param1: number, _param2: number, _coordStart: number, _coordEnd: number) => {
+                return (
+                    (
+                        (_param1 <= _coordStart) || (_param2 <= _coordStart)
+                    ) && (
+                        (_param1 >= _coordEnd) || (_param2 >= _coordEnd)
+                    )
+                );
+            }
+
+            const greaterThan0Selected = (_param1: number, _param2: number, _coordStart: number, _coordEnd: number) => {
+                return (
+                    (
+                        (_param1 >= _coordStart) || (_param2 >= _coordStart)
+                    ) && (
+                        (_param1 <= _coordEnd) || (_param2 <= _coordEnd)
+                    )
+                );
+            }
+
+            return (
+                (
+                    yGreaterThan0
+                        ? greaterThan0Selected(item.top.value, top2, coords.startY, coords.endY)
+                        : lessThan0Selected(item.top.value, top2, coords.startY, coords.endY)
+                )
+                &&
+                (
+                    xGreaterThan0
+                        ? greaterThan0Selected(item.left.value, left2, coords.startX, coords.endX)
+                        : lessThan0Selected(item.left.value, left2, coords.startX, coords.endX)
+                )
+            );
+        };
+
         items.forEach(item => {
-            const mustSelect = selectItem(item, coords);
-            if (item.isSelected && !item.isSelected?.value !== mustSelect) {
-                selectItemById(item.id.value, false);
+            const mustSelect = selectItemByCoords(item, coords);
+
+            if (item.isSelected && item.isSelected.value !== mustSelect) {
+                set(item.isSelected, mustSelect);
             }
         });
-    }, [items, selectItem, selectItemById]);
+    }, [items]);
 
     const handleSelecteAllFlowItems = useCallback(() => {
         items.forEach(item => {
-            if (item.isSelected && !item.isSelected?.value) {
+            if (item.isSelected && !item.isSelected.value) {
                 set(item.isSelected, true);
             }
         });
     }, [items]);
 
     const handleDelete = useCallback(() => {
-        if (items.some(item => item.isSelected?.value)) {
-            setItems(items.filter(item => !item.isSelected?.value));
+        if (items.some(item => item.isSelected.value)) {
+            setItems(items.filter(item => !item.isSelected.value));
         }
     }, [items, setItems]);
 
     const handleArrowKeyDown = useCallback((direction: "ArrowUp" | "ArrowDown" | "ArrowLeft" | "ArrowRight") => {
         items.forEach(item => {
-            if (item.isSelected?.value) {
+            if (item.isSelected.value) {
                 switch (direction) {
                     case 'ArrowDown':
                         set(item.top, item.top.value + 15);
                         break;
                     case 'ArrowUp':
-                        set(item.top, item.top.value - 15);
+                        if ((item.top.value - 15) > 0) {
+                            set(item.top, item.top.value - 15);
+                        }
                         break;
                     case 'ArrowLeft':
-                        set(item.left, item.left.value - 15);
+                        if ((item.left.value - 15) > 0) {
+                            set(item.left, item.left.value - 15);
+                        }
                         break;
                     case 'ArrowRight':
                         set(item.left, item.left.value + 15);
@@ -150,6 +156,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
             isSelected: observe(true),
             description: observe(""),
             hasError: observe(false),
+            connections: observe([]),
         };
 
         // Are your dropping in a line
@@ -264,16 +271,18 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     onKeyDownCtrlA={handleSelecteAllFlowItems}
                     onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                 >
-                    {/* {lines.map(({ id, originId, targetId }, index) => <Line
-                        id={id}
-                        key={index}
-                        originId={originId}
-                        targetId={targetId}
-                        parentRef={boardRef}
-                        onDropItem={handleDroptem}
-                        onContextMenu={onContextMenu}
-                        allowedsInDrop={typesAllowedToDrop}
-                    />)} */}
+                    {lines.map(({ id, originId, targetId }, index) => (
+                        <Line
+                            id={id}
+                            key={index}
+                            parentRef={boardRef}
+                            originIdStore={originId}
+                            targetIdStore={targetId}
+                            onDropItem={handleDroptem}
+                            onContextMenu={onContextMenu}
+                            allowedsInDrop={typesAllowedToDrop}
+                        />
+                    ))}
                     {items.map((item, index) => (
                         <FlowItem
                             item={item}
