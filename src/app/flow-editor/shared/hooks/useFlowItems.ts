@@ -64,12 +64,10 @@ export const useDragAllElements = () => (targetId: string | undefined, top: numb
 };
 
 // Se undefined desmarca todos
-export const useSelectItemById = () => (id: string | undefined, keepSelecteds: boolean) => {
-
-    // Get all selecteds items
+export const useSelectItemById = () => (id: string | undefined, isPressedCtrlKey: boolean) => {
     const items = FlowItemsState.value;
 
-    if (keepSelecteds) {
+    if (isPressedCtrlKey) {
         items.forEach(item => {
             if (item.id.value === id) {
                 set(item.isSelected, !item.isSelected.value);
@@ -82,22 +80,46 @@ export const useSelectItemById = () => (id: string | undefined, keepSelecteds: b
             }
         });
     } else {
-        // Serve para o caso de você clicar em um item que que já está selecionado, deve ser mantida a seleção de todos
-        const keepMULTselect = items.filter(item => item.isSelected.value).some(item => item.id.value === id);
 
-        if (!keepMULTselect) {
+        // Serve para o caso de você clicar em um item que que já está selecionado, deve ser mantida a seleção de todos
+        const keepSelection = items.some(item => (
+            (item.isSelected.value && item.id.value === id) ||
+            (item.connections.value.some(conn => conn.isSelected.value && conn.id.value === id))
+        ));
+
+        if (!keepSelection) {
             items.forEach(item => {
-                if (item.id.value === id) {
-                    set(item.isSelected, true);
-                    item.connections.value.forEach(connection => set(connection.isSelected, false));
-                } else {
-                    item.connections.value.forEach(connection => set(connection.isSelected, connection.id.value === id));
-                    set(item.isSelected, false);
-                }
+                set(item.isSelected, item.id.value === id);
+                item.connections.value.forEach(conn => set(conn.isSelected, conn.id.value === id));
             });
         }
     }
 };
+
+export const useDeleteSelecteds = () => () => {
+    const items = FlowItemsState.value;
+    const itemsSelecteds = FlowItemsState.value.filter(item => item.isSelected.value);
+
+    if (items.some(item => item.isSelected.value)) {
+
+        items.forEach(item => {
+            set(item.connections, oldConns => ([
+                ...oldConns.filter(oldConn => !itemsSelecteds.some(selectedItem => selectedItem.id.value === oldConn.targetId.value))
+            ]));
+        });
+
+        set(FlowItemsState, [
+            ...items.filter(item => !item.isSelected.value)
+        ]);
+
+    }
+
+    items.forEach(item => {
+        if (item.connections.value.some(conn => conn.isSelected.value)) {
+            set(item.connections, oldConns => oldConns.filter(oldConn => !oldConn.isSelected.value));
+        }
+    });
+}
 
 export const useCreateOrUpdateConnection = () => (
     /**
@@ -123,21 +145,21 @@ export const useCreateOrUpdateConnection = () => (
      */
 
     // Validate that you are connecting to yourself
-    if (originItemId === targetItemId) return false;
+    if (originItemId === targetItemId) return;
 
     // Find all items from the board
     const items = FlowItemsState.value;
 
     /** Validates that the target item does exists */
-    if (!items.some(item => item.id.value === targetItemId)) return false;
+    if (!items.some(item => item.id.value === targetItemId)) return;
 
     // Validates that the source item is already connected
-    if (items.some(item => item.id.value === originItemId && (item.connections.value || []).some(connection => connection.targetId.value === targetItemId))) return false;
+    if (items.some(item => item.id.value === originItemId && (item.connections.value || []).some(connection => connection.targetId.value === targetItemId))) return;
 
     // Validates whether you are creating a new connection or just editing an existing one
     if (connectionId) {
         const originItem = FlowItemsState.value.find(item => item.id.value === originItemId);
-        if (!originItem) return false;
+        if (!originItem) return;
 
         originItem.connections.value.forEach(connection => {
             if (connection.id.value === connectionId) {
@@ -148,7 +170,7 @@ export const useCreateOrUpdateConnection = () => (
         set(originItem.connections, originItem.connections.value);
     } else {
         const originItem = FlowItemsState.value.find(item => item.id.value === originItemId);
-        if (!originItem) return false;
+        if (!originItem) return;
 
         set<IConnection[]>(originItem.connections, [
             ...originItem.connections.value,
@@ -162,9 +184,6 @@ export const useCreateOrUpdateConnection = () => (
             }
         ]);
     }
-
-    // If has changed connection or create
-    return true;
 };
 
 export const useSizeByText = () => (text: string) => {

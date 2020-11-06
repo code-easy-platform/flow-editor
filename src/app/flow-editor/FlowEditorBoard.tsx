@@ -3,13 +3,12 @@ import { observe, set, useObserver } from "react-observing";
 import { DropTargetMonitor } from 'react-dnd';
 import { Utils } from 'code-easy-components';
 
-import { ICoords, IFlowItem, IDroppableItem, IFlowEditorBoardProps } from './shared/interfaces';
-import { EmptyFeedback, FlowItem, SelectorArea, EditorPanel } from './components';
+import { ICoords, IFlowItem, IDroppableItem, IFlowEditorBoardProps, IConnection } from './shared/interfaces';
+import { EmptyFeedback, FlowItem, SelectorArea, EditorPanel, Toolbar } from './components';
 import BreandCrumbs from './components/breadcrumbs/BreandCrumbs';
-import { useConfigs, useLines, useSelectItemById } from './shared/hooks';
-import Toolbar from './components/tool-bar/ToolBar';
+import { useConfigs, useDeleteSelecteds, useSelectItemById } from './shared/hooks';
+import { Lines } from './components/flow-item/line/Lines';
 import { FlowItemsState } from './shared/stores';
-import { Line } from './components/flow-item/line/Line';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const {
@@ -23,14 +22,12 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [], toolItems = [] } = props;
     const { onMouseEnter, onMouseLeave, onContextMenu, onDropItem, onFocus } = props;
     const { onAnyKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV } = props;
-
     const [items, setItems] = useObserver(FlowItemsState);
-    const selectItemById = useSelectItemById();
-    const lines = useLines(/* items */);
-
+    const deleteSelectedItems = useDeleteSelecteds();
     const boardRef = useRef<SVGSVGElement>(null);
+    const selectItemById = useSelectItemById();
 
-    const setSelectedFlowItem = useCallback((coords: ICoords) => {
+    const handleOnCoordsChange = useCallback((coords: ICoords) => {
 
         const selectItemByCoords = (item: IFlowItem, coords: ICoords): boolean => {
             const top2 = item.top.value + (item.height.value || 0);
@@ -85,17 +82,14 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
 
     const handleSelecteAllFlowItems = useCallback(() => {
         items.forEach(item => {
+            item.connections.value.forEach(conn => {
+                set(conn.isSelected, true)
+            });
             if (item.isSelected && !item.isSelected.value) {
                 set(item.isSelected, true);
             }
         });
     }, [items]);
-
-    const handleDelete = useCallback(() => {
-        if (items.some(item => item.isSelected.value)) {
-            setItems(items.filter(item => !item.isSelected.value));
-        }
-    }, [items, setItems]);
 
     const handleArrowKeyDown = useCallback((direction: "ArrowUp" | "ArrowDown" | "ArrowLeft" | "ArrowRight") => {
         items.forEach(item => {
@@ -122,19 +116,14 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         });
     }, [items]);
 
-    /** Essa função é executada sempre um item(aceito como item soltável) é sortado no painel */
     const handleDroptem = useCallback((item: IDroppableItem, monitor: DropTargetMonitor, connectionTargetId?: string | undefined) => {
 
         const target = boardRef.current;
         const draggedOffSet = monitor.getClientOffset();
         if (!target || !draggedOffSet) return;
 
-        // Deselect all items selecteds
-        items.forEach(item => {
-            if (item.isSelected && item.isSelected.value) {
-                set(item.isSelected, false);
-            }
-        });
+        // Deselect all selecteds items
+        items.forEach(item => set(item.isSelected, false));
 
         const targetSize = target.getBoundingClientRect();
         const targetOffsetY = (draggedOffSet.y + (targetSize.top - targetSize.top - targetSize.top) - 25);
@@ -160,34 +149,48 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         };
 
         // Are your dropping in a line
-        /* if (connectionTargetId) {
-            const lineTarget = (await snapshot.getPromise(FlowLinesStore)).find(line => line.id === connectionTargetId);
+        if (connectionTargetId) {
 
+            const itemTarget = items.find(item => item.connections.value.some(conn => conn.id.value === connectionTargetId));
+            if (!itemTarget) return;
+
+            const lineTarget = itemTarget?.connections.value.find(line => line.id.value === connectionTargetId);
             if (!lineTarget?.originId) return;
 
             // New connection to be used
-            const newConnection = {
-                id: Utils.getUUID(),
-                originId: String(newItem.id),
-                targetId: String(lineTarget.targetId),
+            const newConnection: IConnection = {
+                isSelected: observe(false),
+                connectionLabel: observe(''),
+                id: observe(Utils.getUUID()),
+                targetId: lineTarget.targetId,
+                connectionDescription: observe(''),
+                originId: observe(String(newItem.id.value)),
             };
 
-            // Update lines and added the new line
-            set(FlowLinesStore, oldLines => {
-                return [
-                    newConnection,
-                    ...oldLines.map(line => {
-                        if (line.id !== lineTarget.id) return line;
+            // added the new line
+            set<IConnection[]>(itemTarget.connections, [
+                ...itemTarget.connections.value.map(line => {
+                    if (line.id.value === lineTarget.id.value) {
                         return {
-                            ...line,
-                            targetId: String(newItem.id)
+                            ...lineTarget,
+                            targetId: observe(String(newItem.id.value)),
                         };
-                    })
-                ]
-            });
+                    } else {
+                        return line;
+                    }
+                }),
+                newConnection,
+            ]);
+
+            // Update lines
+            /* itemTarget.connections.value.forEach(line => {
+                if (line.id.value !== lineTarget.id.value) return line;
+                set(line.targetId, String(newItem.id.value))
+            }); */
+
 
             // Updates the source item that was previously linked to the new item as a destination
-            set(FlowItemStore(lineTarget.originId), oldItemState => {
+            /* set(FlowItemStore(lineTarget.originId), oldItemState => {
                 return {
                     ...oldItemState,
                     connections: [
@@ -200,19 +203,14 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                         })
                     ]
                 }
-            });
+            }); */
 
             // Add first connection
             newItem = {
                 ...newItem,
-                connections: [
-                    {
-                        ...newConnection,
-                        isSelected: false,
-                    }
-                ]
+                connections: observe([newConnection])
             };
-        } */
+        }
 
         /** Wait for the return to insert the item, if you receive undefined just insert, if different from undefined insert the result of the event if there is something */
         const onDropRes = onDropItem ? onDropItem(item.itemProps.id, String(newItem.id), newItem) : undefined;
@@ -232,7 +230,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     }, [items, onDropItem, setItems]);
 
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex' }} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+        <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ width: '100%', height: '100%', display: 'flex' }}>
             <Toolbar
                 items={toolItems}
                 itemWidth={toolbarItemWidth}
@@ -240,7 +238,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                 borderColor={toolbarBorderColor}
                 backgroundColor={toolbarBackgroundColor}
             />
-            <main key={id} style={{ flex: 1, overflow: 'auto' }}>
+            <main style={{ flex: 1, overflow: 'auto' }}>
                 <BreandCrumbs
                     backgroundColor={breadcrumbBackgroundColor}
                     borderColor={breadcrumbBorderColor}
@@ -259,7 +257,6 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     useElevation={useElevation}
                     onAnyKeyDown={onAnyKeyDown}
                     onContextMenu={onContextMenu}
-                    onKeyDownDelete={handleDelete}
                     onKeyDownCtrlC={onKeyDownCtrlC}
                     onKeyDownCtrlD={onKeyDownCtrlD}
                     onKeyDownCtrlV={onKeyDownCtrlV}
@@ -268,21 +265,15 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     backgroundColor={backgroundColor}
                     allowedsInDrop={typesAllowedToDrop}
                     onArrowKeyDown={handleArrowKeyDown}
+                    onKeyDownDelete={deleteSelectedItems}
                     onKeyDownCtrlA={handleSelecteAllFlowItems}
                     onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                 >
-                    {lines.map(({ id, originId, targetId }, index) => (
-                        <Line
-                            id={id}
-                            key={index}
-                            parentRef={boardRef}
-                            originIdStore={originId}
-                            targetIdStore={targetId}
-                            onDropItem={handleDroptem}
-                            onContextMenu={onContextMenu}
-                            allowedsInDrop={typesAllowedToDrop}
-                        />
-                    ))}
+                    <Lines
+                        parentRef={boardRef}
+                        onDropItem={handleDroptem}
+                        onContextMenu={onContextMenu}
+                    />
                     {items.map((item, index) => (
                         <FlowItem
                             item={item}
@@ -296,10 +287,13 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                         borderType={selectionBorderType}
                         borderWidth={selectionBorderWidth}
                         borderColor={selectionBorderColor}
-                        onCoordsChange={setSelectedFlowItem}
+                        onCoordsChange={handleOnCoordsChange}
                         backgroundColor={selectionBackgroundColor}
                     />
-                    <EmptyFeedback show={items.length === 0} children={childrenWhenItemsEmpty} />
+                    <EmptyFeedback
+                        show={items.length === 0}
+                        children={childrenWhenItemsEmpty}
+                    />
                 </EditorPanel>
             </main>
         </div>

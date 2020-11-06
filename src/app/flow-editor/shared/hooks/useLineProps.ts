@@ -1,9 +1,12 @@
 import { observe, useObserverValue } from "react-observing";
-import { EFlowItemType } from "../enums";
 import { FlowItemsState } from "../stores";
+import { EFlowItemType } from "../enums";
 
 export const useLineProps = (id: string | undefined, originId: string, targetId: string) => {
-    const originItem = FlowItemsState.value.find(item => item.id.value === originId);
+    const items = useObserverValue(FlowItemsState);
+
+
+    const originItem = items.find(item => item.id.value === originId);
 
     // Find the origin component props
     const flowItemType = useObserverValue(originItem?.flowItemType || observe(EFlowItemType.acorn));
@@ -21,7 +24,7 @@ export const useLineProps = (id: string | undefined, originId: string, targetId:
     const isSelected = useObserverValue(connection?.isSelected || observe(false));
 
 
-    const targetItem = FlowItemsState.value.find(item => item.id.value === targetId);
+    const targetItem = items.find(item => item.id.value === targetId);
 
     // Find the target component
     const targetConnections = useObserverValue(targetItem?.connections || observe([]));

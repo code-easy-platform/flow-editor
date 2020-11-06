@@ -105,7 +105,7 @@ export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, pa
         }));
     }, [left, top]);
 
-    const onMouseUp = useCallback(async (e: any) => {
+    const onMouseUp = useCallback((e: any) => {
         e.stopPropagation();
 
         document.body.style.pointerEvents = 'unset';
@@ -113,13 +113,13 @@ export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, pa
             parentRef.current.style.pointerEvents = 'auto';
         }
 
-        const hasChange = createOrUpdateConnection(id, String(originId), e.target.id);
+        createOrUpdateConnection(id, String(originId), e.target.id);
 
         window.onmouseup = null;
         window.onmousemove = null;
         document.body.style.cursor = 'unset';
 
-        if (!hasChange || !!newConnectionBoxRef) {
+        if (!!newConnectionBoxRef) {
             setBasicPosition({
                 isCurved,
                 top1: top,

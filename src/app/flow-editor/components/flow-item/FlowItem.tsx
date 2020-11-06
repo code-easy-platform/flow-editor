@@ -62,8 +62,6 @@ export const FlowItem: React.FC<FlowProps> = ({ item: flowItem, parentRef, onCon
 
         // Select the item and emit OnChange event
         selectItemById(flowItem.id.value, e.ctrlKey);
-        /* if (!flowItem.isSelected.value) {
-        } */
 
         window.onmousemove = handleMouseMove;
         window.onmouseup = handleMouseUp;
