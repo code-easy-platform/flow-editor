@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { set, useObserverValue, observe } from "react-observing";
+import { set, useObserverValue, observe, ISubscription } from "react-observing";
 import { Utils } from "code-easy-components";
 
 import { IConnection } from "../interfaces";
@@ -124,8 +124,8 @@ export const useDeleteSelecteds = () => () => {
 export const useCreateOrUpdateConnection = () => (
     /**
      * Id on the line being changed.
-     * 
-     * If creating a new line, this property will be empty 
+     *
+     * If creating a new line, this property will be empty
      */
     connectionId: string | undefined,
     /**
@@ -141,7 +141,7 @@ export const useCreateOrUpdateConnection = () => (
     /**
      *
      * If the "connectionId" is undefined it means that a new connection is being created
-     * 
+     *
      */
 
     // Validate that you are connecting to yourself
@@ -215,23 +215,36 @@ export const useBoardSize = () => {
     const items = useObserverValue(FlowItemsState);
 
     useEffect(() => {
-        const subscriptions: any[] = [];
+        const subscriptions: ISubscription[] = [];
 
-        items.forEach(item => {
-            subscriptions.push(item.top.subscribe(top => {
-                if (!items.some(item => item.top.value > (top + 300))) {
-                    setCoords(_coords => ({ ..._coords, height: top + 300 }));
-                }
-            }));
-            subscriptions.push(item.left.subscribe(left => {
-                if (!items.some(item => item.left.value > (left + 200))) {
-                    setCoords(_coords => ({ ..._coords, width: left + 200 }));
-                }
-            }));
+        items.forEach((item, _, arrayItems) => {
+            subscriptions.push(
+                item.top.subscribe(top => {
+                    setCoords(_coords => {
+                        if (!arrayItems.some(item => item.top.value > top)) {
+                            return { ..._coords, height: top + 300 };
+                        } else {
+                            return _coords;
+                        }
+                    });
+                })
+            );
+
+            subscriptions.push(
+                item.left.subscribe(left => {
+                    setCoords(_coords => {
+                        if (!arrayItems.some(item => item.left.value > left)) {
+                            return { ..._coords, width: left + 300 };
+                        } else {
+                            return _coords;
+                        }
+                    });
+                })
+            );
         });
 
         return () => subscriptions.forEach(subscrition => subscrition.unsubscribe());
-    }, [coords, items]);
+    }, [items]);
 
     return coords;
 };
