@@ -1,4 +1,4 @@
-import React, { memo, useRef } from 'react';
+import React, { memo, useCallback, useRef } from 'react';
 import { IObservable, observe } from 'react-observing';
 
 import { Line } from './Line';
@@ -18,20 +18,19 @@ interface INewConnectionBoxProps {
 }
 /** Allow create a new connection */
 const NewConnectionBox: React.FC<INewConnectionBoxProps> = ({ originIdStore, parentRef, left = 0, top = 0, height = 0, width = 0, isRounded = false, lineWidth = 1, cursor = 'crosshair', onMouseDown, onContextMenu }) => {
-
     const ref = useRef<SVGRectElement | null>(null);
 
-    const handleOnContextMenu = (e: React.MouseEvent<SVGRectElement, MouseEvent>) => {
+    const handleOnContextMenu = useCallback((e: React.MouseEvent<SVGRectElement, MouseEvent>) => {
         e.stopPropagation();
         e.preventDefault();
         onContextMenu && onContextMenu(e);
-    }
+    }, [onContextMenu]);
 
-    const handleOnMouseDown = (e: React.MouseEvent<SVGRectElement, MouseEvent>) => {
+    const handleOnMouseDown = useCallback((e: React.MouseEvent<SVGRectElement, MouseEvent>) => {
         e.stopPropagation();
         e.preventDefault();
         onMouseDown && onMouseDown(e);
-    }
+    }, [onMouseDown]);
 
     return (
         <>

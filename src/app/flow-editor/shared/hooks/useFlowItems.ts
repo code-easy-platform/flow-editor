@@ -101,7 +101,7 @@ export const useDeleteSelecteds = () => () => {
     const itemsSelecteds = FlowItemsState.value.filter(item => item.isSelected.value);
 
     items.forEach(item => {
-        
+
         // Remove all selecteds lines
         if (item.connections.value.some(conn => conn.isSelected.value)) {
             set(item.connections, oldConns => oldConns.filter(oldConn => !oldConn.isSelected.value));
@@ -136,7 +136,7 @@ export const useCreateOrUpdateConnection = () => (
      * Line target item identifier
      */
     targetItemId: string
-) => {
+): boolean => {
 
     /**
      *
@@ -145,21 +145,21 @@ export const useCreateOrUpdateConnection = () => (
      */
 
     // Validate that you are connecting to yourself
-    if (originItemId === targetItemId) return;
+    if (originItemId === targetItemId) return false;
 
     // Find all items from the board
     const items = FlowItemsState.value;
 
     /** Validates that the target item does exists */
-    if (!items.some(item => item.id.value === targetItemId)) return;
+    if (!items.some(item => item.id.value === targetItemId)) return false;
 
     // Validates that the source item is already connected
-    if (items.some(item => item.id.value === originItemId && (item.connections.value || []).some(connection => connection.targetId.value === targetItemId))) return;
+    if (items.some(item => item.id.value === originItemId && (item.connections.value || []).some(connection => connection.targetId.value === targetItemId))) return false;
 
     // Validates whether you are creating a new connection or just editing an existing one
     if (connectionId) {
         const originItem = FlowItemsState.value.find(item => item.id.value === originItemId);
-        if (!originItem) return;
+        if (!originItem) return false;
 
         originItem.connections.value.forEach(connection => {
             if (connection.id.value === connectionId) {
@@ -170,7 +170,7 @@ export const useCreateOrUpdateConnection = () => (
         set(originItem.connections, originItem.connections.value);
     } else {
         const originItem = FlowItemsState.value.find(item => item.id.value === originItemId);
-        if (!originItem) return;
+        if (!originItem) return false;
 
         set<IConnection[]>(originItem.connections, [
             ...originItem.connections.value,
@@ -184,6 +184,9 @@ export const useCreateOrUpdateConnection = () => (
             }
         ]);
     }
+
+    // If has changed connection or create
+    return true;
 };
 
 export const useSizeByText = () => (text: string) => {

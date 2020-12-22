@@ -113,13 +113,13 @@ export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, pa
             parentRef.current.style.pointerEvents = 'auto';
         }
 
-        createOrUpdateConnection(id, String(originId), e.target.id);
+        const hasChange = createOrUpdateConnection(id, String(originId), e.target.id);
 
         window.onmouseup = null;
         window.onmousemove = null;
         document.body.style.cursor = 'unset';
 
-        if (!!newConnectionBoxRef) {
+        if (!hasChange || !!newConnectionBoxRef) {
             setBasicPosition({
                 isCurved,
                 top1: top,
