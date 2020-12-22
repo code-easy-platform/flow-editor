@@ -135,11 +135,11 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
             left: observe(Math.round(targetOffsetX / 15) * 15),
             top: observe(Math.round(targetOffsetY / 15) * 15),
             label: observe(item.itemProps.label || ""),
-            id: observe(Utils.getUUID().toString()),
             height: observe(item.itemProps.height),
             width: observe(item.itemProps.width),
             isEnabledNewConnetion: observe(true),
             icon: observe(item.itemProps.icon),
+            id: observe(Utils.getUUID()),
             hasWarning: observe(false),
             isDisabled: observe(false),
             isSelected: observe(true),
@@ -151,9 +151,11 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         // Are your dropping in a line
         if (connectionTargetId) {
 
+            // Finds the item that owns the target connection
             const itemTarget = items.find(item => item.connections.value.some(conn => conn.id.value === connectionTargetId));
             if (!itemTarget) return;
 
+            // Finds the line target
             const lineTarget = itemTarget?.connections.value.find(line => line.id.value === connectionTargetId);
             if (!lineTarget?.originId) return;
 
@@ -162,48 +164,13 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                 isSelected: observe(false),
                 connectionLabel: observe(''),
                 id: observe(Utils.getUUID()),
-                targetId: lineTarget.targetId,
                 connectionDescription: observe(''),
                 originId: observe(String(newItem.id.value)),
+                targetId: observe(lineTarget.targetId.value),
             };
 
-            // added the new line
-            set<IConnection[]>(itemTarget.connections, [
-                ...itemTarget.connections.value.map(line => {
-                    if (line.id.value === lineTarget.id.value) {
-                        return {
-                            ...lineTarget,
-                            targetId: observe(String(newItem.id.value)),
-                        };
-                    } else {
-                        return line;
-                    }
-                }),
-                newConnection,
-            ]);
-
-            // Update lines
-            /* itemTarget.connections.value.forEach(line => {
-                if (line.id.value !== lineTarget.id.value) return line;
-                set(line.targetId, String(newItem.id.value))
-            }); */
-
-
-            // Updates the source item that was previously linked to the new item as a destination
-            /* set(FlowItemStore(lineTarget.originId), oldItemState => {
-                return {
-                    ...oldItemState,
-                    connections: [
-                        ...(oldItemState.connections || []).map(connection => {
-                            if (connection.id !== lineTarget.id) return connection;
-                            return {
-                                ...connection,
-                                targetId: String(newItem.id)
-                            };
-                        })
-                    ]
-                }
-            }); */
+            // Updated target id from lineTarget
+            set(lineTarget.targetId, newItem.id.value);
 
             // Add first connection
             newItem = {
