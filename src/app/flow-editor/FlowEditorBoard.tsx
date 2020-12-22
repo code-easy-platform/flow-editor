@@ -129,7 +129,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         const targetOffsetY = (draggedOffSet.y + (targetSize.top - targetSize.top - targetSize.top) - 25);
         const targetOffsetX = (draggedOffSet.x + (targetSize.left - targetSize.left - targetSize.left) - 25);
 
-        let newItem: IFlowItem = {
+        const newItem: IFlowItem = {
             itemType: item.itemProps.itemType ? observe(item.itemProps.itemType) : undefined,
             flowItemType: observe(item.itemProps.flowItemType),
             left: observe(Math.round(targetOffsetX / 15) * 15),
@@ -173,10 +173,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
             set(lineTarget.targetId, newItem.id.value);
 
             // Add first connection
-            newItem = {
-                ...newItem,
-                connections: observe([newConnection])
-            };
+            set(newItem.connections, [newConnection]);
         }
 
         /** Wait for the return to insert the item, if you receive undefined just insert, if different from undefined insert the result of the event if there is something */
