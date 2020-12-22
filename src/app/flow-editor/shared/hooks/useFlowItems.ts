@@ -100,25 +100,25 @@ export const useDeleteSelecteds = () => () => {
     const items = FlowItemsState.value;
     const itemsSelecteds = FlowItemsState.value.filter(item => item.isSelected.value);
 
-    if (items.some(item => item.isSelected.value)) {
-
-        items.forEach(item => {
-            set(item.connections, oldConns => ([
-                ...oldConns.filter(oldConn => !itemsSelecteds.some(selectedItem => selectedItem.id.value === oldConn.targetId.value))
-            ]));
-        });
-
-        set(FlowItemsState, [
-            ...items.filter(item => !item.isSelected.value)
-        ]);
-
-    }
-
     items.forEach(item => {
+        
+        // Remove all selecteds lines
         if (item.connections.value.some(conn => conn.isSelected.value)) {
             set(item.connections, oldConns => oldConns.filter(oldConn => !oldConn.isSelected.value));
         }
+
+        // Remove all connections connected with removed item
+        set(item.connections, oldConns => ([
+            ...oldConns.filter(oldConn => !itemsSelecteds.some(selectedItem => selectedItem.id.value === oldConn.targetId.value))
+        ]));
     });
+
+    // Remove all selecteds items
+    if (items.some(item => item.isSelected.value)) {
+        set(FlowItemsState, [
+            ...items.filter(item => !item.isSelected.value)
+        ]);
+    }
 }
 
 export const useCreateOrUpdateConnection = () => (

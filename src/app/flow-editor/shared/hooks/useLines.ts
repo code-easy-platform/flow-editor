@@ -10,14 +10,31 @@ export const useLines = () => {
     const [lines, setLines] = useState<IConnection[]>([]);
     useEffect(() => {
         const conns: IConnection[] = [];
+        const subscriptions: ISubscription[] = [];
 
         items.forEach(item => {
             item.connections.value.forEach(connection => {
                 conns.push(connection);
             });
+
+            subscriptions.push(item.connections.subscribe(() => {
+                setLines(oldLines => {
+                    oldLines = [];
+
+                    items.forEach(_item => {
+                        _item.connections.value.forEach(connection => {
+                            oldLines.push(connection);
+                        });
+                    });
+
+                    return oldLines;
+                });
+            }));
         });
 
-        setLines(conns)
+        setLines(conns);
+
+        return () => subscriptions.forEach(subs => subs?.unsubscribe())
     }, [items]);
 
     useEffect(() => {
