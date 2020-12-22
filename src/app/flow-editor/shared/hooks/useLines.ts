@@ -41,32 +41,34 @@ export const useLines = () => {
         const subscriptions: ISubscription[] = [];
 
         items.forEach(item => {
-            subscriptions.push(item.connections.subscribe(connections => {
-                connections.forEach(connection => {
-                    if (lines.some(line => line.id.value === connection.id.value)) {
-                        setLines([
-                            ...lines.map(conn => {
-                                if (conn.id.value === connection.id.value) {
-                                    return {
-                                        ...conn,
-                                        targetId: connection.targetId
-                                    };
-                                } else {
-                                    return conn;
-                                }
-                            })
-                        ]);
-                    } else {
-                        setLines([
-                            ...lines,
-                            connection,
-                        ]);
-                    }
-                });
-            }));
+            subscriptions.push(
+                item.connections.subscribe(connections => {
+                    connections.forEach(connection => {
+                        setLines(oldLines => {
+                            if (oldLines.some(line => line.id.value === connection.id.value)) {
+                                return [
+                                    ...oldLines.map(line => {
+                                        if (line.id.value === connection.id.value) {
+                                            return connection;
+                                        } else {
+                                            return line;
+                                        }
+                                    })
+                                ];
+                            } else {
+                                return [
+                                    ...oldLines,
+                                    connection
+                                ];
+                            }
+                        });
+                    });
+                })
+            );
         });
+
         return () => subscriptions.forEach(subscription => subscription.unsubscribe());
-    }, [items, lines]);
+    }, [items]);
 
     return lines.map(line => ({
         id: line.id.value,
