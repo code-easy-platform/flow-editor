@@ -9,12 +9,13 @@ interface ToolbarProps {
     borderColor?: string;
     items: IFlowItem[];
     itemWidth?: number;
+    onFocus?(): void;
     isShow: boolean;
 }
-export const Toolbar: React.FC<ToolbarProps> = ({ items, isShow, itemWidth, backgroundColor, borderColor }) => {
+export const Toolbar: React.FC<ToolbarProps> = ({ items, isShow, itemWidth, backgroundColor, borderColor, onFocus }) => {
     return (
         (items.length > 0) && isShow
-            ? <div className="toolbar" style={{ backgroundColor, borderColor }}>
+            ? <div className="toolbar" onFocus={onFocus} tabIndex={-1} style={{ backgroundColor, borderColor }}>
                 {items.map((item: IFlowItem, index) => {
                     return <ListItemDraggable
                         flowItemType={item.flowItemType.value}

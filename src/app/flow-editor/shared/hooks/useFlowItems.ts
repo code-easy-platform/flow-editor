@@ -115,10 +115,16 @@ export const useDeleteSelecteds = () => () => {
 
     // Remove all selecteds items
     if (items.some(item => item.isSelected.value)) {
+        const newListItems = items.filter(item => !item.isSelected.value);
+
         set(FlowItemsState, [
-            ...items.filter(item => !item.isSelected.value)
+            ...newListItems
         ]);
+
+        return newListItems;
     }
+
+    return items;
 }
 
 export const useCreateOrUpdateConnection = () => (

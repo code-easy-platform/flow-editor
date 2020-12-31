@@ -20,7 +20,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         selectionBackgroundColor, selectionBorderColor, useElevation,
     } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [], toolItems = [] } = props;
-    const { onMouseEnter, onMouseLeave, onContextMenu, onDropItem, onFocus } = props;
+    const { onMouseEnter, onMouseLeave, onContextMenu, onDropItem, onFocus, onChangeItems } = props;
     const { onAnyKeyDown, onKeyDownCtrlC, onKeyDownCtrlD, onKeyDownCtrlV } = props;
     const [items, setItems] = useObserver(FlowItemsState);
     const deleteSelectedItems = useDeleteSelecteds();
@@ -177,21 +177,35 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
         }
 
         /** Wait for the return to insert the item, if you receive undefined just insert, if different from undefined insert the result of the event if there is something */
-        const onDropRes = onDropItem ? onDropItem(item.itemProps.id, String(newItem.id), newItem) : undefined;
-        if (!onDropRes) {
+        const onDropRes = onDropItem ? onDropItem(item.itemProps.id, String(newItem.id.value), newItem) : undefined;
 
-            // Add a new item in array state
-            setItems(oldItems => ([...oldItems, newItem]));
+        let newListItems: IFlowItem[] = [];
+        // Add a new item in array state
+        setItems(oldItems => {
+            newListItems = [...oldItems, !onDropRes ? newItem : onDropRes];
+            return newListItems;
+        });
 
-        } else if (onDropRes) {
-
-            // Add a new item in array state
-            setItems(oldItems => ([...oldItems, onDropRes]));
-
-        }
-
+        // Add focus to board
         target.focus();
-    }, [items, onDropItem, setItems]);
+
+        // Emit changes
+        onChangeItems && onChangeItems(newListItems);
+    }, [items, onChangeItems, onDropItem, setItems]);
+
+    const handleDelete = useCallback(() => {
+
+        // Delete items
+        const newListItems = deleteSelectedItems();
+
+        // Emit changes
+        onChangeItems && onChangeItems(newListItems);
+    }, [deleteSelectedItems, onChangeItems]);
+
+    const handleKeyDownCtrlD = useCallback((e: React.KeyboardEvent<SVGSVGElement>) => {
+        e.preventDefault();
+        onKeyDownCtrlD && onKeyDownCtrlD(e);
+    }, [onKeyDownCtrlD]);
 
     return (
         <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} style={{ width: '100%', height: '100%', display: 'flex' }}>
@@ -201,6 +215,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                 isShow={Boolean(showToolbar)}
                 borderColor={toolbarBorderColor}
                 backgroundColor={toolbarBackgroundColor}
+                onFocus={() => boardRef.current?.focus()}
             />
             <main style={{ flex: 1, overflow: 'auto' }}>
                 <BreandCrumbs
@@ -221,15 +236,15 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     useElevation={useElevation}
                     onAnyKeyDown={onAnyKeyDown}
                     onContextMenu={onContextMenu}
+                    onKeyDownDelete={handleDelete}
                     onKeyDownCtrlC={onKeyDownCtrlC}
-                    onKeyDownCtrlD={onKeyDownCtrlD}
                     onKeyDownCtrlV={onKeyDownCtrlV}
                     elevationColor={elevationColor}
                     backgroundType={backgroundType}
                     backgroundColor={backgroundColor}
+                    onKeyDownCtrlD={handleKeyDownCtrlD}
                     allowedsInDrop={typesAllowedToDrop}
                     onArrowKeyDown={handleArrowKeyDown}
-                    onKeyDownDelete={deleteSelectedItems}
                     onKeyDownCtrlA={handleSelecteAllFlowItems}
                     onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                 >

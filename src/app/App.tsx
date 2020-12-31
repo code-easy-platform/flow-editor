@@ -1,16 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { ItemsLogical, ToolItems, AllowedsInDrop } from './Mock';
-import { FlowEditor,  } from './flow-editor';
+import { ItemsLogical, ToolItems, AllowedsInDrop, BreadCrumps } from './Mock';
+import { FlowEditor, IBreadCrumbButton, IFlowItem } from './flow-editor';
 import './App.css';
 
 const App: React.FC = () => {
+    const [breadCrumps, setBreadCrumps] = useState<IBreadCrumbButton[]>([]);
+    const [itemsLogical, setItemsLogical] = useState<IFlowItem[]>([]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setItemsLogical(ItemsLogical);
+            setBreadCrumps(BreadCrumps);
+        }, 500);
+    }, [setItemsLogical]);
+
     return (
         <div className="App">
             <FlowEditor
                 id="FlowEditor"
+                items={itemsLogical}
                 toolItems={ToolItems}
-                items={ItemsLogical.map(item => ({ ...item }))}
+                breadcrumbs={breadCrumps}
+                onChangeItems={items => {
+                    console.log(items)
+                    setItemsLogical(items);
+                }}
                 configs={{
 
                     /** FLOW ITEMS */
