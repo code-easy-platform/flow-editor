@@ -22,10 +22,7 @@ const App: React.FC = () => {
                 items={itemsLogical}
                 toolItems={ToolItems}
                 breadcrumbs={breadCrumps}
-                onChangeItems={items => {
-                    console.log(items)
-                    setItemsLogical(items);
-                }}
+                onChangeItems={setItemsLogical}
                 configs={{
 
                     /** FLOW ITEMS */
@@ -47,11 +44,11 @@ const App: React.FC = () => {
                     selectionBorderColor: 'var(--color-botton-bar)',
                     selectionBackgroundColor: '#ffffff11',
                 }}
-                childrenWhenItemsEmpty={<>
+                childrenWhenItemsEmpty={
                     <div style={{ height: '-webkit-fill-available', width: '-webkit-fill-available', justifyContent: 'center', alignItems: 'center', opacity: 0.5 }}>
                         <h1>Drag and drop something here to start</h1>
                     </div>
-                </>}
+                }
             />
         </div>
     );

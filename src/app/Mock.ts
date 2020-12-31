@@ -13,7 +13,7 @@ export const ItemsLogical: IFlowItem[] = [
     { id: observe('4'), isDisabled: observe(false), isSelected: observe(false), hasWarning: observe(false), hasError: observe(false), itemType: observe(EItemType.ACTION), isEnabledNewConnetion: observe(true), connections: observe([{ id: observe('113'), targetId: observe('5'), originId: observe('4'), isSelected: observe(false), connectionLabel: observe(undefined), connectionDescription: observe(undefined) }]), icon: observe(IconFlowAction), label: observe('Action'), description: observe('Minha descrição legal'), flowItemType: observe(EFlowItemType.acorn), left: observe(105), top: observe(550), height: observe(40), width: observe(40) },
     { id: observe('5'), isDisabled: observe(false), isSelected: observe(false), hasWarning: observe(false), hasError: observe(false), itemType: observe(EItemType.ASSIGN), isEnabledNewConnetion: observe(true), connections: observe([{ id: observe('114'), targetId: observe('4'), originId: observe('5'), isSelected: observe(false), connectionLabel: observe('Linha 05'), connectionDescription: observe('Descrição da linha 01') }]), icon: observe(IconFlowAssign), label: observe('Assign'), description: observe('Minha descrição legal'), flowItemType: observe(EFlowItemType.acorn), left: observe(105), top: observe(700), height: observe(40), width: observe(40) },
     { id: observe('6'), isDisabled: observe(false), isSelected: observe(false), hasWarning: observe(false), hasError: observe(false), itemType: observe(EItemType.COMMENT), isEnabledNewConnetion: observe(true), connections: observe([]), description: observe('Write here your comment\nWrite here your comment\nWrite here your comment'), flowItemType: observe(EFlowItemType.comment), left: observe(210), top: observe(200), height: observe(40), width: observe(40), icon: observe(IconFlowComment), label: observe("") },
-]
+];
 
 export const ToolItems: IFlowItem[] = [
     { id: observe(undefined), left: observe(0), top: observe(0), height: observe(0), width: observe(0), isDisabled: observe(false), isSelected: observe(false), hasError: observe(false), hasWarning: observe(false), label: observe(""), isEnabledNewConnetion: observe(false), connections: observe([]), flowItemType: observe(EFlowItemType.acorn), icon: observe(IconFlowStart), itemType: observe(EItemType.START), description: observe("") },
@@ -28,19 +28,19 @@ export const ToolItems: IFlowItem[] = [
 
 export const BreadCrumps: IBreadCrumbButton[] = [
     {
-        label: 'src',
-        disabled: false,
-        onClick: console.log,
+        label: observe('App'),
+        disabled: observe(false),
+        onClick: observe(console.log),
     },
     {
-        label: 'app',
-        disabled: false,
-        onClick: console.log,
+        label: observe('Routes'),
+        disabled: observe(false),
+        onClick: observe(console.log),
     },
     {
-        label: 'App.tsx',
-        disabled: false,
-        onClick: console.log,
+        label: observe('GetAll'),
+        disabled: observe(false),
+        onClick: observe(console.log),
     },
 ];
 
