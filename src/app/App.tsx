@@ -12,6 +12,8 @@ const App: React.FC = () => {
         setTimeout(() => {
             setItemsLogical(ItemsLogical);
             setBreadCrumps(BreadCrumps);
+            console.log(ItemsLogical)
+            console.log(BreadCrumps)
         }, 500);
     }, [setItemsLogical]);
 

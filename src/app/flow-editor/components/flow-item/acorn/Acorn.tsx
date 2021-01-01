@@ -29,10 +29,10 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
     const hasError = useObserverValue(item.hasError);
     const height = useObserverValue(item.height);
     const width = useObserverValue(item.width);
-    const label = useObserverValue(item.label);
     const left = useObserverValue(item.left);
     const icon = useObserverValue(item.icon);
     const top = useObserverValue(item.top);
+    const id = useObserverValue(item.id);
 
     const strokeColor: string = (() => {
         if (isSelected) return `${flowItemSelectedColor}`;
@@ -60,7 +60,7 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
             style={{ pointerEvents: (useEvents === undefined || useEvents) ? undefined : 'none' }}
         >
             {isEnabledNewConnetion && <NewConnectionBox
-                onMouseDown={e => selectItemById(item.id.value, e.ctrlKey)}
+                onMouseDown={e => selectItemById(id, e.ctrlKey)}
                 height={(height || 0) + 20}
                 width={(width || 0) + 20}
                 originIdStore={item.id}
@@ -72,18 +72,18 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
             <TextOverItem
                 left={left + ((width || 0) / 2)}
                 textColor={flowItemTextColor}
-                label={label}
+                label={item.label}
                 top={top}
             />
             <SelectionBox
                 fullDraggable={!isEnabledNewConnetion}
                 backgroundColor={backgroundColor}
                 onMouseDown={handleMouseDownMove}
-                id={String(item.id.value)}
                 strokeColor={strokeColor}
                 strokeWidth={lineWidth}
                 height={height || 0}
                 width={width || 0}
+                id={String(id)}
                 left={left}
                 top={top}
             />
