@@ -32,6 +32,8 @@ export const ItemsProvider: React.FC<ItemsProviderProps> = ({ children, items })
                     const { height, width } = getSizeByText(value || '');
                     set(item.height, height);
                     set(item.width, width);
+
+                    console.log("teste")
                 }));
             }
         });
