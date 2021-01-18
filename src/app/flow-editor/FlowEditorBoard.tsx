@@ -4,19 +4,19 @@ import { DropTargetMonitor } from 'react-dnd';
 import { Utils } from 'code-easy-components';
 
 import { ICoords, IFlowItem, IDroppableItem, IFlowEditorBoardProps, IConnection } from './shared/interfaces';
+import { EmptyFeedback, FlowItem, SelectorArea, EditorPanel, Toolbar, Rulers } from './components';
 import { useConfigs, useDeleteSelecteds, useItems, useSelectItemById } from './shared/hooks';
-import { EmptyFeedback, FlowItem, SelectorArea, EditorPanel, Toolbar } from './components';
 import BreandCrumbs from './components/breadcrumbs/BreandCrumbs';
 import { Lines } from './components/flow-item/line/Lines';
 
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const {
-        elevationColor, breadcrumbBorderColor, disableSelection,
-        dottedSize, dotColor, typesAllowedToDrop, backgroundType,
         selectionBorderWidth, backgroundColor, selectionBorderType,
         breadcrumbBackgroundColor, breadcrumbTextColor, showToolbar,
         toolbarBackgroundColor, toolbarBorderColor, toolbarItemWidth,
         selectionBackgroundColor, selectionBorderColor, useElevation,
+        dottedSize, dotColor, typesAllowedToDrop, backgroundType, linesColor,
+        elevationColor, breadcrumbBorderColor, disableSelection, rulers = [],
     } = useConfigs();
     const { id, childrenWhenItemsEmpty = "Nothing here to edit", breadcrumbs = [], toolItems = [] } = props;
     const { onMouseEnter, onMouseLeave, onContextMenu, onDropItem, onFocus, onChangeItems } = props;
@@ -24,6 +24,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const deleteSelectedItems = useDeleteSelecteds();
     const boardRef = useRef<SVGSVGElement>(null);
     const selectItemById = useSelectItemById();
+
     const itemsStore = useItems();
     const [items, setItems] = useObserver(itemsStore);
 
@@ -269,6 +270,10 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                         borderColor={selectionBorderColor}
                         onCoordsChange={handleOnCoordsChange}
                         backgroundColor={selectionBackgroundColor}
+                    />
+                    <Rulers
+                        rulers={rulers}
+                        strokeColor={linesColor}
                     />
                     <EmptyFeedback
                         show={items.length === 0}

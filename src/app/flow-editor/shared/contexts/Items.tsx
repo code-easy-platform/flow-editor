@@ -41,8 +41,6 @@ export const ItemsProvider: React.FC<ItemsProviderProps> = ({ children, items })
         return () => subscriptions.forEach(subs => subs.unsubscribe());
     }, [getSizeByText, items]);
 
-    console.log(items)
-
     return (
         <ItemsContext.Provider value={ItemsStore}>
             {children}

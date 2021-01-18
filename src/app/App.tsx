@@ -12,8 +12,6 @@ const App: React.FC = () => {
         setTimeout(() => {
             setItemsLogical(ItemsLogical);
             setBreadCrumps(BreadCrumps);
-            console.log(ItemsLogical)
-            console.log(BreadCrumps)
         }, 500);
     }, [setItemsLogical]);
 
@@ -45,6 +43,8 @@ const App: React.FC = () => {
                     /** SELECTION */
                     selectionBorderColor: 'var(--color-botton-bar)',
                     selectionBackgroundColor: '#ffffff11',
+
+                    rulers: [60, 100]
                 }}
                 childrenWhenItemsEmpty={
                     <div style={{ height: '-webkit-fill-available', width: '-webkit-fill-available', justifyContent: 'center', alignItems: 'center', opacity: 0.5 }}>
