@@ -136,11 +136,13 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
             left: observe(Math.round(targetOffsetX / 15) * 15),
             top: observe(Math.round(targetOffsetY / 15) * 15),
             label: observe(item.itemProps.label || ""),
+            isEditableOnDoubleClick: observe(true),
             height: observe(item.itemProps.height),
             isAcceptingConnections: observe(true),
             width: observe(item.itemProps.width),
             isEnabledNewConnetion: observe(true),
             icon: observe(item.itemProps.icon),
+            isEditingTitle: observe(true),
             id: observe(Utils.getUUID()),
             hasWarning: observe(false),
             isDisabled: observe(false),
@@ -250,6 +252,10 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     onKeyDownCtrlA={handleSelecteAllFlowItems}
                     onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                 >
+                    <Rulers
+                        rulers={rulers}
+                        strokeColor={linesColor}
+                    />
                     <Lines
                         parentRef={boardRef}
                         onDropItem={handleDroptem}
@@ -264,16 +270,13 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                         />
                     ))}
                     <SelectorArea
+                        parentElement={boardRef}
                         isDisabled={disableSelection}
                         borderType={selectionBorderType}
                         borderWidth={selectionBorderWidth}
                         borderColor={selectionBorderColor}
                         onCoordsChange={handleOnCoordsChange}
                         backgroundColor={selectionBackgroundColor}
-                    />
-                    <Rulers
-                        rulers={rulers}
-                        strokeColor={linesColor}
                     />
                     <EmptyFeedback
                         show={items.length === 0}

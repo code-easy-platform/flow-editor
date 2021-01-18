@@ -44,7 +44,7 @@ const App: React.FC = () => {
                     selectionBorderColor: 'var(--color-botton-bar)',
                     selectionBackgroundColor: '#ffffff11',
 
-                    rulers: [60, 100]
+                    rulers: [80]
                 }}
                 childrenWhenItemsEmpty={
                     <div style={{ height: '-webkit-fill-available', width: '-webkit-fill-available', justifyContent: 'center', alignItems: 'center', opacity: 0.5 }}>
