@@ -136,6 +136,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
             top: observe(Math.round(targetOffsetY / 15) * 15),
             label: observe(item.itemProps.label || ""),
             height: observe(item.itemProps.height),
+            isAcceptingConnections: observe(true),
             width: observe(item.itemProps.width),
             isEnabledNewConnetion: observe(true),
             icon: observe(item.itemProps.icon),

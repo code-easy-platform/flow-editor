@@ -28,6 +28,7 @@ export const Comment: React.FC<CommentProps> = ({ item, parentRef, onMouseDown, 
 
     const [isEditing, setIsEditing] = useState(false);
 
+    const isAcceptingConnections = useObserverValue(item.isAcceptingConnections);
     const [description, setDescription] = useObserver(item.description);
     const isSelected = useObserverValue(item.isSelected);
     const hasWarning = useObserverValue(item.hasWarning);
@@ -78,6 +79,7 @@ export const Comment: React.FC<CommentProps> = ({ item, parentRef, onMouseDown, 
                 height={(height || 0) + ((lineWidth || 0) * 2) + 16}
                 onMouseDown={!isEditing ? handleOnMouseDown : undefined}
                 onContextMenu={!isEditing ? handleOnContextMenu : undefined}
+                data-allow-connection={String(isAcceptingConnections || true)}
             >
                 <textarea
                     value={description}

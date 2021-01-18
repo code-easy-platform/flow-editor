@@ -21,6 +21,7 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
     const { flowItemErrorColor, flowItemTextColor, flowItemWarningColor, flowItemSelectedColor, lineWidth, backgroundColor } = useConfigs();
     const selectItemById = useSelectItemById();
 
+    const isAcceptingConnections = useObserverValue(item.isAcceptingConnections);
     const isEnabledNewConnetion = useObserverValue(item.isEnabledNewConnetion);
     const description = useObserverValue(item.description);
     const isDisabled = useObserverValue(item.isDisabled);
@@ -76,6 +77,7 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
                 top={top}
             />
             <SelectionBox
+                allowConnection={isAcceptingConnections}
                 fullDraggable={!isEnabledNewConnetion}
                 backgroundColor={backgroundColor}
                 onMouseDown={handleMouseDownMove}
