@@ -5,8 +5,6 @@ interface RulersProps {
     rulers: number[];
 }
 export const Rulers: React.FC<RulersProps> = memo(({ rulers, strokeColor = 'gray' }) => {
-    console.log(rulers);
-
     return (
         <>
             {rulers.map((ruler, index) => (
