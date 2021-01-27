@@ -30,7 +30,7 @@ export const SelectionBox: React.FC<SelectionBoxProps> = memo(({ height, left, t
             />
             <rect // Move element
                 height={(height || 0) + (fullDraggable ? ((height || 0) / 3) : 0)}
-                data-allow-connection={String(allowConnection || true)}
+                data-allow-connection={String(!!allowConnection)}
                 y={top - ((height || 0) / 3)}
                 style={{ cursor: 'move' }}
                 onMouseDown={onMouseDown}
