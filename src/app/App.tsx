@@ -21,6 +21,7 @@ const App: React.FC = () => {
                 id="FlowEditor"
                 items={itemsLogical}
                 toolItems={ToolItems}
+                onSelect={console.log}
                 breadcrumbs={breadCrumps}
                 onChangeItems={setItemsLogical}
                 configs={{
