@@ -3,3 +3,4 @@ export * from './useFlowItems';
 export * from './useLineProps';
 export * from './UseBoardSize';
 export * from './useLines';
+export * from './useZoom';

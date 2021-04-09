@@ -4,8 +4,8 @@ import { DropTargetMonitor } from 'react-dnd';
 import { Utils } from 'code-easy-components';
 
 import { ICoords, IFlowItem, IDroppableItem, IFlowEditorBoardProps, IConnection } from './shared/interfaces';
+import { useConfigs, useDeleteSelecteds, useItems, useSelectItemById, useZoom } from './shared/hooks';
 import { EmptyFeedback, FlowItem, SelectorArea, EditorPanel, Toolbar, Rulers } from './components';
-import { useConfigs, useDeleteSelecteds, useItems, useSelectItemById } from './shared/hooks';
 import BreandCrumbs from './components/breadcrumbs/BreandCrumbs';
 import { Lines } from './components/flow-item/line/Lines';
 import { OnSelectListener } from './components/on-select-listener/OnSelectListener';
@@ -25,6 +25,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     const deleteSelectedItems = useDeleteSelecteds();
     const boardRef = useRef<SVGSVGElement>(null);
     const selectItemById = useSelectItemById();
+    const { setZoom } = useZoom();
 
     const itemsStore = useItems();
     const [items, setItems] = useObserver(itemsStore);
@@ -250,6 +251,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
                     onKeyDownCtrlD={handleKeyDownCtrlD}
                     allowedsInDrop={typesAllowedToDrop}
                     onArrowKeyDown={handleArrowKeyDown}
+                    onChangeZoom={(zoom) => setZoom(zoom)}
                     onKeyDownCtrlA={handleSelecteAllFlowItems}
                     onMouseDown={e => selectItemById(undefined, e.ctrlKey)}
                 >

@@ -4,6 +4,7 @@ import { Utils } from "code-easy-components";
 
 import { IConnection } from "../interfaces";
 import { ItemsContext } from "../contexts";
+import { useZoom } from "./useZoom";
 
 export const useItems = () => useContext(ItemsContext);
 
@@ -12,6 +13,7 @@ export const useItems = () => useContext(ItemsContext);
  */
 export const useDragAllElements = () => {
     const itemsStore = useItems();
+    const { zoom } = useZoom();
 
     return (targetId: string | undefined, top: number, left: number, snapGridWhileDragging: boolean | undefined) => {
         // Encontra todos os item selecionados
@@ -47,9 +49,11 @@ export const useDragAllElements = () => {
             const oldCompLeft = comp.left.value;
             const oldCompTop = comp.top.value;
 
+            console.log((left - old.left) / 2)
+
             // Find the new postions
-            let newCompLeft = !stop.left ? comp.left.value + (left - old.left) : comp.left.value;
-            let newCompTop = !stop.top ? comp.top.value + (top - old.top) : comp.top.value;
+            let newCompLeft = !stop.left ? comp.left.value + (((left - old.left) / devicePixelRatio) / zoom) : comp.left.value;
+            let newCompTop = !stop.top ? comp.top.value + (((top - old.top) / devicePixelRatio) / zoom) : comp.top.value;
 
             // Garante que um item não seja arrastado para posições negativas
             if (newCompTop < 0) {

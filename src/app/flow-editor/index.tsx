@@ -1,8 +1,8 @@
 import React from 'react';
-import HTML5Backend from 'react-dnd-html5-backend';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DndProvider } from 'react-dnd';
 
-import { ConfigurationProvider, ItemsProvider } from './shared/contexts';
+import { ConfigurationProvider, ItemsProvider, ZoomProvider } from './shared/contexts';
 import { IFlowEditorProps } from './shared/interfaces';
 import { FlowEditorBoard } from './FlowEditorBoard';
 
@@ -11,7 +11,9 @@ export const FlowEditor: React.FC<IFlowEditorProps> = ({ configs, items, ...rest
         <ConfigurationProvider configs={configs}>
             <DndProvider backend={HTML5Backend}>
                 <ItemsProvider items={items}>
-                    <FlowEditorBoard {...rest} />
+                    <ZoomProvider>
+                        <FlowEditorBoard {...rest} />
+                    </ZoomProvider>
                 </ItemsProvider>
             </DndProvider>
         </ConfigurationProvider>
