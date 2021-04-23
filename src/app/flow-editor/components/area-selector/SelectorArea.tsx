@@ -1,3 +1,4 @@
+import { useZoom } from 'app/flow-editor/shared/hooks';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 import { ICoords } from '../../shared/interfaces';
@@ -15,9 +16,9 @@ interface SelectorAreaProps {
 }
 /** Reinderiza a área de seleção na tela, para que seja possível selecionar diversos items de uma vez. */
 export const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSelectionStart, parentElement, borderType, backgroundColor = "#ffffff11", borderColor = "#999fff", borderWidth = 1, isDisabled = false, onCoordsChange }) => {
-
     const selectorAreaRef = useRef<any>(null);
     const selectionStarted = useRef(false);
+    const { zoom } = useZoom()
 
     const [position, setPosition] = useState({
         startLeft: 0,
@@ -32,20 +33,31 @@ export const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSe
             onSelectionStart && onSelectionStart(e);
         }
 
-        setPosition({
-            ...position,
-            endLeft: e.offsetX,
-            endTop: e.offsetY,
+        let startLeft = 0;
+        let startTop = 0;
+        let endLeft = 0;
+        let endTop = 0;
+
+        setPosition(oldPosition => {
+            endLeft = oldPosition.endLeft + ((e.movementX / devicePixelRatio) / zoom);
+            endTop = oldPosition.endTop + ((e.movementY / devicePixelRatio) / zoom);
+            startLeft = oldPosition.startLeft;
+            startTop = oldPosition.startTop;
+
+            return {
+                ...oldPosition,
+                endLeft,
+                endTop,
+            }
         });
 
-        onCoordsChange &&
-            onCoordsChange({
-                startY: position.startTop,
-                startX: position.startLeft,
-                endY: e.offsetY,
-                endX: e.offsetX,
-            });
-    }, [onCoordsChange, onSelectionStart, position]);
+        onCoordsChange && onCoordsChange({
+            startX: startLeft,
+            startY: startTop,
+            endX: endLeft,
+            endY: endTop,
+        });
+    }, [onCoordsChange, onSelectionStart, zoom]);
 
     const mouseUp = useCallback((e: MouseEvent) => {
         window.onmousemove = null;
@@ -76,19 +88,21 @@ export const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSe
             window.onmousemove = mouseMove;
             window.onmouseup = mouseUp;
 
-            /**
-             * Em teoria isso não deveria contecer já que se trata de consts
-             * e em teoria deveria estar sendo feito essas atribuições dentro do setPosition,
-             * funcionou apenas assim.
-             */
-            position.startLeft = e.offsetX;
-            position.startTop = e.offsetY;
-            position.endLeft = e.offsetX;
-            position.endTop = e.offsetY;
+            setPosition({
+                startLeft: e.offsetX / zoom,
+                startTop: e.offsetY / zoom,
+                endLeft: e.offsetX / zoom,
+                endTop: e.offsetY / zoom,
+            });
 
-            setPosition(position);
+            onCoordsChange && onCoordsChange({
+                startX: e.offsetX / zoom,
+                startY: e.offsetY / zoom,
+                endX: e.offsetX / zoom,
+                endY: e.offsetY / zoom,
+            });
         }
-    }, [parentElement, position, mouseMove, mouseUp]);
+    }, [parentElement, zoom, mouseMove, mouseUp, onCoordsChange]);
 
     useEffect(() => {
         if (!isDisabled && selectorAreaRef.current && parentElement.current) {

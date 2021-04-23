@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useDrop, DropTargetMonitor, XYCoord } from 'react-dnd';
 
+import { useBoardSize, useZoom } from '../../shared/hooks';
 import { IDroppableItem } from '../../shared/interfaces';
-import { useBoardSize } from '../../shared/hooks';
 
 type EditorPanelProps = Omit<{
     dotColor?: string;
@@ -36,18 +36,22 @@ export const EditorPanel = React.forwardRef(({ allowedsInDrop, onDropItem, onDro
     const { height, width } = useBoardSize();
 
     const [background, setBackground] = React.useState<string>();
-    const [zoom, setZoom] = React.useState(1);
-    const wheel = (e: React.WheelEvent<SVGSVGElement>) => {
+    const { zoom, setZoom } = useZoom();
 
+    const handleWheel = useCallback((e: React.WheelEvent<SVGSVGElement>) => {
         if (e.altKey) {
             if (e.deltaY > 0) {
+                if (zoom <= 0.2) return;
+
                 setZoom(zoom - 0.1);
             } else {
+                if (zoom >= 5) return;
+
                 setZoom(zoom + 0.1);
             }
             onChangeZoom && onChangeZoom(zoom);
         }
-    }
+    }, [onChangeZoom, setZoom, zoom]);
 
     const newRef = useRef<SVGSVGElement>(null);
     if (!ref) ref = newRef;
@@ -117,7 +121,7 @@ export const EditorPanel = React.forwardRef(({ allowedsInDrop, onDropItem, onDro
             tabIndex={0}
             width={width}
             height={height}
-            onWheel={wheel}
+            onWheel={handleWheel}
             onKeyDown={handleKeyDown}
             preserveAspectRatio="none"
             style={{
@@ -126,7 +130,7 @@ export const EditorPanel = React.forwardRef(({ allowedsInDrop, onDropItem, onDro
                 minWidth: '100%',
                 minHeight: '100%',
                 backgroundImage: background,
-                backgroundSize: `${dottedSize}px ${dottedSize}px`,
+                backgroundSize: `${(dottedSize / zoom) / devicePixelRatio}px ${(dottedSize / zoom) / devicePixelRatio}px`,
                 boxShadow: useElevation ? `inset 0 0 14px 0px ${elevationColor}` : 'unset',
             }}
         />

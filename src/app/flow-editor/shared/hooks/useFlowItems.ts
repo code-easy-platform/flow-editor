@@ -1,76 +1,81 @@
-import { useContext } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { set, observe, useObserver } from "react-observing";
 import { Utils } from "code-easy-components";
 
+import { useConfigs } from "./useConfigurations";
 import { IConnection } from "../interfaces";
 import { ItemsContext } from "../contexts";
 import { useZoom } from "./useZoom";
 
 export const useItems = () => useContext(ItemsContext);
 
+
 /**
  * DragAll allow you drag all elements selecteds in the board.
  */
 export const useDragAllElements = () => {
+    const topLeftRedundant = useRef<{ [key: string]: { top: number, left: number } }>({});
+    const { snapGridWhileDragging } = useConfigs();
     const itemsStore = useItems();
     const { zoom } = useZoom();
 
-    return (targetId: string | undefined, top: number, left: number, snapGridWhileDragging: boolean | undefined) => {
-        // Encontra todos os item selecionados
+    useEffect(() => {
+        const clear = () => {
+            topLeftRedundant.current = {};
+        }
+
+        window.addEventListener('mouseup', clear);
+
+        return () => {
+            window.removeEventListener('mouseup', clear);
+        }
+    });
+
+    const dragSnapGridSize = useMemo(() => 15, []);
+
+    const snapGrid = useCallback((type: 'X' | 'Y', position: string | undefined, oldMovement: number, newMovement: number) => {
+        if (!position) return oldMovement + newMovement;
+
+        if (!snapGridWhileDragging) return oldMovement + newMovement;
+
+        if (type === 'X') {
+            topLeftRedundant.current[position].left += newMovement;
+
+            if (topLeftRedundant.current[position].left <= -dragSnapGridSize || topLeftRedundant.current[position].left >= dragSnapGridSize) {
+                const movement = oldMovement + topLeftRedundant.current[position].left;
+                topLeftRedundant.current[position].left = 0;
+                return movement;
+            } else {
+                return oldMovement;
+            }
+        } else {
+            topLeftRedundant.current[position].top += newMovement;
+
+            if (topLeftRedundant.current[position].top <= -dragSnapGridSize || topLeftRedundant.current[position].top >= dragSnapGridSize) {
+                const movement = oldMovement + topLeftRedundant.current[position].top;
+                topLeftRedundant.current[position].top = 0;
+                return movement;
+            } else {
+                return oldMovement;
+            }
+        }
+    }, [snapGridWhileDragging, dragSnapGridSize])
+
+    return (movementX: number, movementY: number) => {
         const selectedItems = itemsStore.value.filter(item => item.isSelected?.value);
 
-        // Encontra o item alvo do mouse
-        const targetItem = selectedItems.find(selectedItem => selectedItem.id.value === targetId);
-        if (!targetItem) return;
-
-        // Valida se o usuário optou pela ajuda no encaixe na grid
-        if (snapGridWhileDragging) {
-            top = Math.round(top / 15) * 15;
-            left = Math.round(left / 15) * 15;
-
-            // Valida se realmente houve alguma mudança
-            if (targetItem.top.value === top && targetItem.left.value === left) return;
-        }
-
-        /** Evita que esses valores sejam alterados pela referência entre as variáveis */
-        const old = {
-            left: targetItem.left.value,
-            top: targetItem.top.value,
-        }
-
-        /** Ajuda a evitar que os items sejam amontuados quando arrastados para um dos cantos */
-        let stop = {
-            left: false,
-            top: false,
-        }
-
-        // Muda a posição de todos os items que estão selecionados
         selectedItems.forEach(comp => {
-            const oldCompLeft = comp.left.value;
-            const oldCompTop = comp.top.value;
+            if (!comp.id.value) return;
 
-            console.log((left - old.left) / 2)
-
-            // Find the new postions
-            let newCompLeft = !stop.left ? comp.left.value + (((left - old.left) / devicePixelRatio) / zoom) : comp.left.value;
-            let newCompTop = !stop.top ? comp.top.value + (((top - old.top) / devicePixelRatio) / zoom) : comp.top.value;
-
-            // Garante que um item não seja arrastado para posições negativas
-            if (newCompTop < 0) {
-                newCompTop = oldCompTop;
-                stop.top = true;
+            if (!topLeftRedundant.current[comp.id.value]) {
+                topLeftRedundant.current[comp.id.value] = { left: 0, top: 0 };
             }
 
-            if (newCompLeft < 0) {
-                newCompLeft = oldCompLeft;
-                stop.left = true;
-            }
-
-            set(comp.top, newCompTop);
-            set(comp.left, newCompLeft);
+            set(comp.top, oldTop => snapGrid('Y', comp.id.value, oldTop, ((movementY / devicePixelRatio) / zoom)));
+            set(comp.left, oldLeft => snapGrid('X', comp.id.value, oldLeft, ((movementX / devicePixelRatio) / zoom)));
         });
-    };
-};
+    }
+}
 
 // Se undefined desmarca todos
 export const useSelectItemById = () => {
