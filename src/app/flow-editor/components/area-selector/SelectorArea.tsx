@@ -63,9 +63,6 @@ export const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSe
         window.onmousemove = null;
         window.onmouseup = null;
 
-        document.body.style.pointerEvents = 'unset';
-        parentElement.current.style.pointerEvents = 'auto';
-
         setPosition({
             startLeft: 0,
             startTop: 0,
@@ -77,13 +74,10 @@ export const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSe
             selectionStarted.current = false;
             onSelectionEnd && onSelectionEnd(e);
         }
-    }, [parentElement, onSelectionEnd]);
+    }, [onSelectionEnd]);
 
     const mouseDown = useCallback((e: MouseEvent | any) => {
         if (e.target.id === parentElement.current.id) {
-
-            document.body.style.pointerEvents = 'none';
-            parentElement.current.style.pointerEvents = 'auto';
 
             window.onmousemove = mouseMove;
             window.onmouseup = mouseUp;

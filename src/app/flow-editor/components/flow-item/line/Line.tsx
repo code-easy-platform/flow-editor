@@ -3,7 +3,7 @@ import { useDrop, DropTargetMonitor } from 'react-dnd';
 import { IObservable, useObserverValue } from 'react-observing';
 import { Utils } from 'code-easy-components';
 
-import { useConfigs, useSelectItemById, useCreateOrUpdateConnection } from '../../../shared/hooks';
+import { useConfigs, useSelectItemById, useCreateOrUpdateConnection, useZoom } from '../../../shared/hooks';
 import { TextOverLine, Arrow, SingleLine } from './components';
 import { IDroppableItem } from '../../../shared/interfaces';
 import { EFlowItemType } from '../../../shared/enums';
@@ -54,6 +54,7 @@ export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, pa
     const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor, flowItemTextColor } = useConfigs();
     const createOrUpdateConnection = useCreateOrUpdateConnection();
     const selectItemById = useSelectItemById();
+    const { zoom } = useZoom();
 
     const originId = useObserverValue(originIdStore);
     const targetId = useObserverValue(targetIdStore);
@@ -93,25 +94,25 @@ export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, pa
     }, [left, left2, top, top2, isCurved]);
 
     const mouseMove = useCallback((event: MouseEvent) => {
-        setBasicPosition(oldBasicPosition => ({
-            ...oldBasicPosition,
-            isCurved: false,
-            showNewLine: true,
-            top2: event.offsetY,
-            left2: event.offsetX,
-            isLeftToRight: (event.offsetX >= left),
-            rotate: Utils.getAngle(event.offsetX, event.offsetY, left, top),
-            lineDistance: Math.hypot((event.offsetY - top), (event.offsetX - left)),
-        }));
-    }, [left, top]);
+        setBasicPosition(oldBasicPosition => {
+            const newLeft2 = oldBasicPosition.left2 + ((event.movementX / devicePixelRatio) / zoom);
+            const newTop2 = oldBasicPosition.top2 + ((event.movementY / devicePixelRatio) / zoom);
+
+            return {
+                ...oldBasicPosition,
+                isCurved: false,
+                showNewLine: true,
+                top2: newTop2,
+                left2: newLeft2,
+                isLeftToRight: (newLeft2 >= left),
+                rotate: Utils.getAngle(newLeft2, newTop2, left, top),
+                lineDistance: Math.hypot((newTop2 - top), (newLeft2 - left)),
+            };
+        });
+    }, [left, top, zoom]);
 
     const onMouseUp = useCallback((e: any) => {
         e.stopPropagation();
-
-        document.body.style.pointerEvents = 'unset';
-        if (parentRef.current) {
-            parentRef.current.style.pointerEvents = 'auto';
-        }
 
         let hasChange = false;
         if (e.target.dataset.allowConnection === 'true') {
@@ -120,7 +121,7 @@ export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, pa
 
         window.onmouseup = null;
         window.onmousemove = null;
-        document.body.style.cursor = 'unset';
+        document.body.style.cursor = 'auto';
 
         if (!hasChange || !!newConnectionBoxRef) {
             setBasicPosition({
@@ -135,15 +136,10 @@ export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, pa
                 lineDistance: Math.hypot((top2 - top), (left2 - left)),
             });
         }
-    }, [parentRef, createOrUpdateConnection, id, originId, newConnectionBoxRef, isCurved, top, top2, left, left2]);
+    }, [createOrUpdateConnection, id, originId, newConnectionBoxRef, isCurved, top, top2, left, left2]);
 
     const mouseDown = useCallback((e: any) => {
         e.stopPropagation();
-
-        document.body.style.pointerEvents = 'none';
-        if (parentRef.current) {
-            parentRef.current.style.pointerEvents = 'auto';
-        }
 
         document.body.style.cursor = 'crosshair';
         window.onmousemove = mouseMove;
@@ -151,7 +147,7 @@ export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, pa
 
         selectItemById(id, e.ctrlKey);
         onMouseDown && onMouseDown(e);
-    }, [parentRef, mouseMove, onMouseUp, selectItemById, id, onMouseDown]);
+    }, [mouseMove, onMouseUp, selectItemById, id, onMouseDown]);
 
     // Used when being used to create a new line
     if (newConnectionBoxRef?.current) {
