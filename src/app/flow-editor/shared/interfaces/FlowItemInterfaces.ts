@@ -86,14 +86,14 @@ export interface IFlowItem extends IBasicFlowItem {
      */
     isEditingTitle: IObservable<boolean | undefined>;
     /**
-     * Used to show a input text when doucle click over the title
+     * Used to show a input text when double click over the title
      */
     isEditableOnDoubleClick: IObservable<boolean | undefined>;
     icon: IObservable<string | IFileContent | undefined>;
     /**
      * Used to validate that this item can be connected with another item
      */
-    isEnabledNewConnetion: IObservable<boolean | undefined>;
+    isEnabledNewConnection: IObservable<boolean | undefined>;
     /**
      * Used to validate that this item can be used as a connection
      */

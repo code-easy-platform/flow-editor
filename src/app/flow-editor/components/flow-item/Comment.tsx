@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useObserver, useObserverValue } from 'react-observing';
 
 import { IFlowItem } from '../../shared/interfaces/FlowItemInterfaces';
@@ -40,13 +40,12 @@ export const Comment: React.FC<CommentProps> = ({ item, parentRef, onMouseDown, 
     const left = useObserverValue(item.left);
     const top = useObserverValue(item.top);
 
-    const strokeColor: string = isSelected
-        ? `${flowItemSelectedColor}`
-        : hasError
-            ? `${flowItemErrorColor}`
-            : hasWarning
-                ? `${flowItemWarningColor}`
-                : "transparent";
+    const strokeColor = useMemo(() => {
+        if (isSelected) return `${flowItemSelectedColor}`;
+        if (hasError) return `${flowItemErrorColor}`;
+        if (hasWarning) return `${flowItemWarningColor}`;
+        return `transparent`;
+    }, [flowItemErrorColor, flowItemSelectedColor, flowItemWarningColor, hasError, hasWarning, isSelected]);
 
     useEffect(() => {
         if (textareaRef.current && isEditing) {
@@ -82,7 +81,6 @@ export const Comment: React.FC<CommentProps> = ({ item, parentRef, onMouseDown, 
                 width={(width || 0) + ((lineWidth || 0) * 2) + 38}
                 originIdStore={item.id}
                 lineWidth={lineWidth}
-                parentRef={parentRef}
                 left={left - 20}
                 top={top - 20}
             />

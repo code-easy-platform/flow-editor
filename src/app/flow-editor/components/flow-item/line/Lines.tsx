@@ -10,11 +10,11 @@ interface ILinesProps {
      * Executed when a item is dropped in the line
      * @param item Item dropped
      * @param monitor Dnd current monitor
-     * @param connectionId Used to idicate the line target
+     * @param connectionId Used to indicate the line target
      */
     onDropItem?(item: any, monitor: DropTargetMonitor, connectionId: string | undefined): void;
     /**
-     * Used to start the context menu for this específic component
+     * Used to start the context menu for this specific component
      */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 };
@@ -27,12 +27,11 @@ export const Lines: React.FC<ILinesProps> = ({ parentRef, onContextMenu, onDropI
             <Line
                 id={id}
                 key={index}
-                parentRef={parentRef}
                 onDropItem={onDropItem}
                 originIdStore={originId}
                 targetIdStore={targetId}
                 onContextMenu={onContextMenu}
-                allowedsInDrop={typesAllowedToDrop}
+                allowedInDrop={typesAllowedToDrop}
             />
         ))}
     </>);

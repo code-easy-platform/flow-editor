@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { ItemsLogical, ToolItems, AllowedsInDrop, BreadCrumps } from './Mock';
+import { ItemsLogical, ToolItems, AllowedInDrop, BreadCrumps } from './Mock';
 import { FlowEditor, IBreadCrumbButton, IFlowItem } from './flow-editor';
 import './App.css';
 
@@ -28,13 +28,13 @@ const App: React.FC = () => {
 
                     /** FLOW ITEMS */
                     flowItemWarningColor: 'var(--main-warning-color)',
-                    flowItemSelectedColor: 'var(--color-botton-bar)',
+                    flowItemSelectedColor: 'var(--color-bottom-bar)',
                     flowItemErrorColor: 'var(--main-error-color)',
                     commentTextColor: '#ffffff',
                     lineWidth: 1,
 
                     /** EDITOR */
-                    typesAllowedToDrop: AllowedsInDrop,
+                    typesAllowedToDrop: AllowedInDrop,
                     snapGridWhileDragging: true,
                     backgroundType: "dotted",
                     dottedSize: 15,
@@ -42,7 +42,7 @@ const App: React.FC = () => {
                     showToolbar: true,
 
                     /** SELECTION */
-                    selectionBorderColor: 'var(--color-botton-bar)',
+                    selectionBorderColor: 'var(--color-bottom-bar)',
                     selectionBackgroundColor: '#ffffff11',
 
                     rulers: [80]

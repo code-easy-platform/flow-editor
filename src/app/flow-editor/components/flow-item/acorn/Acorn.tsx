@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { IFlowItem } from '../../../shared/interfaces/FlowItemInterfaces';
 import { useConfigs, useSelectItemById } from '../../../shared/hooks';
@@ -14,7 +14,7 @@ interface FlowComponentProps {
 
     /** Used in parent component to move this element in the screen */
     onMouseDown?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
-    /** Used to start the context menu for this específic component */
+    /** Used to start the context menu for this specific component */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
 export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents, onContextMenu, onMouseDown }) => {
@@ -22,7 +22,7 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
     const selectItemById = useSelectItemById();
 
     const isAcceptingConnections = useObserverValue(item.isAcceptingConnections);
-    const isEnabledNewConnetion = useObserverValue(item.isEnabledNewConnetion);
+    const isEnabledNewConnection = useObserverValue(item.isEnabledNewConnection);
     const description = useObserverValue(item.description);
     const isDisabled = useObserverValue(item.isDisabled);
     const isSelected = useObserverValue(item.isSelected);
@@ -35,12 +35,12 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
     const top = useObserverValue(item.top);
     const id = useObserverValue(item.id);
 
-    const strokeColor: string = (() => {
+    const strokeColor: string = useMemo(() => {
         if (isSelected) return `${flowItemSelectedColor}`;
         else if (hasError) return `${flowItemErrorColor}`;
         else if (hasWarning) return `${flowItemWarningColor}`;
         else return `transparent`;
-    })();
+    }, [flowItemErrorColor, flowItemSelectedColor, flowItemWarningColor, hasError, hasWarning, isSelected]);
 
     const handleMouseDownMove = useCallback((e: React.MouseEvent<SVGGElement, MouseEvent>) => {
         if (isDisabled) return;
@@ -58,21 +58,25 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
         <g
             role={item.flowItemType.value}
             onContextMenu={handleContextMenu}
-            style={{ pointerEvents: (useEvents === undefined || useEvents) ? undefined : 'none' }}
+            style={{
+                transform: `translate(${left}px, ${top}px)`,
+                pointerEvents: (useEvents === undefined || useEvents) ? undefined : 'none',
+            }}
         >
-            {isEnabledNewConnetion && <NewConnectionBox
-                onMouseDown={e => selectItemById(id, e.ctrlKey)}
-                height={(height || 0) + 20}
-                width={(width || 0) + 20}
-                originIdStore={item.id}
-                parentRef={parentRef}
-                left={left - 10}
-                isRounded={true}
-                top={top - 10}
-            />}
+            {isEnabledNewConnection && (
+                <NewConnectionBox
+                    onMouseDown={e => selectItemById(id, e.ctrlKey)}
+                    height={(height || 0) + 20}
+                    width={(width || 0) + 20}
+                    originIdStore={item.id}
+                    isRounded={true}
+                    left={-10}
+                    top={-10}
+                />
+            )}
             <SelectionBox
                 allowConnection={isAcceptingConnections}
-                fullDraggable={!isEnabledNewConnetion}
+                fullDraggable={!isEnabledNewConnection}
                 backgroundColor={backgroundColor}
                 onMouseDown={handleMouseDownMove}
                 strokeColor={strokeColor}
@@ -80,23 +84,18 @@ export const Acorn: React.FC<FlowComponentProps> = ({ item, parentRef, useEvents
                 height={height || 0}
                 width={width || 0}
                 id={String(id)}
-                left={left}
-                top={top}
             />
             <ImageView
                 imageSrc={typeof icon === 'string' ? icon : String(icon?.content)}
                 height={height}
                 width={width}
-                left={left}
-                top={top}
             />
             <TextOverItem
                 isEditableOnDoubleClick={item.isEditableOnDoubleClick}
-                left={left + ((width || 0) / 2)}
                 isEditing={item.isEditingTitle}
                 textColor={flowItemTextColor}
+                left={(width || 0) / 2}
                 label={item.label}
-                top={top}
             />
             <title>{description}</title>
         </g>

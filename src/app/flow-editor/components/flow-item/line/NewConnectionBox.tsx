@@ -11,13 +11,12 @@ interface INewConnectionBoxProps {
     lineWidth?: number;
     isRounded?: boolean;
     cursor?: 'crosshair' | string;
-    parentRef: React.RefObject<SVGSVGElement>;
     originIdStore: IObservable<string | undefined>;
     onMouseDown?(e: React.MouseEvent<SVGRectElement, MouseEvent>): void;
     onContextMenu?(e: React.MouseEvent<SVGRectElement, MouseEvent>): void;
 }
 /** Allow create a new connection */
-const NewConnectionBox: React.FC<INewConnectionBoxProps> = ({ originIdStore, parentRef, left = 0, top = 0, height = 0, width = 0, isRounded = false, lineWidth = 1, cursor = 'crosshair', onMouseDown, onContextMenu }) => {
+const NewConnectionBox: React.FC<INewConnectionBoxProps> = ({ originIdStore, left = 0, top = 0, height = 0, width = 0, isRounded = false, lineWidth = 1, cursor = 'crosshair', onMouseDown, onContextMenu }) => {
     const ref = useRef<SVGRectElement | null>(null);
 
     const handleOnContextMenu = useCallback((e: React.MouseEvent<SVGRectElement, MouseEvent>) => {
@@ -36,7 +35,6 @@ const NewConnectionBox: React.FC<INewConnectionBoxProps> = ({ originIdStore, par
         <>
             <Line
                 id={undefined}
-                parentRef={parentRef}
                 newConnectionBoxRef={ref}
                 originIdStore={originIdStore}
                 onMouseDown={handleOnMouseDown}

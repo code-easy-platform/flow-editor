@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { IObservable, useObserver, useObserverValue } from 'react-observing';
 
 import { useSizeByText } from '../../../../shared/hooks';
@@ -9,16 +9,46 @@ interface TextOverItemProps {
     isEditing: IObservable<boolean | undefined>;
     label: IObservable<string | undefined>;
     textColor?: string;
-    left: number;
-    top: number;
+    left?: number;
 }
-export const TextOverItem: React.FC<TextOverItemProps> = ({ left, top, textColor, onMouseDown, ...props }) => {
+export const TextOverItem: React.FC<TextOverItemProps> = ({ textColor, left = 0, onMouseDown, ...props }) => {
     const isEditableOnDoubleClick = useObserverValue(props.isEditableOnDoubleClick);
     const [isEditing, setIsEditing] = useObserver(props.isEditing);
-    const [label, setLabel] = useObserver(props.label);
-    const getSizeByText = useSizeByText();
+    const [label] = useObserver(props.label);
+
+    if (!isEditing) return (
+        <text // Move element and display their title
+            onDoubleClick={isEditableOnDoubleClick ? () => setIsEditing(true) : undefined}
+            onMouseDown={onMouseDown}
+            textAnchor={"middle"}
+            fontSize={"small"}
+            fill={textColor}
+            x={left}
+            y={-5}
+        >{label}</text>
+    );
+
+    return (
+        <TextOverLineEditor
+            left={left}
+            labelObservable={props.label}
+            isEditingObservable={props.isEditing}
+        />
+    );
+};
+
+interface ITextOverLineEditorProps {
+    left?: number;
+    isEditingObservable: IObservable<boolean | undefined>;
+    labelObservable: IObservable<string | undefined>;
+}
+const TextOverLineEditor: React.FC<ITextOverLineEditorProps> = ({ left = 0, labelObservable, isEditingObservable }) => {
+    const [isEditing, setIsEditing] = useObserver(isEditingObservable);
+    const [label, setLabel] = useObserver(labelObservable);
 
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const getSizeByText = useSizeByText();
 
     useEffect(() => {
         if (inputRef.current && isEditing) {
@@ -27,9 +57,14 @@ export const TextOverItem: React.FC<TextOverItemProps> = ({ left, top, textColor
         }
     }, [isEditing]);
 
-    const sizes = getSizeByText(label || '');
-    const width = (sizes.width > 90 ? 90 : sizes.width) + 20;
-    const height = (sizes.height || 10) + 10;
+    const { width, height } = useMemo(() => {
+        const sizes = getSizeByText(label || '');
+        const width = (sizes.width > 90 ? 90 : sizes.width) + 20;
+        const height = (sizes.height || 10) + 10;
+
+        return { width, height };
+    }, [getSizeByText, label]);
+
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
@@ -42,26 +77,12 @@ export const TextOverItem: React.FC<TextOverItemProps> = ({ left, top, textColor
         e.stopPropagation();
     }, [setIsEditing]);
 
-    if (!isEditing) {
-        return (
-            <text // Move element and display their title
-                onDoubleClick={isEditableOnDoubleClick ? () => setIsEditing(true) : undefined}
-                onMouseDown={onMouseDown}
-                textAnchor={"middle"}
-                fontSize={"small"}
-                fill={textColor}
-                y={top - 5}
-                x={left}
-            >{label}</text>
-        );
-    }
-
     return (
         <foreignObject
+            y={-height}
             width={width}
             height={height}
-            y={top - height}
-            x={left - (width / 2)}
+            x={-(width / 2) + left}
             style={{ zIndex: 10, maxWidth: 100 }}
         >
             <input
@@ -81,4 +102,4 @@ export const TextOverItem: React.FC<TextOverItemProps> = ({ left, top, textColor
             />
         </foreignObject>
     );
-};
+}

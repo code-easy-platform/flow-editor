@@ -17,7 +17,7 @@ interface LineProps {
     /**
      *
      */
-    allowedsInDrop?: string[];
+    allowedInDrop?: string[];
     /**
      * Source flow item
      */
@@ -26,7 +26,6 @@ interface LineProps {
      * Target flow item
      */
     targetIdStore: IObservable<string | undefined>;
-    parentRef: React.RefObject<SVGSVGElement>;
     /**
      * Reference to the element used to create new connections between items
      *
@@ -38,7 +37,7 @@ interface LineProps {
      * Executed when a item is dropped in the line
      * @param item Item dropped
      * @param monitor Dnd current monitor
-     * @param connectionId Used to idicate the line target
+     * @param connectionId Used to indicate the line target
      */
     onDropItem?(item: any, monitor: DropTargetMonitor, connectionId: string | undefined): void;
     /**
@@ -46,11 +45,11 @@ interface LineProps {
      */
     onMouseDown?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
     /**
-     * Used to start the context menu for this específic component
+     * Used to start the context menu for this specific component
      */
     onContextMenu?(event: React.MouseEvent<SVGGElement, MouseEvent>): void;
 }
-export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, parentRef, allowedsInDrop, newConnectionBoxRef, onContextMenu, onMouseDown, onDropItem }) => {
+export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, allowedInDrop, newConnectionBoxRef, onContextMenu, onMouseDown, onDropItem }) => {
     const { disableOpacity, linesColor, lineWidth, flowItemSelectedColor, flowItemTextColor } = useConfigs();
     const createOrUpdateConnection = useCreateOrUpdateConnection();
     const selectItemById = useSelectItemById();
@@ -162,7 +161,7 @@ export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, pa
 
     /** Used to make it possible to drop items on the line. */
     const [{ isDraggingOver }, dropRef] = useDrop<IDroppableItem, any, any>({
-        accept: !isComment && allowedsInDrop ? allowedsInDrop : [], // Especifica quem pode ser dropado na editor
+        accept: !isComment && allowedInDrop ? allowedInDrop : [], // Especifica quem pode ser solto na editor
         drop: (item, monitor) => onDropItem && onDropItem(item, monitor, id),
         collect: (monitor) => ({
             isDraggingOver: monitor.isOver(),
@@ -191,7 +190,9 @@ export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, pa
                 lineType={lineType}
                 lineWidth={lineWidth}
                 top1={basicPosition.top1}
+                top2={basicPosition.top2}
                 left1={basicPosition.left1}
+                left2={basicPosition.left2}
                 onContextMenu={onContextMenu}
                 rotate={basicPosition.rotate}
                 onMouseDown={handleSelectLine}
@@ -201,7 +202,6 @@ export const Line: React.FC<LineProps> = ({ id, originIdStore, targetIdStore, pa
                 strokeColor={isDraggingOver ? flowItemSelectedColor : strokeColor}
             />
             <Arrow
-                id={String(id)}
                 radius={radius}
                 cursor={"crosshair"}
                 lineWidth={lineWidth}

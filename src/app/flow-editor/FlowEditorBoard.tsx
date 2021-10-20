@@ -141,7 +141,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
             height: observe(item.itemProps.height),
             isAcceptingConnections: observe(true),
             width: observe(item.itemProps.width),
-            isEnabledNewConnetion: observe(true),
+            isEnabledNewConnection: observe(true),
             icon: observe(item.itemProps.icon),
             isEditingTitle: observe(true),
             id: observe(Utils.getUUID()),

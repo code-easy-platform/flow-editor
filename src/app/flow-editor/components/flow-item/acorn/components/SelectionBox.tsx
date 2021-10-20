@@ -9,12 +9,10 @@ interface SelectionBoxProps {
     strokeWidth?: number;
     height: number;
     width: number;
-    left: number;
-    top: number;
     id: string;
 }
 /** Render image icon */
-export const SelectionBox: React.FC<SelectionBoxProps> = memo(({ height, left, top, width, id, strokeColor, strokeWidth, fullDraggable, backgroundColor, allowConnection, onMouseDown }) => {
+export const SelectionBox: React.FC<SelectionBoxProps> = memo(({ height, width, id, strokeColor, strokeWidth, fullDraggable, backgroundColor, allowConnection, onMouseDown }) => {
     return (
         <>
             <rect // Help in the background
@@ -22,21 +20,18 @@ export const SelectionBox: React.FC<SelectionBoxProps> = memo(({ height, left, t
                 fill={backgroundColor}
                 height={height}
                 width={width}
-                x={left}
                 id={id}
-                y={top}
                 rx={50}
                 ry={50}
             />
             <rect // Move element
                 data-allow-connection={String(allowConnection === undefined ? true : !!allowConnection)}
                 height={(height || 0) + (fullDraggable ? ((height || 0) / 3) : 0)}
-                y={top - ((height || 0) / 3)}
                 style={{ cursor: 'move' }}
                 onMouseDown={onMouseDown}
+                y={(height || 0) / 3}
                 fill={"transparent"}
                 width={width}
-                x={left}
                 id={id}
             ></rect>
             <rect // Selection
@@ -47,8 +42,6 @@ export const SelectionBox: React.FC<SelectionBoxProps> = memo(({ height, left, t
                 fill={"transparent"}
                 height={height}
                 width={width}
-                x={left}
-                y={top}
             />
         </>
     );
