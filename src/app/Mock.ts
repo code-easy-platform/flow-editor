@@ -1,4 +1,4 @@
-import { IconFlowStart, IconFlowIf, IconFlowForeach, IconFlowAction, IconFlowAssign, IconFlowComment, IconFlowEnd, IconFlowSwitch } from 'code-easy-components';
+import { IconFlowStart, IconFlowIf, IconFlowForeach, IconFlowAction, IconFlowAssign, IconFlowComment, IconFlowEnd, IconFlowSwitch } from './flow-editor/shared/assets';
 import { observe } from 'react-observing';
 
 import { IFlowItem } from "./flow-editor/shared/interfaces/FlowItemInterfaces";

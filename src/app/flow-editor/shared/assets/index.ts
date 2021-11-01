@@ -5,15 +5,15 @@ import IconAction from './flow-icons/action.svg';
 import IconAssign from './flow-icons/assign.svg';
 import IconSwitch from './flow-icons/switch.svg';
 import IconForEach from './flow-icons/foreach.svg';
-import IconComment from './flow-icons/comment.png';
+import IconComment from './flow-icons/comment.svg';
 
-export const DefaultFlowIcons = {
-    IconIf,
-    IconEnd,
-    IconStart,
-    IconAction,
-    IconAssign,
-    IconSwitch,
-    IconForEach,
-    IconComment,
+export {
+    IconIf as IconFlowIf,
+    IconEnd as IconFlowEnd,
+    IconStart as IconFlowStart,
+    IconAction as IconFlowAction,
+    IconAssign as IconFlowAssign,
+    IconSwitch as IconFlowSwitch,
+    IconForEach as IconFlowForeach,
+    IconComment as IconFlowComment,
 };
