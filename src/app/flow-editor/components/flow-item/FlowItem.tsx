@@ -43,7 +43,7 @@ export const FlowItem: React.FC<FlowProps> = memo(({ item: flowItem, parentRef, 
 
     }, [dragAllFlowItems]);
 
-    /** Declara a fun no ref da svg para que o item atual possa ser arrastado na tela. */
+    /** Declare a function in the ref of the svg to the actual item can be dragged in the screen. */
     const handleMouseDown = useCallback((e: React.MouseEvent<SVGGElement, MouseEvent>) => {
         e.stopPropagation();
 
