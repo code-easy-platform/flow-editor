@@ -1,0 +1,10 @@
+body {
+  background-color: #1e1e1e;
+  font-family: sans-serif;
+  min-height: 100vh;
+  min-width: 100vw;
+  overflow: hidden;
+  color: white;
+  padding: 0;
+  margin: 0;
+}
