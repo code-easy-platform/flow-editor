@@ -1,38 +1,16 @@
 import React, { useEffect } from 'react';
-import { observe } from 'react-observing';
-import { v4 as uuid } from 'uuid';
+import { useObserverValue } from 'react-observing';
 
 import { StyledPanel, StyledPanelWrapper, StyledSvgPanel } from './shared/styled-components';
 import { DraggableContainer, Line } from './shared/components';
-
-const blocks = [
-  {
-    id: observe(uuid()),
-    top: observe(450),
-    left: observe(450),
-    width: observe(100),
-    height: observe(100),
-  },
-  {
-    id: observe(uuid()),
-    top: observe(250),
-    left: observe(250),
-    width: observe(100),
-    height: observe(100),
-  },
-  {
-    id: observe(uuid()),
-    top: observe(50),
-    left: observe(50),
-    width: observe(100),
-    height: observe(100),
-  },
-];
+import { FlowStore, LinesSelector } from './shared/stores';
 
 interface IFlowEditorBoardProps {
 
 }
-export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
+export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = () => {
+  const lines = useObserverValue(LinesSelector);
+  const flow = useObserverValue(FlowStore);
 
   useEffect(() => {
     const handleMouseWheel = (e: WheelEvent) => {
@@ -50,28 +28,29 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = (props) => {
     <StyledPanelWrapper isDotted={true}>
 
       <StyledSvgPanel>
-        {blocks.map((block, index) => {
-          if (index + 1 >= blocks.length) return null;
+        {lines.map((line, index) => {
+          if (index + 1 >= lines.length) return null;
 
           return (
             <Line
-              key={block.id.value}
-              top2Observable={block.top}
-              left2Observable={block.left}
-              top1Observable={blocks[index + 1].top}
-              left1Observable={blocks[index + 1].left}
+              key={line.id.value}
+              top2Observable={line.top}
+              left2Observable={line.left}
+              top1Observable={lines[index + 1].top}
+              left1Observable={lines[index + 1].left}
             />
           )
         })}
       </StyledSvgPanel>
 
       <StyledPanel>
-        {blocks.map(block => (
+        {flow.map(block => (
           <DraggableContainer
             heightObservable={block.height}
             widthObservable={block.width}
             leftObservable={block.left}
             topObservable={block.top}
+            render={block.render}
             key={block.id.value}
           />
         ))}

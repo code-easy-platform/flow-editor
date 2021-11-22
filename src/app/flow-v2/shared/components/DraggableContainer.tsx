@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { ReactNode, useCallback, useMemo } from 'react';
 import { IObservable, useObserver, useObserverValue } from 'react-observing';
 import styled from '@emotion/styled';
 
@@ -20,23 +20,15 @@ export const StyledContainer = styled.div<ICustomTheme>(({ theme }) => ({
   }
 }));
 
-const StyledTitle = styled.span<ICustomTheme>(({ theme }) => ({
-  border: 'none',
-  resize: 'none',
-  backgroundColor: 'transparent',
-  fontsize: theme.typography.subtitle2.size,
-  fontWeight: theme.typography.subtitle2.weight,
-  letterSpacing: theme.typography.subtitle2.letterSpacing,
-}));
-
 
 interface IDraggableContainerProps {
+  render: () => ReactNode;
   topObservable: IObservable<number>;
   leftObservable: IObservable<number>;
   widthObservable: IObservable<number>;
   heightObservable: IObservable<number>;
 }
-export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ leftObservable, topObservable, heightObservable, widthObservable }) => {
+export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render, leftObservable, topObservable, heightObservable, widthObservable }) => {
   const [left, setLeft] = useObserver(leftObservable);
   const [top, setTop] = useObserver(topObservable);
   const height = useObserverValue(heightObservable);
@@ -57,6 +49,8 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ leftObs
     window.addEventListener('mouseup', mouseUp);
   }, [setLeft, setTop]);
 
+  const content = useMemo(() => render(), [render]);
+
 
   return (
     <StyledContainer
@@ -68,10 +62,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ leftObs
         transform: `translate(${gridSnap(left)}px, ${gridSnap(top)}px)`,
       }}
     >
-      <StyledTitle
-        as={true ? "span" : "textarea"}
-        onMouseDown={e => e.stopPropagation()}
-      >Start</StyledTitle>
+      {content}
     </StyledContainer>
   );
 }
