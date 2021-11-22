@@ -44,8 +44,8 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ leftObs
 
   const mouseDown = useCallback(() => {
     const mouseMouse = (e: MouseEvent) => {
-      setLeft(old => old + e.movementX);
-      setTop(old => old + e.movementY);
+      setLeft(old => old + (e.movementX / devicePixelRatio));
+      setTop(old => old + (e.movementY / devicePixelRatio));
     }
 
     const mouseUp = () => {

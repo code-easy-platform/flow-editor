@@ -26,10 +26,19 @@ export const Line: React.FC<IDraggableContainerProps> = ({ left1Observable, top1
   const diferenceLeft1Left2 = useMemo(() => (resolvedLeft2 - resolvedLeft1) * -1, [resolvedLeft1, resolvedLeft2]);
 
   const resolvedQuadraticY = useMemo(() => {
-    return diferenceLeft1Left2 > 0 ? (diferenceLeft1Left2 <= 25 ? diferenceLeft1Left2 : 25) : 0
+    if (diferenceLeft1Left2 <= 0) return 0;
+
+    if (diferenceLeft1Left2 > 25) return 25;
+
+    return diferenceLeft1Left2;
   }, [diferenceLeft1Left2]);
+
   const resolvedQuadraticX = useMemo(() => {
-    return 100 + (diferenceLeft1Left2 > 0 && diferenceLeft1Left2 < 200 ? diferenceLeft1Left2 : diferenceLeft1Left2 > 200 ? 200 : 0)
+    if (diferenceLeft1Left2 > 0 && diferenceLeft1Left2 < 200) return 100 + diferenceLeft1Left2;
+
+    if (diferenceLeft1Left2 > 200) return 100 + 200;
+
+    return 100;
   }, [diferenceLeft1Left2]);
 
 
