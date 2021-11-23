@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 
 import { ICustomTheme } from './../../shared/themes/ICustomTheme';
 import { gridSnap } from '../services';
+import { BoardZoomStore } from '../stores';
 
 export const StyledContainer = styled.div<ICustomTheme>(({ theme }) => ({
   top: 0,
@@ -36,8 +37,8 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
   const mouseDown = useCallback(() => {
     const mouseMouse = (e: MouseEvent) => {
-      setLeft(old => old + (e.movementX / devicePixelRatio));
-      setTop(old => old + (e.movementY / devicePixelRatio));
+      setLeft(old => old + ((e.movementX / devicePixelRatio) / BoardZoomStore.value));
+      setTop(old => old + ((e.movementY / devicePixelRatio) / BoardZoomStore.value));
     }
 
     const mouseUp = () => {
