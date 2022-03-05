@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useObserverValue, useObserver } from 'react-observing';
 
-import { StyledPanel, StyledPanelWrapper, StyledSvgPanel } from './shared/styled-components';
+import { StyledPanel, StyledPanelWrapper, StyledSvgPanel } from './shared/components';
 import { BoardZoomStore, FlowStore, LinesSelector } from './shared/stores';
 import { DraggableContainer, Line } from './shared/components';
 
