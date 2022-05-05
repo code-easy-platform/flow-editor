@@ -8,17 +8,24 @@ interface IDraggableContainerProps {
   left1Observable: IObservable<number>;
   top2Observable: IObservable<number>;
   left2Observable: IObservable<number>;
+
+  height1Observable: IObservable<number>;
+  width1Observable: IObservable<number>;
+  height2Observable: IObservable<number>;
+  width2Observable: IObservable<number>;
 }
-export const Line: React.FC<IDraggableContainerProps> = ({ left1Observable, top1Observable, left2Observable, top2Observable }) => {
+export const Line: React.FC<IDraggableContainerProps> = ({ left1Observable, top1Observable, left2Observable, width1Observable, height1Observable, top2Observable }) => {
   const left1 = useObserverValue(left1Observable);
   const left2 = useObserverValue(left2Observable);
   const top1 = useObserverValue(top1Observable);
   const top2 = useObserverValue(top2Observable);
+  const width1 = useObserverValue(width1Observable);
+  const height1 = useObserverValue(height1Observable);
 
-  const resolvedTop1 = useMemo(() => gridSnap(top1) + 97, [top1]);
   const resolvedTop2 = useMemo(() => gridSnap(top2) + 11, [top2]);
-  const resolvedLeft1 = useMemo(() => gridSnap(left1) + 97, [left1]);
   const resolvedLeft2 = useMemo(() => gridSnap(left2) + 11, [left2]);
+  const resolvedTop1 = useMemo(() => gridSnap(top1) + height1 - 11, [top1, height1]);
+  const resolvedLeft1 = useMemo(() => gridSnap(left1) + width1 - 11, [left1, width1]);
 
   const resolvedLeftMiddle = useMemo(() => (resolvedLeft2 - resolvedLeft1) * 0.5, [resolvedLeft1, resolvedLeft2]);
   const resolvedTopMiddle = useMemo(() => (resolvedTop2 - resolvedTop1) * 0.5, [resolvedTop1, resolvedTop2]);

@@ -1,25 +1,9 @@
 import { ReactNode, useCallback, useMemo } from 'react';
 import { IObservable, useObserver, useObserverValue } from 'react-observing';
-import styled from '@emotion/styled';
 
-import { ICustomTheme } from './../../shared/themes/ICustomTheme';
-import { gridSnap } from '../services';
+import styles from './DraggableContainer.module.css';
 import { BoardZoomStore } from '../stores';
-
-export const StyledContainer = styled.div<ICustomTheme>(({ theme }) => ({
-  top: 0,
-  left: 0,
-  cursor: 'move',
-  display: 'flex',
-  userSelect: 'none',
-  position: 'absolute',
-  flexDirection: 'column',
-  padding: theme.spacing(1),
-  borderRadius: theme.borderRadius.medium,
-  '&:active': {
-    boxShadow: '1px 1px 1px 1px black'
-  }
-}));
+import { gridSnap } from '../services';
 
 
 interface IDraggableContainerProps {
@@ -37,8 +21,10 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
   const mouseDown = useCallback(() => {
     const mouseMouse = (e: MouseEvent) => {
-      setLeft(old => old + ((e.movementX / devicePixelRatio) / BoardZoomStore.value));
-      setTop(old => old + ((e.movementY / devicePixelRatio) / BoardZoomStore.value));
+      const zeroIfLessThanZero = (num: number) => num < 0 ? 0 : num;
+
+      setLeft(old => zeroIfLessThanZero(old + ((e.movementX / devicePixelRatio) / BoardZoomStore.value)));
+      setTop(old => zeroIfLessThanZero(old + ((e.movementY / devicePixelRatio) / BoardZoomStore.value)));
     }
 
     const mouseUp = () => {
@@ -54,16 +40,16 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
 
   return (
-    <StyledContainer
+    <div
+      className={styles.draggableContainer}
       onMouseDown={mouseDown}
       style={{
         width: width,
         height: height,
-        backgroundColor: "green",
         transform: `translate(${gridSnap(left)}px, ${gridSnap(top)}px)`,
       }}
     >
       {content}
-    </StyledContainer>
+    </div>
   );
 }

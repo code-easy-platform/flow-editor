@@ -1,0 +1,9 @@
+.draggableContainer {
+  top: 0;
+  left: 0;
+  cursor: move;
+  display: flex;
+  user-select: none;
+  position: absolute;
+  flex-direction: column;
+}

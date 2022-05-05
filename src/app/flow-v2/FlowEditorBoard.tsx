@@ -38,10 +38,16 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = () => {
         {lines.map(line => (
           <Line
             key={line.id}
+
             top1Observable={line.top1}
             top2Observable={line.top2}
             left1Observable={line.left1}
             left2Observable={line.left2}
+
+            width1Observable={line.width1}
+            width2Observable={line.width2}
+            height1Observable={line.height1}
+            height2Observable={line.height2}
           />
         ))}
       </StyledSvgPanel>
