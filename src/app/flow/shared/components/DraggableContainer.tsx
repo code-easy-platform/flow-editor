@@ -8,12 +8,16 @@ import { gridSnap } from '../services';
 
 interface IDraggableContainerProps {
   render: () => ReactNode;
+
   topObservable: IObservable<number>;
   leftObservable: IObservable<number>;
   widthObservable: IObservable<number>;
   heightObservable: IObservable<number>;
+
+  numberOfInputSlots: number;
+  numberOfOutputSlots: number;
 }
-export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render, leftObservable, topObservable, heightObservable, widthObservable }) => {
+export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render, numberOfInputSlots, numberOfOutputSlots, leftObservable, topObservable, heightObservable, widthObservable }) => {
   const [left, setLeft] = useObserver(leftObservable);
   const [top, setTop] = useObserver(topObservable);
   const height = useObserverValue(heightObservable);
@@ -40,7 +44,9 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
   const containerTranslate = useMemo(() => `translate(${gridSnap(left)}px, ${gridSnap(top)}px)`, [left, top]);
 
-  const connections = [1, 2, 3, 4];
+  const numberOfInputSlotsAsArray = useMemo(() => Array.from(Array(numberOfInputSlots)), [numberOfInputSlots]);
+  const numberOfOutputSlotsAsArray = useMemo(() => Array.from(Array(numberOfOutputSlots)), [numberOfOutputSlots]);
+
 
   return (
     <div
@@ -48,7 +54,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
       className={styles.draggableContainer}
       style={{ width: width, height: height, transform: containerTranslate }}
     >
-      {connections.map((item, index) => (
+      {numberOfInputSlotsAsArray.map((item, index) => (
         <span
           style={{ top: index * 16 }}
           className={styles.draggableContainerInput}
@@ -59,9 +65,9 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
         {content}
       </div>
 
-      {connections.map((item, index) => (
+      {numberOfOutputSlotsAsArray.map((item, index) => (
         <span
-          style={{ bottom: (index * 16) + 6 }}
+          style={{ bottom: index * 16 }}
           className={styles.draggableContainerOutput}
         />
       ))}

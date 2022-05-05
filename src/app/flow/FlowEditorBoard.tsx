@@ -68,25 +68,33 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
               width2Observable={line.width2}
               height1Observable={line.height1}
               height2Observable={line.height2}
+
+              inputSlotObservable={line.inputSlot}
+              outputSlotObservable={line.outputSlot}
             />
           ))}
         </g>
       </svg>
 
-      <div
-        className={styles.panel}
-        onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}
-      >
-        {flow.map(block => (
-          <DraggableContainer
-            heightObservable={block.height}
-            widthObservable={block.width}
-            leftObservable={block.left}
-            topObservable={block.top}
-            render={block.render}
-            key={block.id.value}
-          />
-        ))}
+      <div className={styles.panel} onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}>
+        {flow.map((block, _, allBlocks) => {
+          const relatedBlocks = allBlocks
+            .filter(relatedBlock => relatedBlock.id.value !== block.id.value)
+            .filter(relatedBlock => relatedBlock.connections.value.some(connection => connection.relatedId.value === block.id.value))
+
+          return (
+            <DraggableContainer
+              numberOfOutputSlots={block.connections.value.length}
+              numberOfInputSlots={relatedBlocks.length}
+              heightObservable={block.height}
+              widthObservable={block.width}
+              leftObservable={block.left}
+              topObservable={block.top}
+              render={block.render}
+              key={block.id.value}
+            />
+          );
+        })}
       </div>
 
     </div>

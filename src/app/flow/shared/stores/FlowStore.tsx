@@ -1,17 +1,40 @@
+import { ReactNode } from 'react';
 import { IObservable, observe, selector } from 'react-observing';
 
 import { TId } from '../types';
 
 
-export const FlowStore = observe([
+export interface INodeConnection {
+  relatedId: IObservable<TId>;
+  inputSlot: IObservable<number>;
+  outputSlot: IObservable<number>;
+}
+
+interface INode {
+  id: IObservable<TId>;
+  render: () => ReactNode;
+  top: IObservable<number>;
+  left: IObservable<number>;
+  width: IObservable<number>;
+  height: IObservable<number>;
+  connections: IObservable<INodeConnection[]>;
+}
+
+export const FlowStore = observe<INode[]>([
   {
     id: observe('1'),
     top: observe(50),
     left: observe(50),
     width: observe(60),
     height: observe(50),
-    relatedId: observe(['2']),
     render: () => <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'green', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>Start</span>,
+    connections: observe([
+      {
+        inputSlot: observe(0),
+        outputSlot: observe(0),
+        relatedId: observe('2'),
+      },
+    ]),
   },
   {
     id: observe('2'),
@@ -19,8 +42,24 @@ export const FlowStore = observe([
     left: observe(250),
     width: observe(100),
     height: observe(100),
-    relatedId: observe(['3', '4']),
     render: () => <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'brown' }}>Node</span>,
+    connections: observe([
+      {
+        inputSlot: observe(0),
+        outputSlot: observe(1),
+        relatedId: observe('3'),
+      },
+      {
+        inputSlot: observe(0),
+        outputSlot: observe(0),
+        relatedId: observe('4'),
+      },
+      {
+        inputSlot: observe(2),
+        outputSlot: observe(2),
+        relatedId: observe('5'),
+      },
+    ]),
   },
   {
     id: observe('3'),
@@ -28,8 +67,14 @@ export const FlowStore = observe([
     left: observe(550),
     width: observe(60),
     height: observe(120),
-    relatedId: observe(['5']),
     render: () => <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'blue' }}>Teste</span>,
+    connections: observe([
+      {
+        inputSlot: observe(0),
+        outputSlot: observe(0),
+        relatedId: observe('5'),
+      },
+    ]),
   },
   {
     id: observe('4'),
@@ -37,8 +82,14 @@ export const FlowStore = observe([
     left: observe(500),
     width: observe(120),
     height: observe(40),
-    relatedId: observe(['5']),
     render: () => <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'gray' }}>Testando</span>,
+    connections: observe([
+      {
+        inputSlot: observe(1),
+        outputSlot: observe(0),
+        relatedId: observe('5'),
+      },
+    ]),
   },
   {
     id: observe('5'),
@@ -46,8 +97,8 @@ export const FlowStore = observe([
     left: observe(750),
     width: observe(60),
     height: observe(50),
-    relatedId: observe([]),
-    render: () => <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'darkred', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>End</span>,
+    connections: observe([]),
+    render: () => <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'red', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>End</span>,
   },
 ]);
 
@@ -55,41 +106,48 @@ export const FlowStore = observe([
 export interface ILine {
   id: TId;
   top1: IObservable<number>;
-  left1: IObservable<number>;
   top2: IObservable<number>;
+  left1: IObservable<number>;
   left2: IObservable<number>;
-  height1: IObservable<number>;
   width1: IObservable<number>;
-  height2: IObservable<number>;
   width2: IObservable<number>;
+  height2: IObservable<number>;
+  height1: IObservable<number>;
+  inputSlot: IObservable<number>;
+  outputSlot: IObservable<number>;
 }
 export const LinesSelector = selector<ILine[]>({
   get: ({ get }) => {
     const lines: ILine[] = [];
 
-    const flow = get(FlowStore);
+    get(FlowStore)
+      .forEach((block, _, allBlocks) => {
 
-    flow.forEach(block => {
-      const relatedBlocks = flow
-        .filter(relatedBlock => get(relatedBlock.id) !== get(block.id))
-        .filter(relatedBlock => get(block.relatedId).includes(get(relatedBlock.id)));
+        get(block.connections)
+          .forEach(connection => {
+            const relatedBlock = allBlocks.find(block => get(connection.relatedId) === get(block.id))
 
-      relatedBlocks.forEach(relatedBlock => {
-        lines.push({
-          top1: block.top,
-          left1: block.left,
-          top2: relatedBlock.top,
-          left2: relatedBlock.left,
+            if (!relatedBlock) return;
 
-          height1: block.height,
-          width1: block.width,
-          height2: relatedBlock.height,
-          width2: relatedBlock.width,
 
-          id: `${get(block.id)}-${get(relatedBlock.id)}`,
-        });
+            lines.push({
+              top1: block.top,
+              left1: block.left,
+              top2: relatedBlock.top,
+              left2: relatedBlock.left,
+
+              width1: block.width,
+              height1: block.height,
+              width2: relatedBlock.width,
+              height2: relatedBlock.height,
+
+              inputSlot: connection.inputSlot,
+              outputSlot: connection.outputSlot,
+
+              id: `${get(block.id)}-${get(relatedBlock.id)}`,
+            });
+          });
       });
-    });
 
     return lines;
   }
