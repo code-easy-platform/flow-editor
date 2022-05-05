@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useObserverValue, useObserver } from 'react-observing';
 
 import { BoardZoomStore, FlowStore, LinesSelector } from './shared/stores';
@@ -8,17 +8,21 @@ import styles from './FlowEditorBoard.module.css';
 
 interface IFlowEditorBoardProps { }
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = () => {
+  const [scrollX, setScrollX] = useState(0);
+  const [scrollY, setScrollY] = useState(0);
+
   const [zoom, setZoom] = useObserver(BoardZoomStore);
   const lines = useObserverValue(LinesSelector);
   const flow = useObserverValue(FlowStore);
 
   useEffect(() => {
     const handleMouseWheel = (e: WheelEvent) => {
-      e.stopImmediatePropagation();
-      e.stopPropagation();
-      e.preventDefault();
 
       if (e.ctrlKey) {
+        e.stopImmediatePropagation();
+        e.stopPropagation();
+        e.preventDefault();
+
         if (e.deltaY < 0) {
           setZoom(oldZoom => oldZoom >= 2 ? oldZoom : oldZoom + 0.1);
         } else {
@@ -39,24 +43,29 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = () => {
     >
 
       <svg className={styles.svgPanel}>
-        {lines.map(line => (
-          <Line
-            key={line.id}
+        <g style={{ transform: `translate(${scrollX}px, ${scrollY}px)` }}>
+          {lines.map(line => (
+            <Line
+              key={line.id}
 
-            top1Observable={line.top1}
-            top2Observable={line.top2}
-            left1Observable={line.left1}
-            left2Observable={line.left2}
+              top1Observable={line.top1}
+              top2Observable={line.top2}
+              left1Observable={line.left1}
+              left2Observable={line.left2}
 
-            width1Observable={line.width1}
-            width2Observable={line.width2}
-            height1Observable={line.height1}
-            height2Observable={line.height2}
-          />
-        ))}
+              width1Observable={line.width1}
+              width2Observable={line.width2}
+              height1Observable={line.height1}
+              height2Observable={line.height2}
+            />
+          ))}
+        </g>
       </svg>
 
-      <div className={styles.panel}>
+      <div
+        className={styles.panel}
+        onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}
+      >
         {flow.map(block => (
           <DraggableContainer
             heightObservable={block.height}
