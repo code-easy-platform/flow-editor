@@ -6,8 +6,12 @@ import { DraggableContainer, Line } from './shared/components';
 import styles from './FlowEditorBoard.module.css';
 
 
-interface IFlowEditorBoardProps { }
-export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = () => {
+interface IFlowEditorBoardProps {
+  backgroundSize?: number;
+  backgroundColorPaper?: string;
+  backgroundColorDefault?: string;
+}
+export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundSize = 30 }) => {
   const [scrollX, setScrollX] = useState(0);
   const [scrollY, setScrollY] = useState(0);
 
@@ -39,7 +43,14 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = () => {
   return (
     <div
       className={styles.panelWrapper}
-      style={{ zoom, backgroundSize: `${(15 / zoom) / devicePixelRatio}px ${(15 / zoom) / devicePixelRatio}px` }}
+      style={{
+        zoom,
+        backgroundSize: `${(backgroundSize / zoom) / devicePixelRatio}px ${(backgroundSize / zoom) / devicePixelRatio}px`,
+        ...({
+          '--color-panel-paper': backgroundColorPaper,
+          '--color-panel-default': backgroundColorDefault,
+        }) as any,
+      }}
     >
 
       <svg className={styles.svgPanel}>

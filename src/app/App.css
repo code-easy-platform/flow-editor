@@ -1,4 +1,4 @@
-body {
+body, #root {
   background-color: #1e1e1e;
   font-family: sans-serif;
   min-height: 100vh;
@@ -7,4 +7,6 @@ body {
   color: white;
   padding: 0;
   margin: 0;
+
+  /* padding: 100px; */
 }
