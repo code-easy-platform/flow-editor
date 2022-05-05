@@ -38,18 +38,33 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
   const content = useMemo(() => render(), [render]);
 
+  const containerTranslate = useMemo(() => `translate(${gridSnap(left)}px, ${gridSnap(top)}px)`, [left, top]);
+
+  const connections = [1, 2, 3, 4];
 
   return (
     <div
-      className={styles.draggableContainer}
       onMouseDown={mouseDown}
-      style={{
-        width: width,
-        height: height,
-        transform: `translate(${gridSnap(left)}px, ${gridSnap(top)}px)`,
-      }}
+      className={styles.draggableContainer}
+      style={{ width: width, height: height, transform: containerTranslate }}
     >
-      {content}
+      {connections.map((item, index) => (
+        <span
+          style={{ top: index * 16 }}
+          className={styles.draggableContainerInput}
+        />
+      ))}
+
+      <div className={styles.draggableContainerContent}>
+        {content}
+      </div>
+
+      {connections.map((item, index) => (
+        <span
+          style={{ bottom: (index * 16) + 6 }}
+          className={styles.draggableContainerOutput}
+        />
+      ))}
     </div>
   );
 }
