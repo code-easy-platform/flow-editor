@@ -10,8 +10,6 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
-    "@emotion/react": "^11.6.0",
-    "@emotion/styled": "^11.6.0",
     "code-easy-components": "^0.0.16",
     "react": "^17.0.2",
     "react-dnd": "^14.0.2",

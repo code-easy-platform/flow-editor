@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useObserverValue, useObserver } from 'react-observing';
 
-import { StyledPanel, StyledPanelWrapper, StyledSvgPanel } from './shared/components';
 import { BoardZoomStore, FlowStore, LinesSelector } from './shared/stores';
 import { DraggableContainer, Line } from './shared/components';
+import styles from './FlowEditorBoard.module.css';
+
 
 interface IFlowEditorBoardProps { }
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = () => {
@@ -32,9 +33,12 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = () => {
 
 
   return (
-    <StyledPanelWrapper style={{ zoom, backgroundSize: `${(15 / zoom) / devicePixelRatio}px ${(15 / zoom) / devicePixelRatio}px` }}>
+    <div
+      className={styles.panelWrapper}
+      style={{ zoom, backgroundSize: `${(15 / zoom) / devicePixelRatio}px ${(15 / zoom) / devicePixelRatio}px` }}
+    >
 
-      <StyledSvgPanel>
+      <svg className={styles.svgPanel}>
         {lines.map(line => (
           <Line
             key={line.id}
@@ -50,9 +54,9 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = () => {
             height2Observable={line.height2}
           />
         ))}
-      </StyledSvgPanel>
+      </svg>
 
-      <StyledPanel>
+      <div className={styles.panel}>
         {flow.map(block => (
           <DraggableContainer
             heightObservable={block.height}
@@ -63,8 +67,8 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = () => {
             key={block.id.value}
           />
         ))}
-      </StyledPanel>
+      </div>
 
-    </StyledPanelWrapper>
+    </div>
   );
 }
