@@ -1,9 +1,8 @@
 import { ReactNode, useCallback, useMemo } from 'react';
 import { IObservable, useObserver, useObserverValue } from 'react-observing';
 
+import { useBoardZoomContext, useSnapGridContext } from '../context';
 import styles from './DraggableContainer.module.css';
-import { useSnapGridContext } from '../context';
-import { BoardZoomStore } from '../stores';
 import { gridSnap } from '../services';
 
 
@@ -19,7 +18,9 @@ interface IDraggableContainerProps {
   numberOfOutputSlots: number;
 }
 export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render, numberOfInputSlots, numberOfOutputSlots, leftObservable, topObservable, heightObservable, widthObservable }) => {
+  const zoomObservable = useBoardZoomContext();
   const snapGrid = useSnapGridContext();
+
   const movementMultiplier = useMemo(() => 2, []);
 
   const [left, setLeft] = useObserver(leftObservable);
@@ -32,8 +33,8 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
     const mouseMouse = (e: MouseEvent) => {
       const zeroIfLessThanZero = (num: number) => num < 0 ? 0 : num;
 
-      setLeft(old => zeroIfLessThanZero(old + (((e.movementX * movementMultiplier) / devicePixelRatio) / BoardZoomStore.value)));
-      setTop(old => zeroIfLessThanZero(old + (((e.movementY * movementMultiplier) / devicePixelRatio) / BoardZoomStore.value)));
+      setLeft(old => zeroIfLessThanZero(old + (((e.movementX * movementMultiplier) / devicePixelRatio) / zoomObservable.value)));
+      setTop(old => zeroIfLessThanZero(old + (((e.movementY * movementMultiplier) / devicePixelRatio) / zoomObservable.value)));
     }
 
     const mouseUp = () => {
@@ -43,7 +44,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
     window.addEventListener('mousemove', mouseMouse);
     window.addEventListener('mouseup', mouseUp);
-  }, [setLeft, setTop, movementMultiplier]);
+  }, [setLeft, setTop, movementMultiplier, zoomObservable]);
 
 
   const content = useMemo(() => render(), [render]);

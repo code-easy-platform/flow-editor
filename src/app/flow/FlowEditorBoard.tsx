@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useObserverValue, useObserver } from 'react-observing';
 
-import { BoardZoomStore, FlowStore, LinesSelector } from './shared/stores';
+import { useBoardZoomContext, useItemsContext } from './shared/context';
 import { DraggableContainer, Line } from './shared/components';
 import styles from './FlowEditorBoard.module.css';
 
@@ -15,9 +15,12 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
   const [scrollX, setScrollX] = useState(0);
   const [scrollY, setScrollY] = useState(0);
 
-  const [zoom, setZoom] = useObserver(BoardZoomStore);
-  const lines = useObserverValue(LinesSelector);
-  const flow = useObserverValue(FlowStore);
+  const [zoom, setZoom] = useObserver(useBoardZoomContext());
+
+  const { flowStore, linesStore } = useItemsContext();
+  const lines = useObserverValue(linesStore);
+  const flow = useObserverValue(flowStore);
+
 
   useEffect(() => {
     const handleMouseWheel = (e: WheelEvent) => {
