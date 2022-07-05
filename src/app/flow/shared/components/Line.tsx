@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
-
 import { IObservable, useObserverValue } from 'react-observing';
+
+import { useSnapGridContext } from '../context';
 import { gridSnap } from '../services/GridSnap';
 
 interface IDraggableContainerProps {
@@ -18,6 +19,8 @@ interface IDraggableContainerProps {
   outputSlotObservable: IObservable<number>;
 }
 export const Line: React.FC<IDraggableContainerProps> = ({ left1Observable, top1Observable, left2Observable, width1Observable, height1Observable, top2Observable, inputSlotObservable, outputSlotObservable }) => {
+  const snapGrid = useSnapGridContext();
+
   const top1 = useObserverValue(top1Observable);
   const top2 = useObserverValue(top2Observable);
   const left1 = useObserverValue(left1Observable);
@@ -27,11 +30,11 @@ export const Line: React.FC<IDraggableContainerProps> = ({ left1Observable, top1
   const inputSlot = useObserverValue(inputSlotObservable);
   const outputSlot = useObserverValue(outputSlotObservable);
 
-  const resolvedLeft2 = useMemo(() => gridSnap(left2) - 10, [left2]);
-  const resolvedLeft1 = useMemo(() => gridSnap(left1) + width1 + 10, [left1, width1]);
+  const resolvedLeft2 = useMemo(() => gridSnap(left2, snapGrid) - 10, [left2, snapGrid]);
+  const resolvedLeft1 = useMemo(() => gridSnap(left1, snapGrid) + width1 + 10, [left1, width1, snapGrid]);
 
-  const resolvedTop1 = useMemo(() => gridSnap(top1) + height1 - 4 - (outputSlot * 16), [top1, height1, outputSlot]);
-  const resolvedTop2 = useMemo(() => gridSnap(top2) + 10 + (inputSlot * 16), [top2, inputSlot]);
+  const resolvedTop1 = useMemo(() => gridSnap(top1, snapGrid) + height1 - 4 - (outputSlot * 16), [top1, height1, outputSlot, snapGrid]);
+  const resolvedTop2 = useMemo(() => gridSnap(top2, snapGrid) + 10 + (inputSlot * 16), [top2, inputSlot, snapGrid]);
 
 
   const resolvedLeftMiddle = useMemo(() => (resolvedLeft2 - resolvedLeft1) * 0.5, [resolvedLeft1, resolvedLeft2]);
