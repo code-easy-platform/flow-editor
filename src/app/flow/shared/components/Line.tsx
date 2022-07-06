@@ -33,8 +33,8 @@ export const Line: React.FC<IDraggableContainerProps> = ({ left1Observable, top1
   const resolvedLeft2 = useMemo(() => gridSnap(left2, snapGrid) - 10, [left2, snapGrid]);
   const resolvedLeft1 = useMemo(() => gridSnap(left1, snapGrid) + width1 + 10, [left1, width1, snapGrid]);
 
-  const resolvedTop1 = useMemo(() => gridSnap(top1, snapGrid) + height1 - 4 - (outputSlot * 16), [top1, height1, outputSlot, snapGrid]);
-  const resolvedTop2 = useMemo(() => gridSnap(top2, snapGrid) + 10 + (inputSlot * 16), [top2, inputSlot, snapGrid]);
+  const resolvedTop1 = useMemo(() => gridSnap(top1, snapGrid) + height1 - 7 - (outputSlot * 16), [top1, height1, outputSlot, snapGrid]);
+  const resolvedTop2 = useMemo(() => gridSnap(top2, snapGrid) + 7 + (inputSlot * 16), [top2, inputSlot, snapGrid]);
 
 
   const resolvedLeftMiddle = useMemo(() => (resolvedLeft2 - resolvedLeft1) * 0.5, [resolvedLeft1, resolvedLeft2]);

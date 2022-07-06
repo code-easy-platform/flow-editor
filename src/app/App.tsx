@@ -6,12 +6,11 @@ import './App.css';
 
 export const App: React.FC = () => {
   return (
-    <div style={{ width: '100vw', height: '100vh'/* , padding: 100 */ }}>
+    <div style={{ width: '700px', height: '600px', margin: 20, border: '2px solid green' }}>
       <FlowEditor
         snapGridSize={1}
         items={itemsMock}
         backgroundSize={30}
-
 
 
 

@@ -1,8 +1,8 @@
 import { ReactNode, useCallback, useMemo } from 'react';
 import { IObservable, useObserver, useObserverValue } from 'react-observing';
+import { useFrame } from 'react-frame-component';
 
 import { useBoardZoomContext, useSnapGridContext } from '../context';
-import styles from './DraggableContainer.module.css';
 import { gridSnap } from '../services';
 
 
@@ -18,6 +18,8 @@ interface IDraggableContainerProps {
   numberOfOutputSlots: number;
 }
 export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render, numberOfInputSlots, numberOfOutputSlots, leftObservable, topObservable, heightObservable, widthObservable }) => {
+  const { window } = useFrame();
+
   const zoomObservable = useBoardZoomContext();
   const snapGrid = useSnapGridContext();
 
@@ -30,6 +32,8 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
 
   const mouseDown = useCallback(() => {
+    if (!window) return;
+
     const mouseMouse = (e: MouseEvent) => {
       const zeroIfLessThanZero = (num: number) => num < 0 ? 0 : num;
 
@@ -44,7 +48,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
     window.addEventListener('mousemove', mouseMouse);
     window.addEventListener('mouseup', mouseUp);
-  }, [setLeft, setTop, movementMultiplier, zoomObservable]);
+  }, [setLeft, setTop, movementMultiplier, zoomObservable, window]);
 
 
   const content = useMemo(() => render(), [render]);
@@ -58,24 +62,24 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
   return (
     <div
       onMouseDown={mouseDown}
-      className={styles.draggableContainer}
+      className={'draggableContainer'}
       style={{ width: width, height: height, transform: containerTranslate }}
     >
       {numberOfInputSlotsAsArray.map((item, index) => (
         <span
           style={{ top: index * 16 }}
-          className={styles.draggableContainerInput}
+          className={'draggableContainerInput'}
         />
       ))}
 
-      <div className={styles.draggableContainerContent}>
+      <div className={'draggableContainerContent'}>
         {content}
       </div>
 
       {numberOfOutputSlotsAsArray.map((item, index) => (
         <span
           style={{ bottom: index * 16 }}
-          className={styles.draggableContainerOutput}
+          className={'draggableContainerOutput'}
         />
       ))}
     </div>

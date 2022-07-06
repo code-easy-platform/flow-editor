@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useObserverValue, useObserver } from 'react-observing';
+import { useFrame } from 'react-frame-component';
 
 import { useBoardZoomContext, useItemsContext } from './shared/context';
 import { DraggableContainer, Line } from './shared/components';
-import styles from './FlowEditorBoard.module.css';
 
 
 interface IFlowEditorBoardProps {
@@ -12,6 +12,8 @@ interface IFlowEditorBoardProps {
   backgroundColorDefault?: string;
 }
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundSize = 30 }) => {
+  const { document } = useFrame();
+
   const [scrollX, setScrollX] = useState(0);
   const [scrollY, setScrollY] = useState(0);
 
@@ -23,6 +25,8 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
 
   useEffect(() => {
+    if (!document) return;
+
     const handleMouseWheel = (e: WheelEvent) => {
 
       if (e.ctrlKey) {
@@ -40,23 +44,21 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
     document.addEventListener('wheel', handleMouseWheel, { passive: false });
     return () => document.removeEventListener('wheel', handleMouseWheel);
-  }, [setZoom]);
+  }, [setZoom, document]);
 
 
   return (
     <div
-      className={styles.panelWrapper}
+      className={'panel-wrapper'}
       style={{
-        zoom,
-        backgroundSize: `${(backgroundSize / zoom) / devicePixelRatio}px ${(backgroundSize / zoom) / devicePixelRatio}px`,
+        backgroundSize: `${backgroundSize / devicePixelRatio}px ${backgroundSize / devicePixelRatio}px`,
         ...({
           '--color-panel-paper': backgroundColorPaper,
           '--color-panel-default': backgroundColorDefault,
         }) as any,
       }}
     >
-
-      <svg className={styles.svgPanel}>
+      <svg className={'svg-panel'} style={{ zoom }}>
         <g style={{ transform: `translate(${scrollX}px, ${scrollY}px)` }}>
           {lines.map(line => (
             <Line
@@ -79,7 +81,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
         </g>
       </svg>
 
-      <div className={styles.panel} onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}>
+      <div style={{ zoom }} className={'panel'} onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}>
         {flow.map((block, _, allBlocks) => {
           const relatedBlocks = allBlocks
             .filter(relatedBlock => relatedBlock.id.value !== block.id.value)

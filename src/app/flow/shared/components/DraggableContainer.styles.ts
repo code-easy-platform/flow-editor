@@ -1,6 +1,8 @@
+export const DraggableContainerCss = `
 .draggableContainer {
   top: 0;
   left: 0;
+  z-index:1;
   cursor: move;
   display: flex;
   user-select: none;
@@ -33,3 +35,4 @@
   border: 2px solid crimson;
   background-color: darkslategray;
 }
+`;
