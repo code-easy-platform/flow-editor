@@ -1,8 +1,8 @@
-import { ReactNode, useCallback, useMemo } from 'react';
+import { ReactNode, useCallback, useMemo, useRef } from 'react';
 import { IObservable, useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { INodeRenderProps, useBoardZoomContext, useSnapGridContext } from '../context';
+import { INodeRenderProps, useBoardScrollContext, useSnapGridContext } from '../context';
 import { gridSnap } from '../services';
 
 
@@ -20,7 +20,7 @@ interface IDraggableContainerProps {
 export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render, numberOfInputSlots, numberOfOutputSlots, leftObservable, topObservable, heightObservable, widthObservable }) => {
   const { window } = useFrame();
 
-  const zoom = useObserverValue(useBoardZoomContext());
+  const scrollObject = useBoardScrollContext();
   const snapGrid = useSnapGridContext();
 
   const [left, setLeft] = useObserver(leftObservable);
@@ -28,15 +28,17 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
   const height = useObserverValue(heightObservable);
   const width = useObserverValue(widthObservable);
 
+  const cliquedLocationFlowItem = useRef({ top: 0, left: 0 });
 
-  const mouseDown = useCallback(() => {
+
+  const mouseDown = useCallback((e: React.MouseEvent) => {
     if (!window) return;
 
     const mouseMouse = (e: MouseEvent) => {
       const zeroIfLessThanZero = (num: number) => num < 0 ? 0 : num;
 
-      setLeft(old => zeroIfLessThanZero(old + (e.movementX / zoom)));
-      setTop(old => zeroIfLessThanZero(old + (e.movementY / zoom)));
+      setLeft(zeroIfLessThanZero((e.pageX - scrollObject.left.value) - cliquedLocationFlowItem.current.left));
+      setTop(zeroIfLessThanZero((e.pageY - scrollObject.top.value) - cliquedLocationFlowItem.current.top));
     }
 
     const mouseUp = () => {
@@ -44,9 +46,13 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
       window.removeEventListener('mouseup', mouseUp);
     }
 
+    cliquedLocationFlowItem.current = {
+      top: e.nativeEvent.pageY - top - scrollObject.top.value,
+      left: e.nativeEvent.pageX - left - scrollObject.left.value,
+    }
     window.addEventListener('mousemove', mouseMouse);
     window.addEventListener('mouseup', mouseUp);
-  }, [setLeft, setTop, zoom, window]);
+  }, [setLeft, setTop, window, scrollObject, left, top]);
 
 
   const content = useMemo(() => {

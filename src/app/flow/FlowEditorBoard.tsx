@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useObserverValue, useObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { useBoardSizes, useBoardZoomContext, useItemsContext } from './shared/context';
+import { useBoardScrollContext, useBoardSizes, useBoardZoomContext, useItemsContext } from './shared/context';
 import { DraggableContainer, Line } from './shared/components';
 
 
@@ -14,8 +14,9 @@ interface IFlowEditorBoardProps {
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundSize = 30 }) => {
   const { document } = useFrame();
 
-  const [scrollX, setScrollX] = useState(0);
-  const [scrollY, setScrollY] = useState(0);
+  const scrollObject = useBoardScrollContext();
+  const [scrollX, setScrollX] = useObserver(scrollObject.left);
+  const [scrollY, setScrollY] = useObserver(scrollObject.top);
 
   const [zoom, setZoom] = useObserver(useBoardZoomContext());
 
