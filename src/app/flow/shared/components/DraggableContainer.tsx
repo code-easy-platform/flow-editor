@@ -2,12 +2,12 @@ import { ReactNode, useCallback, useMemo } from 'react';
 import { IObservable, useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { useBoardZoomContext, useSnapGridContext } from '../context';
+import { INodeRenderProps, useBoardZoomContext, useSnapGridContext } from '../context';
 import { gridSnap } from '../services';
 
 
 interface IDraggableContainerProps {
-  render: () => ReactNode;
+  render: (props: INodeRenderProps) => ReactNode;
 
   topObservable: IObservable<number>;
   leftObservable: IObservable<number>;
@@ -51,7 +51,13 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
   }, [setLeft, setTop, movementMultiplier, zoomObservable, window]);
 
 
-  const content = useMemo(() => render(), [render]);
+  const content = useMemo(() => {
+    console.log('aqui')
+    return render({
+      width: widthObservable,
+      height: heightObservable,
+    });
+  }, [render, widthObservable, heightObservable]);
 
   const containerTranslate = useMemo(() => `translate(${gridSnap(left, snapGrid)}px, ${gridSnap(top, snapGrid)}px)`, [left, top, snapGrid]);
 

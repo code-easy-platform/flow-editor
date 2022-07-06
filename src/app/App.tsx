@@ -1,5 +1,5 @@
 import React from 'react';
-import { observe } from 'react-observing';
+import { IObservable, observe, useObserver } from 'react-observing';
 
 import { FlowEditor } from './flow';
 import './App.css';
@@ -23,15 +23,31 @@ export const App: React.FC = () => {
 }
 
 
+const ContenElement = (props: { width: IObservable<number>; height: IObservable<number>; }) => {
+  const [width, setWidth] = useObserver(props.width);
+  const [height, setHeight] = useObserver(props.height);
+
+
+  return (
+    <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'green', alignItems: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}>
+      <p>Start</p>
+
+      <span onMouseDown={e => e.stopPropagation()}>
+        <input type="number" value={width} onChange={e => setWidth(Number(e.target.value))} />
+        <input type="number" value={height} onChange={e => setHeight(Number(e.target.value))} />
+      </span>
+    </span>
+  );
+}
 
 const itemsMock = [
   {
     id: observe('1'),
     top: observe(50),
     left: observe(50),
-    width: observe(60),
+    width: observe(170),
     height: observe(50),
-    render: () => <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'green', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>Start</span>,
+    render: (props: any) => <ContenElement {...props} />,
     connections: observe([
       {
         inputSlot: observe(0),

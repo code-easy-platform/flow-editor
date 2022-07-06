@@ -4,6 +4,10 @@ import { IObservable, observe, selector } from "react-observing";
 import { TId } from "../types";
 
 
+export interface INodeRenderProps {
+  width: IObservable<number>;
+  height: IObservable<number>;
+}
 export interface INodeConnection {
   relatedId: IObservable<TId>;
   inputSlot: IObservable<number>;
@@ -11,12 +15,12 @@ export interface INodeConnection {
 }
 export interface INode {
   id: IObservable<TId>;
-  render: () => ReactNode;
   top: IObservable<number>;
   left: IObservable<number>;
   width: IObservable<number>;
   height: IObservable<number>;
   connections: IObservable<INodeConnection[]>;
+  render: (props: INodeRenderProps) => ReactNode;
 }
 
 export interface ILine {
