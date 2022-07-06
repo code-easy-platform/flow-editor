@@ -20,10 +20,8 @@ interface IDraggableContainerProps {
 export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render, numberOfInputSlots, numberOfOutputSlots, leftObservable, topObservable, heightObservable, widthObservable }) => {
   const { window } = useFrame();
 
-  const zoomObservable = useBoardZoomContext();
+  const zoom = useObserverValue(useBoardZoomContext());
   const snapGrid = useSnapGridContext();
-
-  const movementMultiplier = useMemo(() => 2, []);
 
   const [left, setLeft] = useObserver(leftObservable);
   const [top, setTop] = useObserver(topObservable);
@@ -37,8 +35,8 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
     const mouseMouse = (e: MouseEvent) => {
       const zeroIfLessThanZero = (num: number) => num < 0 ? 0 : num;
 
-      setLeft(old => zeroIfLessThanZero(old + (((e.movementX * movementMultiplier) / devicePixelRatio) / zoomObservable.value)));
-      setTop(old => zeroIfLessThanZero(old + (((e.movementY * movementMultiplier) / devicePixelRatio) / zoomObservable.value)));
+      setLeft(old => zeroIfLessThanZero(old + (e.movementX / zoom)));
+      setTop(old => zeroIfLessThanZero(old + (e.movementY / zoom)));
     }
 
     const mouseUp = () => {
@@ -48,7 +46,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
     window.addEventListener('mousemove', mouseMouse);
     window.addEventListener('mouseup', mouseUp);
-  }, [setLeft, setTop, movementMultiplier, zoomObservable, window]);
+  }, [setLeft, setTop, zoom, window]);
 
 
   const content = useMemo(() => {
