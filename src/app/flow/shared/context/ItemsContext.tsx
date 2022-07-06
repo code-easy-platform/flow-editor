@@ -4,6 +4,11 @@ import { IObservable, observe, selector } from "react-observing";
 import { TId } from "../types";
 
 
+interface IBoardSizes {
+  width: IObservable<number>;
+  height: IObservable<number>;
+}
+
 export interface INodeRenderProps {
   width: IObservable<number>;
   height: IObservable<number>;
@@ -38,6 +43,7 @@ export interface ILine {
 }
 
 interface IItemsContextData {
+  boardSizes: IBoardSizes;
   flowStore: IObservable<INode[]>;
   linesStore: IObservable<ILine[]>;
 }
@@ -86,12 +92,37 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
     }
   }), [flow]);
 
+  const boardSizes = useMemo<IBoardSizes>(() => ({
+    width: selector({
+      get: ({ get }) => {
+        return get(flow).reduce((previous, current) => {
+          const left = get(current.left) + get(current.width);
+          if (left > previous) return left;
+
+          return previous;
+        }, 0);
+      }
+    }),
+    height: selector({
+      get: ({ get }) => {
+        return get(flow).reduce((previous, current) => {
+          const top = get(current.top) + get(current.height);
+          if (top > previous) return top;
+
+          return previous;
+        }, 0);
+      }
+    }),
+  }), [flow]);
+
 
   return (
-    <ItemsContext.Provider value={{ flowStore: flow, linesStore: lines }}>
+    <ItemsContext.Provider value={{ flowStore: flow, linesStore: lines, boardSizes }}>
       {children}
     </ItemsContext.Provider>
   );
 }
 
 export const useItemsContext = () => useContext(ItemsContext);
+
+export const useBoardSizes = () => useItemsContext().boardSizes;

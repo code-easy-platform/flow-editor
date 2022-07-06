@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useObserverValue, useObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { useBoardZoomContext, useItemsContext } from './shared/context';
+import { useBoardSizes, useBoardZoomContext, useItemsContext } from './shared/context';
 import { DraggableContainer, Line } from './shared/components';
 
 
@@ -58,50 +58,68 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
         }) as any,
       }}
     >
-      <svg className={'svg-panel'} style={{ zoom }}>
-        <g style={{ transform: `translate(${scrollX}px, ${scrollY}px)` }}>
-          {lines.map(line => (
-            <Line
-              key={line.id}
+      <svg className={'svg-panel'}>
+        <g style={{ transform: `scale(${zoom})` }}>
+          <g style={{ transform: `translate(${scrollX}px, ${scrollY}px)` }}>
+            {lines.map(line => (
+              <Line
+                key={line.id}
 
-              top1Observable={line.top1}
-              top2Observable={line.top2}
-              left1Observable={line.left1}
-              left2Observable={line.left2}
+                top1Observable={line.top1}
+                top2Observable={line.top2}
+                left1Observable={line.left1}
+                left2Observable={line.left2}
 
-              width1Observable={line.width1}
-              width2Observable={line.width2}
-              height1Observable={line.height1}
-              height2Observable={line.height2}
+                width1Observable={line.width1}
+                width2Observable={line.width2}
+                height1Observable={line.height1}
+                height2Observable={line.height2}
 
-              inputSlotObservable={line.inputSlot}
-              outputSlotObservable={line.outputSlot}
-            />
-          ))}
+                inputSlotObservable={line.inputSlot}
+                outputSlotObservable={line.outputSlot}
+              />
+            ))}
+          </g>
         </g>
       </svg>
 
-      <div style={{ zoom }} className={'panel'} onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}>
-        {flow.map((block, _, allBlocks) => {
-          const relatedBlocks = allBlocks
-            .filter(relatedBlock => relatedBlock.id.value !== block.id.value)
-            .filter(relatedBlock => relatedBlock.connections.value.some(connection => connection.relatedId.value === block.id.value))
+      <div className={'panel'} onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}>
+        <BoardSizeContainer>
+          {flow.map((block, _, allBlocks) => {
+            const relatedBlocks = allBlocks
+              .filter(relatedBlock => relatedBlock.id.value !== block.id.value)
+              .filter(relatedBlock => relatedBlock.connections.value.some(connection => connection.relatedId.value === block.id.value))
 
-          return (
-            <DraggableContainer
-              numberOfOutputSlots={block.connections.value.length}
-              numberOfInputSlots={relatedBlocks.length}
-              heightObservable={block.height}
-              widthObservable={block.width}
-              leftObservable={block.left}
-              topObservable={block.top}
-              render={block.render}
-              key={block.id.value}
-            />
-          );
-        })}
+            return (
+              <DraggableContainer
+                numberOfOutputSlots={block.connections.value.length}
+                numberOfInputSlots={relatedBlocks.length}
+                heightObservable={block.height}
+                widthObservable={block.width}
+                leftObservable={block.left}
+                topObservable={block.top}
+                render={block.render}
+                key={block.id.value}
+              />
+            );
+          })}
+        </BoardSizeContainer>
       </div>
 
+    </div>
+  );
+}
+
+
+
+const BoardSizeContainer = ({ children }: { children: React.ReactNode }) => {
+  const height = useObserverValue(useBoardSizes().height);
+  const width = useObserverValue(useBoardSizes().width);
+  const zoom = useObserverValue(useBoardZoomContext());
+
+  return (
+    <div style={{ zoom, height: height + 100, width: width + 100 }}>
+      {children}
     </div>
   );
 }
