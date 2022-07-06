@@ -13,7 +13,12 @@ export const DraggableContainerCss = `
 .draggableContainerContent {
   flex: 1;
   display: flex;
+  overflow: auto;
   flex-direction: column;
+}
+
+.draggableContainerContent::-webkit-scrollbar:horizontal {
+  height: 8px;
 }
 
 .draggableContainerInput {

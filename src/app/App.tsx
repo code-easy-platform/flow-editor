@@ -46,7 +46,7 @@ const itemsMock = [
     top: observe(50),
     left: observe(50),
     width: observe(170),
-    height: observe(50),
+    height: observe(120),
     render: (props: any) => <ContenElement {...props} />,
     connections: observe([
       {
