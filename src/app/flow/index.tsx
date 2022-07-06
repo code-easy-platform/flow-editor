@@ -30,7 +30,7 @@ export const FlowEditor: React.FC<IFlowEditorProps> = ({ snapGridSize = 15, item
         </style>
       </>
     );
-  }, []);
+  }, [customCSS]);
 
 
   return (
