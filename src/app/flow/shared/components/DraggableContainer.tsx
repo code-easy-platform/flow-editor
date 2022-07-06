@@ -66,24 +66,26 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
   return (
     <div
       onMouseDown={mouseDown}
-      className={'draggableContainer'}
+      className={'draggable-container'}
       style={{ width: width, height: height, transform: containerTranslate }}
     >
-      {numberOfInputSlotsAsArray.map((item, index) => (
+      {numberOfInputSlotsAsArray.map((_, index) => (
         <span
           style={{ top: index * 16 }}
-          className={'draggableContainerInput'}
+          onMouseDown={e => e.stopPropagation()}
+          className={'draggable-container-input'}
         />
       ))}
 
-      <div className={'draggableContainerContent'}>
+      <div className={'draggable-container-content'}>
         {content}
       </div>
 
-      {numberOfOutputSlotsAsArray.map((item, index) => (
+      {numberOfOutputSlotsAsArray.map((_, index) => (
         <span
           style={{ bottom: index * 16 }}
-          className={'draggableContainerOutput'}
+          onMouseDown={e => e.stopPropagation()}
+          className={'draggable-container-output'}
         />
       ))}
     </div>
