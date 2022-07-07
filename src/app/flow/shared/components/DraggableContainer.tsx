@@ -2,13 +2,15 @@ import { ReactNode, useCallback, useMemo, useRef } from 'react';
 import { IObservable, useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { INodeRenderProps, useBoardScrollContext, useSnapGridContext } from '../context';
+import { INodeRenderProps, useAddSelectedItem, useBoardScrollContext, useIsSelectedItem, useSnapGridContext } from '../context';
 import { gridSnap } from '../services';
+import { TId } from '../types';
 
 
 interface IDraggableContainerProps {
   render: (props: INodeRenderProps) => ReactNode;
 
+  idObservable: IObservable<TId>;
   topObservable: IObservable<number>;
   leftObservable: IObservable<number>;
   widthObservable: IObservable<number>;
@@ -17,10 +19,14 @@ interface IDraggableContainerProps {
   numberOfInputSlots: number;
   numberOfOutputSlots: number;
 }
-export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render, numberOfInputSlots, numberOfOutputSlots, leftObservable, topObservable, heightObservable, widthObservable }) => {
+export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render, idObservable, numberOfInputSlots, numberOfOutputSlots, leftObservable, topObservable, heightObservable, widthObservable }) => {
   const { window } = useFrame();
 
+  const id = useObserverValue(idObservable);
+
+  const addSelectedItem = useAddSelectedItem();
   const scrollObject = useBoardScrollContext();
+  const isSelected = useIsSelectedItem(id);
   const snapGrid = useSnapGridContext();
 
   const [left, setLeft] = useObserver(leftObservable);
@@ -56,7 +62,6 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
 
   const content = useMemo(() => {
-    console.log('aqui')
     return render({
       width: widthObservable,
       height: heightObservable,
@@ -72,7 +77,9 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
   return (
     <div
       onMouseDown={mouseDown}
+      data-selected={isSelected}
       className={'draggable-container'}
+      onClick={e => addSelectedItem(id, e.ctrlKey)}
       style={{ width: width, height: height, transform: containerTranslate }}
     >
       {numberOfInputSlotsAsArray.map((_, index) => (

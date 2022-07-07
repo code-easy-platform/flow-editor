@@ -1,5 +1,5 @@
-import React, { createContext, ReactNode, useContext, useMemo } from "react";
-import { IObservable, observe, selector } from "react-observing";
+import React, { createContext, ReactNode, useCallback, useContext, useMemo } from "react";
+import { IObservable, observe, selector, useObserver, useObserverValue } from "react-observing";
 
 import { TId } from "../types";
 
@@ -46,6 +46,7 @@ interface IItemsContextData {
   boardSizes: IBoardSizes;
   flowStore: IObservable<INode[]>;
   linesStore: IObservable<ILine[]>;
+  selectedItems: IObservable<TId[]>;
 }
 const ItemsContext = createContext({} as IItemsContextData);
 
@@ -115,9 +116,11 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
     }),
   }), [flow]);
 
+  const selectedItems = useMemo(() => observe([] as TId[]), []);
+
 
   return (
-    <ItemsContext.Provider value={{ flowStore: flow, linesStore: lines, boardSizes }}>
+    <ItemsContext.Provider value={{ flowStore: flow, linesStore: lines, boardSizes, selectedItems }}>
       {children}
     </ItemsContext.Provider>
   );
@@ -126,3 +129,31 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
 export const useItemsContext = () => useContext(ItemsContext);
 
 export const useBoardSizes = () => useItemsContext().boardSizes;
+
+export const useSelectedItems = () => {
+  const { selectedItems } = useItemsContext()
+
+  return selectedItems;
+};
+
+export const useIsSelectedItem = (id: TId) => {
+  const selectedItems = useObserverValue(useItemsContext().selectedItems);
+
+  return useMemo(() => {
+    return selectedItems.some(itemId => itemId === id);
+  }, [selectedItems, id]);
+};
+
+export const useAddSelectedItem = () => {
+  const [selectedItems, setSelectedItems] = useObserver(useItemsContext().selectedItems);
+
+  return useCallback((id: TId, keepSelected = false) => {
+    if (selectedItems.some(itemId => itemId === id)) {
+      setSelectedItems(old => old.filter(itemId => itemId !== id));
+    } else if (keepSelected) {
+      setSelectedItems(old => [...old, id]);
+    } else {
+      setSelectedItems([id]);
+    }
+  }, [selectedItems]);
+};

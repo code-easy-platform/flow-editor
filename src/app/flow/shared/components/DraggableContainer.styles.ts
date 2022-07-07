@@ -9,12 +9,19 @@ export const DraggableContainerCss = `
   position: absolute;
   pointer-events: none;
   flex-direction: column;
+  border: thin solid transparent;
+}
+
+.draggable-container[data-selected=true] {
+  border-radius: 4px;
+  border: thin solid #0f77bf;
 }
 
 .draggable-container-content {
   flex: 1;
   display: flex;
   overflow: auto;
+  border-radius: 4px;
   pointer-events: auto;
   flex-direction: column;
 }

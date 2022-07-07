@@ -99,6 +99,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
                 widthObservable={block.width}
                 leftObservable={block.left}
                 topObservable={block.top}
+                idObservable={block.id}
                 render={block.render}
                 key={block.id.value}
               />

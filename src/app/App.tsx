@@ -23,14 +23,14 @@ export const App: React.FC = () => {
 }
 
 
-const ContentElement = (props: { width: IObservable<number>; height: IObservable<number>; }) => {
+const ContentElement = (props: { width: IObservable<number>; height: IObservable<number>; title: string }) => {
   const [width, setWidth] = useObserver(props.width);
   const [height, setHeight] = useObserver(props.height);
 
 
   return (
-    <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'green', alignItems: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}>
-      <p>Start</p>
+    <span style={{ flex: 1, padding: 8, backgroundColor: 'green', alignItems: 'center', justifyContent: 'center', display: 'flex', flexDirection: 'column' }}>
+      <p>{props.title}</p>
 
       <span onMouseDown={e => e.stopPropagation()}>
         <input type="number" value={width} onChange={e => setWidth(Number(e.target.value))} />
@@ -47,7 +47,7 @@ const itemsMock = [
     left: observe(50),
     width: observe(170),
     height: observe(120),
-    render: (props: any) => <ContentElement {...props} />,
+    render: (props: any) => <ContentElement {...props} title="Start" />,
     connections: observe([
       {
         inputSlot: observe(0),
@@ -62,7 +62,7 @@ const itemsMock = [
     left: observe(250),
     width: observe(100),
     height: observe(100),
-    render: () => <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'brown' }}>Node</span>,
+    render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'brown' }}>Node</span>,
     connections: observe([
       {
         inputSlot: observe(0),
@@ -87,7 +87,7 @@ const itemsMock = [
     left: observe(550),
     width: observe(60),
     height: observe(120),
-    render: () => <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'blue' }}>Teste</span>,
+    render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'blue' }}>Teste</span>,
     connections: observe([
       {
         inputSlot: observe(0),
@@ -102,7 +102,7 @@ const itemsMock = [
     left: observe(500),
     width: observe(120),
     height: observe(40),
-    render: () => <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'gray' }}>Testando</span>,
+    render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'gray' }}>Testando</span>,
     connections: observe([
       {
         inputSlot: observe(1),
@@ -118,6 +118,6 @@ const itemsMock = [
     width: observe(60),
     height: observe(50),
     connections: observe([]),
-    render: () => <span style={{ flex: 1, padding: 8, borderRadius: 4, backgroundColor: 'red', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>End</span>,
+    render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'red', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>End</span>,
   },
 ];
