@@ -2,9 +2,10 @@ import { ReactNode, useCallback, useMemo, useRef } from 'react';
 import { IObservable, useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { INodeRenderProps, useAddSelectedItem, useBoardScrollContext, useIsSelectedItem, useSnapGridContext } from '../context';
+import { INodeRenderProps, useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems } from '../context';
 import { gridSnap } from '../services';
 import { TId } from '../types';
+import { getCtrlKeyBySystem } from '../services/GetCtrlKey';
 
 
 interface IDraggableContainerProps {
@@ -24,9 +25,10 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
   const id = useObserverValue(idObservable);
 
-  const addSelectedItem = useAddSelectedItem();
+  const dragAllSelectedItems = useDragSelectedItems();
+  const addSelectedItem = useToggleSelectedItem();
   const scrollObject = useBoardScrollContext();
-  const isSelected = useIsSelectedItem(id);
+  const isSelected = useIsSelectedItemById(id);
   const snapGrid = useSnapGridContext();
 
   const [left, setLeft] = useObserver(leftObservable);
@@ -38,13 +40,19 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
 
   const mouseDown = useCallback((e: React.MouseEvent) => {
+    addSelectedItem(id, getCtrlKeyBySystem(e.nativeEvent));
+
     if (!window) return;
 
     const mouseMouse = (e: MouseEvent) => {
       const zeroIfLessThanZero = (num: number) => num < 0 ? 0 : num;
 
-      setLeft(zeroIfLessThanZero((e.pageX - scrollObject.left.value) - cliquedLocationFlowItem.current.left));
-      setTop(zeroIfLessThanZero((e.pageY - scrollObject.top.value) - cliquedLocationFlowItem.current.top));
+      const newLeft = zeroIfLessThanZero((e.pageX - scrollObject.left.value) - cliquedLocationFlowItem.current.left);
+      const newTop = zeroIfLessThanZero((e.pageY - scrollObject.top.value) - cliquedLocationFlowItem.current.top);
+      const movementX = newLeft - leftObservable.value;
+      const movementY = newTop - topObservable.value;
+
+      dragAllSelectedItems(movementX, movementY);
     }
 
     const mouseUp = () => {
@@ -58,7 +66,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
     }
     window.addEventListener('mousemove', mouseMouse);
     window.addEventListener('mouseup', mouseUp);
-  }, [setLeft, setTop, window, scrollObject, left, top]);
+  }, [setLeft, setTop, addSelectedItem, dragAllSelectedItems, id, window, scrollObject, leftObservable, topObservable]);
 
 
   const content = useMemo(() => {
@@ -79,7 +87,6 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
       onMouseDown={mouseDown}
       data-selected={isSelected}
       className={'draggable-container'}
-      onClick={e => addSelectedItem(id, e.ctrlKey)}
       style={{ width: width, height: height, transform: containerTranslate }}
     >
       {numberOfInputSlotsAsArray.map((_, index) => (

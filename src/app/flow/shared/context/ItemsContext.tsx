@@ -1,5 +1,5 @@
-import React, { createContext, ReactNode, useCallback, useContext, useMemo } from "react";
-import { IObservable, observe, selector, useObserver, useObserverValue } from "react-observing";
+import React, { createContext, ReactNode, useCallback, useContext, useMemo, useRef } from "react";
+import { IObservable, observe, selector, set, useObserver, useObserverValue } from "react-observing";
 
 import { TId } from "../types";
 
@@ -46,7 +46,8 @@ interface IItemsContextData {
   boardSizes: IBoardSizes;
   flowStore: IObservable<INode[]>;
   linesStore: IObservable<ILine[]>;
-  selectedItems: IObservable<TId[]>;
+  selectedItems: IObservable<INode[]>;
+  selectedItemsId: IObservable<TId[]>;
 }
 const ItemsContext = createContext({} as IItemsContextData);
 
@@ -116,11 +117,20 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
     }),
   }), [flow]);
 
-  const selectedItems = useMemo(() => observe([] as TId[]), []);
+  const selectedItemsId = useMemo(() => observe([] as TId[]), []);
+
+  const selectedItems = useMemo(() => {
+    return selector({
+      get: ({ get }) => {
+        const selectedItems = get(flow).filter(node => get(selectedItemsId).includes(get(node.id)))
+        return selectedItems;
+      }
+    });
+  }, [selectedItemsId]);
 
 
   return (
-    <ItemsContext.Provider value={{ flowStore: flow, linesStore: lines, boardSizes, selectedItems }}>
+    <ItemsContext.Provider value={{ flowStore: flow, linesStore: lines, boardSizes, selectedItems, selectedItemsId }}>
       {children}
     </ItemsContext.Provider>
   );
@@ -130,30 +140,51 @@ export const useItemsContext = () => useContext(ItemsContext);
 
 export const useBoardSizes = () => useItemsContext().boardSizes;
 
-export const useSelectedItems = () => {
-  const { selectedItems } = useItemsContext()
+export const useSelectedItemsId = () => {
+  const { selectedItemsId: selectedItems } = useItemsContext()
 
   return selectedItems;
 };
 
-export const useIsSelectedItem = (id: TId) => {
-  const selectedItems = useObserverValue(useItemsContext().selectedItems);
+export const useIsSelectedItemById = (id: TId) => {
+  const selectedItems = useObserverValue(useItemsContext().selectedItemsId);
 
   return useMemo(() => {
     return selectedItems.some(itemId => itemId === id);
   }, [selectedItems, id]);
 };
 
-export const useAddSelectedItem = () => {
-  const [selectedItems, setSelectedItems] = useObserver(useItemsContext().selectedItems);
+export const useToggleSelectedItem = () => {
+  const [selectedItems, setSelectedItems] = useObserver(useItemsContext().selectedItemsId);
 
   return useCallback((id: TId, keepSelected = false) => {
+    if (selectedItems.some(itemId => itemId === id) && !keepSelected) return;
+
     if (selectedItems.some(itemId => itemId === id)) {
       setSelectedItems(old => old.filter(itemId => itemId !== id));
     } else if (keepSelected) {
       setSelectedItems(old => [...old, id]);
     } else {
       setSelectedItems([id]);
+    }
+  }, [selectedItems]);
+};
+
+export const useDragSelectedItems = () => {
+  const { selectedItems } = useItemsContext();
+
+  return useCallback((movementX: number, movementY: number) => {
+    if (selectedItems.value.length === 0) return;
+
+    if (selectedItems.value.every(node => node.top.value > 0) || movementY > 0) {
+      selectedItems.value.forEach(node => {
+        set(node.top, old => (old + movementY) <= 0 ? 0 : (old + movementY));
+      });
+    }
+    if (selectedItems.value.every(node => node.left.value > 0) || movementX > 0) {
+      selectedItems.value.forEach(node => {
+        set(node.left, old => (old + movementX) <= 0 ? 0 : (old + movementX));
+      });
     }
   }, [selectedItems]);
 };
