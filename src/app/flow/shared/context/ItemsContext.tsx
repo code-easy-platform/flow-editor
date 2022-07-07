@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useCallback, useContext, useMemo, useRef } from "react";
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { IObservable, observe, selector, set, useObserver, useObserverValue } from "react-observing";
 
 import { TId } from "../types";
@@ -147,27 +147,37 @@ export const useSelectedItemsId = () => {
 };
 
 export const useIsSelectedItemById = (id: TId) => {
-  const selectedItems = useObserverValue(useItemsContext().selectedItemsId);
+  const { selectedItemsId } = useItemsContext();
 
-  return useMemo(() => {
-    return selectedItems.some(itemId => itemId === id);
-  }, [selectedItems, id]);
+  const [isSelected, setIsSelected] = useState(selectedItemsId.value.includes(id));
+
+  useEffect(() => {
+    const subscription = selectedItemsId.subscribe(ids => {
+      const isSelected = ids.includes(id);
+      setIsSelected(old => old !== isSelected ? isSelected : old);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [selectedItemsId, id]);
+
+
+  return isSelected;
 };
 
 export const useToggleSelectedItem = () => {
-  const [selectedItems, setSelectedItems] = useObserver(useItemsContext().selectedItemsId);
+  const { selectedItemsId } = useItemsContext();
 
   return useCallback((id: TId, keepSelected = false) => {
-    if (selectedItems.some(itemId => itemId === id) && !keepSelected) return;
+    if (selectedItemsId.value.some(itemId => itemId === id) && !keepSelected) return;
 
-    if (selectedItems.some(itemId => itemId === id)) {
-      setSelectedItems(old => old.filter(itemId => itemId !== id));
+    if (selectedItemsId.value.some(itemId => itemId === id)) {
+      set(selectedItemsId, old => old.filter(itemId => itemId !== id));
     } else if (keepSelected) {
-      setSelectedItems(old => [...old, id]);
+      set(selectedItemsId, old => [...old, id]);
     } else {
-      setSelectedItems([id]);
+      set(selectedItemsId, [id]);
     }
-  }, [selectedItems]);
+  }, [selectedItemsId]);
 };
 
 export const useDragSelectedItems = () => {

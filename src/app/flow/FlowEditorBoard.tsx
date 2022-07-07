@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { useObserverValue, useObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { useBoardScrollContext, useBoardSizes, useBoardZoomContext, useItemsContext } from './shared/context';
-import { DraggableContainer, Line } from './shared/components';
+import { useBoardScrollContext, useBoardZoomContext, useItemsContext } from './shared/context';
+import { BoardSizeAndZoomContainer, DraggableContainer, Line } from './shared/components';
 
 
 interface IFlowEditorBoardProps {
@@ -50,7 +50,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
   return (
     <div
-      className={'panel-wrapper'}
+      className='panel-wrapper'
       style={{
         backgroundSize: `${backgroundSize / devicePixelRatio}px ${backgroundSize / devicePixelRatio}px`,
         ...({
@@ -59,33 +59,31 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
         }) as any,
       }}
     >
-      <svg className={'svg-panel'}>
-        <g style={{ transform: `scale(${zoom})` }}>
-          <g style={{ transform: `translate(${scrollX}px, ${scrollY}px)` }}>
-            {lines.map(line => (
-              <Line
-                key={line.id}
+      <svg className='svg-panel'>
+        <g style={{ transform: `translate(${scrollX}px, ${scrollY}px) scale(${zoom})` }}>
+          {lines.map(line => (
+            <Line
+              key={line.id}
 
-                top1Observable={line.top1}
-                top2Observable={line.top2}
-                left1Observable={line.left1}
-                left2Observable={line.left2}
+              top1Observable={line.top1}
+              top2Observable={line.top2}
+              left1Observable={line.left1}
+              left2Observable={line.left2}
 
-                width1Observable={line.width1}
-                width2Observable={line.width2}
-                height1Observable={line.height1}
-                height2Observable={line.height2}
+              width1Observable={line.width1}
+              width2Observable={line.width2}
+              height1Observable={line.height1}
+              height2Observable={line.height2}
 
-                inputSlotObservable={line.inputSlot}
-                outputSlotObservable={line.outputSlot}
-              />
-            ))}
-          </g>
+              inputSlotObservable={line.inputSlot}
+              outputSlotObservable={line.outputSlot}
+            />
+          ))}
         </g>
       </svg>
 
-      <div className={'panel'} onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}>
-        <BoardSizeContainer>
+      <div className='panel' onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}>
+        <BoardSizeAndZoomContainer>
           {flow.map((block, _, allBlocks) => {
             const relatedBlocks = allBlocks
               .filter(relatedBlock => relatedBlock.id.value !== block.id.value)
@@ -105,23 +103,9 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
               />
             );
           })}
-        </BoardSizeContainer>
+        </BoardSizeAndZoomContainer>
       </div>
 
-    </div>
-  );
-}
-
-
-
-const BoardSizeContainer = ({ children }: { children: React.ReactNode }) => {
-  const height = useObserverValue(useBoardSizes().height);
-  const width = useObserverValue(useBoardSizes().width);
-  const zoom = useObserverValue(useBoardZoomContext());
-
-  return (
-    <div style={{ zoom, height: height + 100, width: width + 100 }}>
-      {children}
     </div>
   );
 }
