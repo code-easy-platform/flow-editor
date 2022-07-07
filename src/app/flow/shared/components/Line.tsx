@@ -59,13 +59,28 @@ export const Line: React.FC<IDraggableContainerProps> = ({ left1Observable, top1
   }, [diferenceLeft1Left2]);
 
 
+
+  const pathD = useMemo(() => {
+    //return `M${resolvedLeft1},${resolvedTop1} q${resolvedQuadraticX},${resolvedQuadraticY} ${resolvedLeftMiddle},${resolvedTopMiddle} T${resolvedLeft2},${resolvedTop2}`;
+    const start = `M${resolvedLeft1},${resolvedTop1} ${resolvedLeft1 + 15},${resolvedTop1}`;
+    const end = `M${resolvedLeft2 - 15},${resolvedTop2} ${resolvedLeft2},${resolvedTop2}`;
+
+    const middle1 = ``;
+    const middle2 = ``;
+    const middle3 = ``;
+    //const middle = `q${resolvedQuadraticX},${resolvedQuadraticY} ${resolvedLeftMiddle},${resolvedTopMiddle} T${resolvedLeft2 - 15},${resolvedTop2}`;
+    const middle = `q${0},${15} ${0},${-15}`;
+
+    return `${start} ${middle} ${end}`;
+  }, [resolvedLeft1, resolvedTop1, resolvedQuadraticX, resolvedQuadraticY, resolvedLeftMiddle, resolvedTopMiddle, resolvedLeft2, resolvedTop2]);
+
   return (
     <path
+      d={pathD}
       fill="none"
       stroke="#333"
       strokeWidth="4"
       strokeLinecap="round"
-      d={`M${resolvedLeft1},${resolvedTop1} q${resolvedQuadraticX},${resolvedQuadraticY} ${resolvedLeftMiddle},${resolvedTopMiddle} T${resolvedLeft2},${resolvedTop2}`}
     />
   );
 }
