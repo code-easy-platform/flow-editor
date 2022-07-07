@@ -45,10 +45,8 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
     if (!window) return;
 
     const mouseMouse = (e: MouseEvent) => {
-      const zeroIfLessThanZero = (num: number) => num < 0 ? 0 : num;
-
-      const newLeft = zeroIfLessThanZero((e.pageX - scrollObject.left.value) - cliquedLocationFlowItem.current.left);
-      const newTop = zeroIfLessThanZero((e.pageY - scrollObject.top.value) - cliquedLocationFlowItem.current.top);
+      const newLeft = (e.pageX - scrollObject.left.value) - cliquedLocationFlowItem.current.left;
+      const newTop = (e.pageY - scrollObject.top.value) - cliquedLocationFlowItem.current.top;
       const movementX = newLeft - leftObservable.value;
       const movementY = newTop - topObservable.value;
 

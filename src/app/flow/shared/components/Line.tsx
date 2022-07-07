@@ -31,21 +31,34 @@ export const Line: React.FC<IDraggableContainerProps> = ({ left1Observable, top1
   const outputSlot = useObserverValue(outputSlotObservable);
 
 
-  const resolvedLeft2 = useMemo(() => gridSnap(left2, snapGrid) - 10, [left2, snapGrid]);
-  const resolvedLeft1 = useMemo(() => gridSnap(left1, snapGrid) + width1 + 10, [left1, width1, snapGrid]);
+  const resolvedLeft2 = useMemo(() => gridSnap(left2, snapGrid) - 5, [left2, snapGrid]);
+  const resolvedLeft1 = useMemo(() => gridSnap(left1, snapGrid) + width1 + 20, [left1, width1, snapGrid]);
 
   const resolvedTop1 = useMemo(() => gridSnap(top1, snapGrid) + height1 - 7 - (outputSlot * 16), [top1, height1, outputSlot, snapGrid]);
   const resolvedTop2 = useMemo(() => gridSnap(top2, snapGrid) + 7 + (inputSlot * 16), [top2, inputSlot, snapGrid]);
 
+  const diferenceLeft1Left2 = useMemo(() => {
+    return (resolvedLeft2 - resolvedLeft1) - 22;
+  }, [resolvedLeft1, resolvedLeft2]);
+
+  const retreat = useMemo(() => {
+    if (diferenceLeft1Left2 > 30) return -30;
+
+    if (diferenceLeft1Left2 > 0) return diferenceLeft1Left2 * -1;
+
+    if (diferenceLeft1Left2 < -200) return -200;
+
+    return diferenceLeft1Left2;
+  }, [diferenceLeft1Left2]);
+
   const pathD = useMemo(() => {
     const start = `M ${resolvedLeft1},${resolvedTop1} ${resolvedLeft1 + 5},${resolvedTop1}`;
-    const middle1 = `c 0,0 -10,0 10,0`;
-    const middle2 = `S ${resolvedLeft2 - 30},${resolvedTop2} ${resolvedLeft2 - 15},${resolvedTop2}`;
+    const middle1 = `c 0,0 ${retreat},0 0,0`;
+    const middle2 = `S ${resolvedLeft2 - (-retreat + 20)},${resolvedTop2} ${resolvedLeft2 - 15},${resolvedTop2}`;
     const end = `M${resolvedLeft2 - 15},${resolvedTop2} ${resolvedLeft2},${resolvedTop2}`;
 
-
     return `${start} ${middle1} ${middle2} ${end}`;
-  }, [resolvedLeft1, resolvedTop1, resolvedLeft2, resolvedTop2]);
+  }, [resolvedLeft1, resolvedTop1, resolvedLeft2, resolvedTop2, retreat]);
 
 
   return (
