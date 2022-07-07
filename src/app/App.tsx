@@ -23,7 +23,7 @@ export const App: React.FC = () => {
 }
 
 
-const ContenElement = (props: { width: IObservable<number>; height: IObservable<number>; }) => {
+const ContentElement = (props: { width: IObservable<number>; height: IObservable<number>; }) => {
   const [width, setWidth] = useObserver(props.width);
   const [height, setHeight] = useObserver(props.height);
 
@@ -47,7 +47,7 @@ const itemsMock = [
     left: observe(50),
     width: observe(170),
     height: observe(120),
-    render: (props: any) => <ContenElement {...props} />,
+    render: (props: any) => <ContentElement {...props} />,
     connections: observe([
       {
         inputSlot: observe(0),
