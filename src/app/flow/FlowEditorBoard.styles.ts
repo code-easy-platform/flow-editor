@@ -30,7 +30,7 @@ html, body {
   z-index: 0;
   width: 100vw;
   height: 100vh;
-  position: fixed;
+  /* position: fixed; */
   pointer-events: none;
   background-color: transparent;
 }

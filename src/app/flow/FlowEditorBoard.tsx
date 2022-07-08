@@ -4,6 +4,7 @@ import { useFrame } from 'react-frame-component';
 
 import { BoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea, ICoords } from './shared/components';
 import { INode, useBoardScrollContext, useBoardZoomContext, useItemsContext } from './shared/context';
+import { SVGBoardSizeAndZoomContainer } from './shared/components/SVGBoardSizeAndZoomContainer';
 
 
 interface IFlowEditorBoardProps {
@@ -117,8 +118,14 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
         }) as any,
       }}
     >
-      <svg className='svg-panel'>
-        <g style={{ transform: `translate(${scrollX}px, ${scrollY}px) scale(${zoom})` }}>
+
+      <div
+        ref={boardRef}
+        className='panel'
+        onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}
+        onMouseDown={e => boardRef.current?.isSameNode(e.target as any) ? set(selectedItemsId, []) : undefined}
+      >
+        <SVGBoardSizeAndZoomContainer>
           {lines.map(line => (
             <Line
               key={line.id}
@@ -137,20 +144,13 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
               outputSlotObservable={line.outputSlot}
             />
           ))}
-        </g>
 
-        <SelectorArea
-          boardRef={boardRef}
-          onCoordsChange={handleOnCoordsChange}
-        />
-      </svg>
+          <SelectorArea
+            boardRef={boardRef}
+            onCoordsChange={handleOnCoordsChange}
+          />
+        </SVGBoardSizeAndZoomContainer>
 
-      <div
-        ref={boardRef}
-        className='panel'
-        onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}
-        onMouseDown={e => boardRef.current?.isSameNode(e.target as any) ? set(selectedItemsId, []) : undefined}
-      >
         <BoardSizeAndZoomContainer>
           {flow.map((block, _, allBlocks) => {
             const relatedBlocks = allBlocks
