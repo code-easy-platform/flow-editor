@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
 import { useBoardScrollContext } from '../context';
@@ -23,9 +22,6 @@ export const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSe
   const scrollObject = useBoardScrollContext();
   const { window } = useFrame();
 
-  const scrollLeft = useObserverValue(scrollObject.left);
-  const scrollTop = useObserverValue(scrollObject.top);
-
   const [startLeft, setStartLeft] = useState(0);
   const [display, setDisplay] = useState(false);
   const [startTop, setStartTop] = useState(0);
@@ -40,8 +36,8 @@ export const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSe
     onSelectionStart?.(e);
 
     const mouseMouse = (e: MouseEvent) => {
-      setEndLeft(e.pageX);
-      setEndTop(e.pageY);
+      setEndLeft(e.pageX - scrollObject.left.value);
+      setEndTop(e.pageY - scrollObject.top.value);
     }
 
     const mouseUp = (e: MouseEvent) => {
@@ -51,74 +47,75 @@ export const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSe
       setDisplay(false);
     }
 
-    setStartLeft(e.pageX - scrollLeft);
-    setStartTop(e.pageY - scrollTop);
-    setEndLeft(e.pageX);
-    setEndTop(e.pageY);
+
+    setStartLeft(e.offsetX - scrollObject.left.value);
+    setStartTop(e.offsetY - scrollObject.top.value);
+    setEndLeft(e.offsetX - scrollObject.left.value);
+    setEndTop(e.offsetY - scrollObject.top.value);
     setDisplay(true);
     window.addEventListener('mousemove', mouseMouse);
     window.addEventListener('mouseup', mouseUp);
-  }, [window, scrollObject, scrollLeft, scrollTop, boardRef]);
+  }, [window, scrollObject, boardRef]);
 
 
   useEffect(() => {
     if (!window) return;
+    if (isDisabled) return;
 
     window.addEventListener('mousedown', handleMouseDown);
     return () => window.removeEventListener('mousedown', handleMouseDown);
-  }, [window, handleMouseDown]);
+  }, [window, isDisabled, handleMouseDown]);
 
 
   const top = useMemo(() => {
     if ((endTop - startTop) > 0) {
-      return startTop + scrollTop;
+      return startTop;
     } else {
-      if ((startTop + scrollTop) < endTop) {
-        return startTop + scrollTop;
+      if ((startTop) < endTop) {
+        return startTop;
       } else {
         return endTop;
       }
     }
-  }, [endTop, startTop, scrollTop]);
+  }, [endTop, startTop]);
 
   const left = useMemo(() => {
     if ((endLeft - startLeft) > 0) {
-      return startLeft + scrollLeft;
+      return startLeft;
     } else {
-      if ((startLeft + scrollLeft) < endLeft) {
-        return startLeft + scrollLeft;
+      if ((startLeft) < endLeft) {
+        return startLeft;
       } else {
         return endLeft;
       }
     }
-  }, [endLeft, startLeft, scrollLeft]);
+  }, [endLeft, startLeft]);
 
   const width = useMemo(() => {
     if ((endLeft - startLeft) > 0) {
-      return (endLeft - startLeft) - scrollLeft;
+      return (endLeft - startLeft);
     } else {
-      const result = (startLeft - endLeft) + scrollLeft;
+      const result = (startLeft - endLeft);
       if (result < 0) {
-        return (endLeft - startLeft) - scrollLeft;
+        return (endLeft - startLeft);
       } else {
-        return (startLeft - endLeft) + scrollLeft;
+        return (startLeft - endLeft);
       }
     }
-  }, [endLeft, startLeft, scrollLeft]);
+  }, [endLeft, startLeft]);
 
   const height = useMemo(() => {
     if ((endTop - startTop) > 0) {
-      return (endTop - startTop) - scrollTop;
+      return (endTop - startTop);
     } else {
-      const result = (startTop - endTop) + scrollTop;
+      const result = (startTop - endTop);
       if (result < 0) {
-        return (endTop - startTop) - scrollTop;
+        return (endTop - startTop);
       } else {
-        return (startTop - endTop) + scrollTop;
+        return (startTop - endTop);
       }
     }
-  }, [endTop, startTop, scrollTop]);
-
+  }, [endTop, startTop]);
 
 
   useEffect(() => {
