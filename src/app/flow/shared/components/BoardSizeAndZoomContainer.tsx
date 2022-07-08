@@ -27,7 +27,7 @@ export const BoardSizeAndZoomContainer = ({ children }: { children: React.ReactN
 
 
   return (
-    <div style={{ zoom, height: height + 100, width: width + 100 }}>
+    <div style={{ zoom, height: height + 100, width: width + 100, pointerEvents: 'none' }}>
       {children}
     </div>
   );

@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useObserverValue, useObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
 import { useBoardScrollContext, useBoardZoomContext, useItemsContext } from './shared/context';
-import { BoardSizeAndZoomContainer, DraggableContainer, Line } from './shared/components';
+import { BoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea } from './shared/components';
 
 
 interface IFlowEditorBoardProps {
@@ -12,6 +12,7 @@ interface IFlowEditorBoardProps {
   backgroundColorDefault?: string;
 }
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundSize = 30 }) => {
+  const boardRef = useRef<HTMLDivElement>(null);
   const { document } = useFrame();
 
   const scrollObject = useBoardScrollContext();
@@ -80,9 +81,14 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
             />
           ))}
         </g>
+
+        <SelectorArea
+          boardRef={boardRef}
+          onCoordsChange={console.log}
+        />
       </svg>
 
-      <div className='panel' onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}>
+      <div ref={boardRef} className='panel' onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}>
         <BoardSizeAndZoomContainer>
           {flow.map((block, _, allBlocks) => {
             const relatedBlocks = allBlocks
@@ -99,13 +105,13 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
                 topObservable={block.top}
                 idObservable={block.id}
                 render={block.render}
+
                 key={block.id.value}
               />
             );
           })}
         </BoardSizeAndZoomContainer>
       </div>
-
     </div>
   );
 }
