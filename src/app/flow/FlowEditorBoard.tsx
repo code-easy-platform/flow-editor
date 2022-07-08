@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { useObserverValue, useObserver } from 'react-observing';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { useObserverValue, useObserver, set } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { useBoardScrollContext, useBoardZoomContext, useItemsContext } from './shared/context';
-import { BoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea } from './shared/components';
+import { BoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea, ICoords } from './shared/components';
+import { INode, useBoardScrollContext, useBoardZoomContext, useItemsContext } from './shared/context';
 
 
 interface IFlowEditorBoardProps {
@@ -21,7 +21,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
   const [zoom, setZoom] = useObserver(useBoardZoomContext());
 
-  const { flowStore, linesStore } = useItemsContext();
+  const { flowStore, linesStore, selectedItemsId } = useItemsContext();
   const lines = useObserverValue(linesStore);
   const flow = useObserverValue(flowStore);
 
@@ -47,6 +47,63 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
     document.addEventListener('wheel', handleMouseWheel, { passive: false });
     return () => document.removeEventListener('wheel', handleMouseWheel);
   }, [setZoom, document]);
+
+  const handleOnCoordsChange = useCallback((coords: ICoords) => {
+    const coordTop2 = coords.endY;
+    const coordLeft2 = coords.endX;
+    const coordTop1 = coords.startY;
+    const coordLeft1 = coords.startX;
+
+
+    const selectItemByCoords = (item: INode): boolean => {
+      const itemTop1 = item.top.value;
+      const itemLeft1 = item.left.value;
+      const itemTop2 = item.top.value + item.height.value;
+      const itemLeft2 = item.left.value + item.width.value;
+
+
+      const yGreaterThan0 = ((coordTop2 - coordTop1) > 0);
+      const xGreaterThan0 = ((coordLeft2 - coordLeft1) > 0);
+
+      const lessThan0Selected = (value1: number, value2: number, _coordStart: number, _coordEnd: number) => {
+        return (
+          (
+            (value1 <= _coordStart) || (value2 <= _coordStart)
+          ) && (
+            (value1 >= _coordEnd) || (value2 >= _coordEnd)
+          )
+        );
+      }
+
+      const greaterThan0Selected = (value1: number, value2: number, _coordStart: number, _coordEnd: number) => {
+        return (
+          (
+            (value1 >= _coordStart) || (value2 >= _coordStart)
+          ) && (
+            (value1 <= _coordEnd) || (value2 <= _coordEnd)
+          )
+        );
+      }
+
+      return (
+        (
+          yGreaterThan0
+            ? greaterThan0Selected(itemTop1, itemTop2, coordTop1, coordTop2)
+            : lessThan0Selected(itemTop1, itemTop2, coordTop1, coordTop2)
+        )
+        &&
+        (
+          xGreaterThan0
+            ? greaterThan0Selected(itemLeft1, itemLeft2, coordLeft1, coordLeft2)
+            : lessThan0Selected(itemLeft1, itemLeft2, coordLeft1, coordLeft2)
+        )
+      );
+    };
+
+    const ids = flow.filter(item => selectItemByCoords(item)).map(node => node.id.value);
+
+    set(selectedItemsId, ids);
+  }, [flow]);
 
 
   return (
@@ -84,11 +141,16 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
         <SelectorArea
           boardRef={boardRef}
-          onCoordsChange={console.log}
+          onCoordsChange={handleOnCoordsChange}
         />
       </svg>
 
-      <div ref={boardRef} className='panel' onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}>
+      <div
+        ref={boardRef}
+        className='panel'
+        onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}
+        onMouseDown={e => boardRef.current?.isSameNode(e.target as any) ? set(selectedItemsId, []) : undefined}
+      >
         <BoardSizeAndZoomContainer>
           {flow.map((block, _, allBlocks) => {
             const relatedBlocks = allBlocks

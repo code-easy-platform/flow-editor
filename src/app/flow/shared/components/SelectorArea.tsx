@@ -1,11 +1,11 @@
-import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
 import { useBoardScrollContext } from '../context';
 
 
-interface ICoords {
+export interface ICoords {
   startY: number,
   startX: number,
   endY: number,
@@ -124,9 +124,9 @@ export const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSe
   useEffect(() => {
     onCoordsChange?.({
       startY: top,
-      endX: width,
       startX: left,
-      endY: height,
+      endY: top + height,
+      endX: left + width,
     });
   }, [top, left, height, width]);
 
