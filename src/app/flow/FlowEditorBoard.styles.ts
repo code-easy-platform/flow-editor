@@ -22,19 +22,6 @@ html, body {
   background-image: radial-gradient(var(--color-panel-paper) 5%, var(--color-panel-default) 5%);
 }
 
-.svg-panel {
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
-  width: 100vw;
-  height: 100vh;
-  /* position: fixed; */
-  pointer-events: none;
-  background-color: transparent;
-}
-
 .panel {
   top: 0;
   left: 0;

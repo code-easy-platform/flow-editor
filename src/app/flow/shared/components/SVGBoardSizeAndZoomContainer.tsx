@@ -26,7 +26,15 @@ export const SVGBoardSizeAndZoomContainer = ({ children }: { children: React.Rea
 
 
   return (
-    <svg style={{ zoom, height: height + 100, width: width + 100, pointerEvents: 'none' }}>
+    <svg style={{
+      zoom,
+      minWidth: '100vw',
+      minHeight: '100vh',
+      width: width + 100,
+      position: 'absolute',
+      height: height + 100,
+      pointerEvents: 'none',
+    }}>
       {children}
     </svg>
   );
