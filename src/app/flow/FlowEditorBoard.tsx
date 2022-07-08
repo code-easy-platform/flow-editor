@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { useObserverValue, useObserver, set } from 'react-observing';
+import { useObserverValue, useSetObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { BoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea, ICoords } from './shared/components';
+import { BoardSizeAndZoomContainer, SVGBoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea, ICoords } from './shared/components';
 import { INode, useBoardScrollContext, useBoardZoomContext, useItemsContext } from './shared/context';
-import { SVGBoardSizeAndZoomContainer } from './shared/components/SVGBoardSizeAndZoomContainer';
 
 
 interface IFlowEditorBoardProps {
@@ -17,12 +16,12 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
   const { document } = useFrame();
 
   const scrollObject = useBoardScrollContext();
-  const [scrollX, setScrollX] = useObserver(scrollObject.left);
-  const [scrollY, setScrollY] = useObserver(scrollObject.top);
-
-  const [zoom, setZoom] = useObserver(useBoardZoomContext());
+  const setZoom = useSetObserver(useBoardZoomContext());
+  const setScrollX = useSetObserver(scrollObject.left);
+  const setScrollY = useSetObserver(scrollObject.top);
 
   const { flowStore, linesStore, selectedItemsId } = useItemsContext();
+  const setSelectedItemsId = useSetObserver(selectedItemsId);
   const lines = useObserverValue(linesStore);
   const flow = useObserverValue(flowStore);
 
@@ -49,6 +48,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
     return () => document.removeEventListener('wheel', handleMouseWheel);
   }, [setZoom, document]);
 
+
   const handleOnCoordsChange = useCallback((coords: ICoords) => {
     const coordTop2 = coords.endY;
     const coordLeft2 = coords.endX;
@@ -61,7 +61,6 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
       const itemLeft1 = item.left.value;
       const itemTop2 = item.top.value + item.height.value;
       const itemLeft2 = item.left.value + item.width.value;
-
 
       const yGreaterThan0 = ((coordTop2 - coordTop1) > 0);
       const xGreaterThan0 = ((coordLeft2 - coordLeft1) > 0);
@@ -103,8 +102,8 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
     const ids = flow.filter(item => selectItemByCoords(item)).map(node => node.id.value);
 
-    set(selectedItemsId, ids);
-  }, [flow]);
+    setSelectedItemsId(ids);
+  }, [flow, setSelectedItemsId]);
 
 
   return (
@@ -118,12 +117,11 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
         }) as any,
       }}
     >
-
       <div
         ref={boardRef}
         className='panel'
         onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}
-        onMouseDown={e => boardRef.current?.isSameNode(e.target as any) ? set(selectedItemsId, []) : undefined}
+        onMouseDown={e => boardRef.current?.isSameNode(e.target as any) ? setSelectedItemsId([]) : undefined}
       >
         <SVGBoardSizeAndZoomContainer>
           {lines.map(line => (

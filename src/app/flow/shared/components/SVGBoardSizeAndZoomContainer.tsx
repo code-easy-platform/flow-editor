@@ -30,9 +30,9 @@ export const SVGBoardSizeAndZoomContainer = ({ children }: { children: React.Rea
       zoom,
       minWidth: '100vw',
       minHeight: '100vh',
-      width: width + 100,
+      width: width + 500,
       position: 'absolute',
-      height: height + 100,
+      height: height + 500,
       pointerEvents: 'none',
     }}>
       {children}
