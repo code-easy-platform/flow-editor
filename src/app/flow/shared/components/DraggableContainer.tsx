@@ -38,7 +38,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
   const cliquedLocationFlowItem = useRef({ top: 0, left: 0 });
 
 
-  const mouseDown = useCallback((e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     addSelectedItem(id, getCtrlKeyBySystem(e.nativeEvent));
 
     if (!window) return;
@@ -81,8 +81,8 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
   return (
     <div
-      onMouseDown={mouseDown}
       data-selected={isSelected}
+      onMouseDown={handleMouseDown}
       className={'draggable-container'}
       style={{ width: width, height: height, transform: containerTranslate }}
     >

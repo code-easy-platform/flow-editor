@@ -3,6 +3,7 @@ import { IObservable, useObserverValue } from 'react-observing';
 
 import { useSnapGridContext } from '../context';
 import { gridSnap } from '../services/GridSnap';
+import { DraggableLine } from './DraggableLine';
 
 interface IDraggableContainerProps {
   top1Observable: IObservable<number>;
@@ -71,20 +72,15 @@ export const Line: React.FC<IDraggableContainerProps> = ({ left1Observable, top1
         strokeLinecap="round"
       />
 
-      <rect
-        width={20}
-        height={20}
-        y={resolvedTop1 - 10}
-        x={resolvedLeft1 + 2}
-        style={{ cursor: 'crosshair', pointerEvents: 'auto' }}
-      />
-
-      <rect
-        width={20}
-        height={20}
-        y={resolvedTop2 - 10}
-        x={resolvedLeft2 - 34}
-        style={{ cursor: 'crosshair', pointerEvents: 'auto' }}
+      <DraggableLine
+        top1={top1}
+        top2={top2}
+        left1={left1}
+        left2={left2}
+        width={width1}
+        height={height1}
+        inputSlot={inputSlot}
+        outputSlot={outputSlot}
       />
     </>
   );
