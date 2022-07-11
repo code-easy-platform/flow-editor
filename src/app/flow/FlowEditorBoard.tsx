@@ -4,6 +4,7 @@ import { useFrame } from 'react-frame-component';
 
 import { BoardSizeAndZoomContainer, SVGBoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea, ICoords } from './shared/components';
 import { INode, useBoardScrollContext, useBoardZoomContext, useItemsContext } from './shared/context';
+import { getCtrlKeyBySystem } from './shared/services';
 
 
 interface IFlowEditorBoardProps {
@@ -30,8 +31,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
     if (!document) return;
 
     const handleMouseWheel = (e: WheelEvent) => {
-
-      if (e.ctrlKey) {
+      if (getCtrlKeyBySystem(e)) {
         e.stopImmediatePropagation();
         e.stopPropagation();
         e.preventDefault();
@@ -44,8 +44,18 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
       }
     }
 
+    const handleCtrlA = (e: KeyboardEvent) => {
+      if (getCtrlKeyBySystem(e) && e.key === 'a') {
+        setSelectedItemsId(flowStore.value.map(node => node.id.value));
+      }
+    }
+
+    document.addEventListener('keydown', handleCtrlA, { passive: false });
     document.addEventListener('wheel', handleMouseWheel, { passive: false });
-    return () => document.removeEventListener('wheel', handleMouseWheel);
+    return () => {
+      document.removeEventListener('keydown', handleCtrlA);
+      document.removeEventListener('wheel', handleMouseWheel);
+    }
   }, [setZoom, document]);
 
 

@@ -3,9 +3,8 @@ import { IObservable, useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
 import { INodeRenderProps, useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems } from '../context';
-import { gridSnap } from '../services';
+import { gridSnap, getCtrlKeyBySystem } from '../services';
 import { TId } from '../types';
-import { getCtrlKeyBySystem } from '../services/GetCtrlKey';
 
 
 interface IDraggableContainerProps {
