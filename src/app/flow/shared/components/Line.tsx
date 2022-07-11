@@ -62,12 +62,30 @@ export const Line: React.FC<IDraggableContainerProps> = ({ left1Observable, top1
 
 
   return (
-    <path
-      d={pathD}
-      fill="none"
-      stroke="#333"
-      strokeWidth="4"
-      strokeLinecap="round"
-    />
+    <>
+      <path
+        d={pathD}
+        fill="none"
+        stroke="#333"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+
+      <rect
+        width={20}
+        height={20}
+        y={resolvedTop1 - 10}
+        x={resolvedLeft1 + 2}
+        style={{ cursor: 'crosshair', pointerEvents: 'auto' }}
+      />
+
+      <rect
+        width={20}
+        height={20}
+        y={resolvedTop2 - 10}
+        x={resolvedLeft2 - 34}
+        style={{ cursor: 'crosshair', pointerEvents: 'auto' }}
+      />
+    </>
   );
 }
