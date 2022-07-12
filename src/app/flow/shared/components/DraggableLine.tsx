@@ -92,6 +92,32 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ height, width, in
     window.addEventListener('mouseup', handleMouseUp)
   }, [window, scrollObject, top1, left1, rest.left1, rest.top1]);
 
+  const handleEndMouseDown = useCallback((e: React.MouseEvent) => {
+    if (!window) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const newLeft = (e.pageX - scrollObject.left.value) - cliquedLocationFlowItem.current.left;
+      const newTop = (e.pageY - scrollObject.top.value) - cliquedLocationFlowItem.current.top;
+
+      setLeft2(newLeft);
+      setTop2(newTop);
+    }
+
+    const handleMouseUp = () => {
+      setLeft2(rest.left2);
+      setTop2(rest.top2);
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+
+    cliquedLocationFlowItem.current = {
+      top: e.nativeEvent.pageY - top2 - scrollObject.top.value,
+      left: e.nativeEvent.pageX - left2 - scrollObject.left.value + 10,
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+  }, [window, scrollObject, top2, left2, rest.left2, rest.top2]);
+
 
   const showDragLine = useMemo(() => {
     return !(rest.left1 === left1 && rest.left2 === left2 && rest.top1 === top1 && rest.top2 === top2);
@@ -113,7 +139,7 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ height, width, in
       <rect
         width={20}
         height={20}
-        /* fill='transparent' */
+        fill='transparent'
         y={resolvedTop1 - 10}
         x={resolvedLeft1 - 10}
         onMouseDown={handleStartMouseDown}
@@ -123,9 +149,10 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ height, width, in
       <rect
         width={20}
         height={20}
+        fill='transparent'
         y={resolvedTop2 - 10}
-        x={resolvedLeft2 - 34}
-        /* fill='transparent' */
+        x={resolvedLeft2 - 25}
+        onMouseDown={handleEndMouseDown}
         style={{ cursor: 'crosshair', pointerEvents: 'auto' }}
       />
     </>
