@@ -6,6 +6,10 @@ import { DraggableContainerCss } from './shared/components/DraggableContainer.st
 import { FlowEditorBoardCss } from './FlowEditorBoard.styles';
 import { FlowEditorBoard } from './FlowEditorBoard';
 
+
+export type { INode, ILine, INodeConnection, INodeRenderProps } from './shared/context';
+
+
 const IFrame = Frame as any;
 
 export interface IFlowEditorProps {

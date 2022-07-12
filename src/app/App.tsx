@@ -1,7 +1,7 @@
 import React from 'react';
 import { IObservable, observe, useObserver } from 'react-observing';
 
-import { FlowEditor } from './flow';
+import { FlowEditor, INode } from './flow';
 import './App.css';
 
 export const App: React.FC = () => {
@@ -40,7 +40,7 @@ const ContentElement = (props: { width: IObservable<number>; height: IObservable
   );
 }
 
-const itemsMock = [
+const itemsMock: INode[] = [
   {
     id: observe('1'),
     top: observe(50),
@@ -53,6 +53,7 @@ const itemsMock = [
         inputSlot: observe(0),
         outputSlot: observe(0),
         relatedId: observe('2'),
+        id: observe('line-id_'),
       },
     ]),
   },
@@ -65,19 +66,22 @@ const itemsMock = [
     render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'brown' }}>Node</span>,
     connections: observe([
       {
-        inputSlot: observe(0),
+        inputSlot: observe(1),
         outputSlot: observe(1),
-        relatedId: observe('3'),
+        relatedId: observe('5'),
+        id: observe('line-id_1'),
       },
       {
         inputSlot: observe(0),
         outputSlot: observe(0),
         relatedId: observe('4'),
+        id: observe('line-id_2'),
       },
       {
-        inputSlot: observe(2),
+        inputSlot: observe(0),
         outputSlot: observe(2),
-        relatedId: observe('5'),
+        relatedId: observe('3'),
+        id: observe('line-id_3'),
       },
     ]),
   },
@@ -93,6 +97,7 @@ const itemsMock = [
         inputSlot: observe(0),
         outputSlot: observe(0),
         relatedId: observe('5'),
+        id: observe('line-id_4'),
       },
     ]),
   },
@@ -105,9 +110,10 @@ const itemsMock = [
     render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'gray' }}>Testando</span>,
     connections: observe([
       {
-        inputSlot: observe(1),
+        inputSlot: observe(2),
         outputSlot: observe(0),
         relatedId: observe('5'),
+        id: observe('line-id_5'),
       },
     ]),
   },

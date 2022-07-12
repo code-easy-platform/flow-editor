@@ -14,6 +14,7 @@ export interface INodeRenderProps {
   height: IObservable<number>;
 }
 export interface INodeConnection {
+  id: IObservable<TId>;
   relatedId: IObservable<TId>;
   inputSlot: IObservable<number>;
   outputSlot: IObservable<number>;
