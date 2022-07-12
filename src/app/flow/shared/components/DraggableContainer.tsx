@@ -2,7 +2,7 @@ import { ReactNode, useCallback, useMemo, useRef } from 'react';
 import { IObservable, useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { INodeRenderProps, useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems } from '../context';
+import { INodeRenderProps, useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useDragLineContext } from '../context';
 import { gridSnap, getCtrlKeyBySystem } from '../services';
 import { TId } from '../types';
 
@@ -20,6 +20,7 @@ interface IDraggableContainerProps {
   numberOfOutputSlots: number;
 }
 export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render, idObservable, numberOfInputSlots, numberOfOutputSlots, leftObservable, topObservable, heightObservable, widthObservable }) => {
+  const dragLineData = useObserverValue(useDragLineContext());
   const { window } = useFrame();
 
   const id = useObserverValue(idObservable);
@@ -88,9 +89,9 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
     >
       {numberOfInputSlotsAsArray.map((_, index) => (
         <span
-          style={{ top: index * 16 }}
           onMouseDown={e => e.stopPropagation()}
           className={'draggable-container-input'}
+          style={{ top: index * 16, border: dragLineData?.type === 'end' ? '2px solid lightgreen' : undefined }}
         />
       ))}
 
@@ -100,9 +101,9 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
       {numberOfOutputSlotsAsArray.map((_, index) => (
         <span
-          style={{ bottom: index * 16 }}
           onMouseDown={e => e.stopPropagation()}
           className={'draggable-container-output'}
+          style={{ bottom: index * 16, border: dragLineData?.type === 'start' ? '2px solid lightgreen' : undefined }}
         />
       ))}
     </div>

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import Frame from 'react-frame-component';
 
-import { BoardZoomProvider, INode, ItemsProvider, SnapGridProvider } from './shared/context';
+import { BoardZoomProvider, DragLineProvider, INode, ItemsProvider, SnapGridProvider } from './shared/context';
 import { DraggableContainerCss } from './shared/components/DraggableContainer.styles';
 import { FlowEditorBoardCss } from './FlowEditorBoard.styles';
 import { FlowEditorBoard } from './FlowEditorBoard';
@@ -49,7 +49,9 @@ export const FlowEditor: React.FC<IFlowEditorProps> = ({ snapGridSize = 15, item
       <ItemsProvider items={items}>
         <SnapGridProvider value={snapGridSize}>
           <BoardZoomProvider value={1}>
-            <FlowEditorBoard {...rest} />
+            <DragLineProvider>
+              <FlowEditorBoard {...rest} />
+            </DragLineProvider>
           </BoardZoomProvider>
         </SnapGridProvider>
       </ItemsProvider>

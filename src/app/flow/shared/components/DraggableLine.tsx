@@ -1,11 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSetObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { useBoardScrollContext, useSnapGridContext } from '../context';
+import { useBoardScrollContext, useDragLineContext, useSnapGridContext } from '../context';
 import { gridSnap } from '../services';
+import { TId } from '../types';
 
 
 interface IDraggableLineProps {
+  nodeId: TId;
+  lineId: TId;
   top1: number;
   top2: number;
   left1: number;
@@ -14,8 +18,10 @@ interface IDraggableLineProps {
   height: number;
   inputSlot: number;
   outputSlot: number;
+
 }
-export const DraggableLine: React.FC<IDraggableLineProps> = ({ height, width, inputSlot, outputSlot, ...rest }) => {
+export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, height, width, inputSlot, outputSlot, ...rest }) => {
+  const setDragLine = useSetObserver(useDragLineContext());
   const scrollObject = useBoardScrollContext();
   const snapGrid = useSnapGridContext();
   const { window } = useFrame();
@@ -54,7 +60,6 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ height, width, in
     return diferenceLeft1Left2;
   }, [diferenceLeft1Left2]);
 
-
   const pathD = useMemo(() => {
     const start = `M ${resolvedLeft1},${resolvedTop1} ${resolvedLeft1 + 5},${resolvedTop1}`;
     const middle1 = `c 0,0 ${retreat},0 0,0`;
@@ -78,6 +83,7 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ height, width, in
     }
 
     const handleMouseUp = () => {
+      setDragLine(undefined);
       setLeft1(rest.left1);
       setTop1(rest.top1);
       window.removeEventListener('mousemove', handleMouseMove)
@@ -88,9 +94,10 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ height, width, in
       top: e.nativeEvent.pageY - top1 - scrollObject.top.value,
       left: e.nativeEvent.pageX - left1 - scrollObject.left.value - 10,
     }
+    setDragLine({ type: 'start', nodeId, lineId });
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseup', handleMouseUp)
-  }, [window, scrollObject, top1, left1, rest.left1, rest.top1]);
+  }, [setDragLine, window, scrollObject, top1, left1, rest.left1, rest.top1, nodeId, lineId]);
 
   const handleEndMouseDown = useCallback((e: React.MouseEvent) => {
     if (!window) return;
@@ -104,6 +111,7 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ height, width, in
     }
 
     const handleMouseUp = () => {
+      setDragLine(undefined);
       setLeft2(rest.left2);
       setTop2(rest.top2);
       window.removeEventListener('mousemove', handleMouseMove)
@@ -114,9 +122,10 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ height, width, in
       top: e.nativeEvent.pageY - top2 - scrollObject.top.value,
       left: e.nativeEvent.pageX - left2 - scrollObject.left.value + 10,
     }
+    setDragLine({ type: 'end', nodeId, lineId });
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseup', handleMouseUp)
-  }, [window, scrollObject, top2, left2, rest.left2, rest.top2]);
+  }, [setDragLine, window, scrollObject, top2, left2, rest.left2, rest.top2, nodeId, lineId]);
 
 
   const showDragLine = useMemo(() => {

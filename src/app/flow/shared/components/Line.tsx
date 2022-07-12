@@ -4,8 +4,12 @@ import { IObservable, useObserverValue } from 'react-observing';
 import { useSnapGridContext } from '../context';
 import { gridSnap } from '../services/GridSnap';
 import { DraggableLine } from './DraggableLine';
+import { TId } from '../types';
 
 interface IDraggableContainerProps {
+  lineIdObservable: IObservable<TId>;
+  blockIdObservable: IObservable<TId>;
+
   top1Observable: IObservable<number>;
   left1Observable: IObservable<number>;
   top2Observable: IObservable<number>;
@@ -19,14 +23,16 @@ interface IDraggableContainerProps {
   inputSlotObservable: IObservable<number>;
   outputSlotObservable: IObservable<number>;
 }
-export const Line: React.FC<IDraggableContainerProps> = ({ left1Observable, top1Observable, left2Observable, width1Observable, height1Observable, top2Observable, inputSlotObservable, outputSlotObservable }) => {
+export const Line: React.FC<IDraggableContainerProps> = ({ lineIdObservable, blockIdObservable, left1Observable, top1Observable, left2Observable, width1Observable, height1Observable, top2Observable, inputSlotObservable, outputSlotObservable }) => {
   const snapGrid = useSnapGridContext();
 
   const top1 = useObserverValue(top1Observable);
   const top2 = useObserverValue(top2Observable);
   const left1 = useObserverValue(left1Observable);
   const left2 = useObserverValue(left2Observable);
+  const lineId = useObserverValue(lineIdObservable);
   const width1 = useObserverValue(width1Observable);
+  const blockId = useObserverValue(blockIdObservable);
   const height1 = useObserverValue(height1Observable);
   const inputSlot = useObserverValue(inputSlotObservable);
   const outputSlot = useObserverValue(outputSlotObservable);
@@ -78,6 +84,8 @@ export const Line: React.FC<IDraggableContainerProps> = ({ left1Observable, top1
         left1={left1}
         left2={left2}
         width={width1}
+        lineId={lineId}
+        nodeId={blockId}
         height={height1}
         inputSlot={inputSlot}
         outputSlot={outputSlot}

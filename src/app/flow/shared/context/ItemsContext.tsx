@@ -30,7 +30,8 @@ export interface INode {
 }
 
 export interface ILine {
-  id: TId;
+  id: IObservable<TId>;
+  blockId: IObservable<TId>;
   top1: IObservable<number>;
   top2: IObservable<number>;
   left1: IObservable<number>;
@@ -86,7 +87,8 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
                 inputSlot: connection.inputSlot,
                 outputSlot: connection.outputSlot,
 
-                id: `${get(block.id)}-${get(relatedBlock.id)}`,
+                blockId: block.id,
+                id: connection.id,
               });
             });
         });

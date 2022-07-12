@@ -136,7 +136,10 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
         <SVGBoardSizeAndZoomContainer>
           {lines.map(line => (
             <Line
-              key={line.id}
+              key={line.id.value}
+
+              lineIdObservable={line.id}
+              blockIdObservable={line.blockId}
 
               top1Observable={line.top1}
               top2Observable={line.top2}
