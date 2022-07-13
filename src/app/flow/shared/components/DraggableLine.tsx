@@ -18,7 +18,6 @@ interface IDraggableLineProps {
   height: number;
   inputSlot: number;
   outputSlot: number;
-
 }
 export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, height, width, inputSlot, outputSlot, ...rest }) => {
   const setDragLine = useSetObserver(useDragLineContext());

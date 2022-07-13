@@ -39,6 +39,9 @@ export const DraggableContainerCss = `
   position: absolute;
   pointer-events: auto;
   border: 2px solid green;
+  background-color: darkgreen;
+}
+.draggable-container-input:hover {
   background-color: green;
 }
 
@@ -50,7 +53,19 @@ export const DraggableContainerCss = `
   border-radius: 50%;
   position: absolute;
   pointer-events: auto;
+  transition: all .1s;
   border: 2px solid crimson;
   background-color: darkslategray;
+}
+.draggable-container-output:hover {
+  background-color: crimson;
+}
+
+.draggable-container-input[data-is-line-dragging=true], .draggable-container-output[data-is-line-dragging=true] {
+  border: 2px solid lightgreen;
+}
+
+.draggable-container-input[data-is-line-dragging=true]:hover, .draggable-container-output[data-is-line-dragging=true]:hover {
+  background-color: lightgreen;
 }
 `;

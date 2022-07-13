@@ -79,6 +79,14 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
   const numberOfInputSlotsAsArray = useMemo(() => Array.from(Array(numberOfInputSlots)), [numberOfInputSlots]);
   const numberOfOutputSlotsAsArray = useMemo(() => Array.from(Array(numberOfOutputSlots)), [numberOfOutputSlots]);
 
+  const highlightInputSlots = useMemo(() => {
+    return dragLineData?.type === 'end';
+  }, [dragLineData?.type]);
+
+  const highlightOutputSlots = useMemo(() => {
+    return dragLineData?.type === 'start';
+  }, [dragLineData?.type]);
+
 
   return (
     <div
@@ -89,9 +97,10 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
     >
       {numberOfInputSlotsAsArray.map((_, index) => (
         <span
+          style={{ top: index * 16 }}
           onMouseDown={e => e.stopPropagation()}
           className={'draggable-container-input'}
-          style={{ top: index * 16, border: dragLineData?.type === 'end' ? '2px solid lightgreen' : undefined }}
+          data-is-line-dragging={highlightInputSlots}
         />
       ))}
 
@@ -101,9 +110,10 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
 
       {numberOfOutputSlotsAsArray.map((_, index) => (
         <span
+          style={{ bottom: index * 16 }}
           onMouseDown={e => e.stopPropagation()}
           className={'draggable-container-output'}
-          style={{ bottom: index * 16, border: dragLineData?.type === 'start' ? '2px solid lightgreen' : undefined }}
+          data-is-line-dragging={highlightOutputSlots}
         />
       ))}
     </div>
