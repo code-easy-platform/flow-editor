@@ -53,7 +53,7 @@ const itemsMock: INode[] = [
         inputSlot: observe(0),
         outputSlot: observe(0),
         relatedId: observe('2'),
-        id: observe('line-id_'),
+        id: observe('line-id_0'),
       },
     ]),
   },

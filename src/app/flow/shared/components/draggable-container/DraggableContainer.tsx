@@ -2,9 +2,10 @@ import { ReactNode, useCallback, useMemo, useRef } from 'react';
 import { IObservable, useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { INodeRenderProps, useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useDragLineContext } from '../../context';
+import { INodeRenderProps, useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useDragLineContext, useItemsContext } from '../../context';
 import { gridSnap, getCtrlKeyBySystem } from '../../services';
 import { TId } from '../../types';
+import { Slot } from './Slot';
 
 
 interface IDraggableContainerProps {
@@ -20,13 +21,13 @@ interface IDraggableContainerProps {
   numberOfOutputSlots: number;
 }
 export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render, idObservable, numberOfInputSlots, numberOfOutputSlots, leftObservable, topObservable, heightObservable, widthObservable }) => {
-  const dragLineData = useObserverValue(useDragLineContext());
   const { window } = useFrame();
 
   const id = useObserverValue(idObservable);
 
   const dragAllSelectedItems = useDragSelectedItems();
   const addSelectedItem = useToggleSelectedItem();
+  const { selectedItemsId } = useItemsContext();
   const scrollObject = useBoardScrollContext();
   const isSelected = useIsSelectedItemById(id);
   const snapGrid = useSnapGridContext();
@@ -42,6 +43,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     addSelectedItem(id, getCtrlKeyBySystem(e.nativeEvent));
 
+    if (!selectedItemsId.value.some(selectedId => selectedId === id)) return;
     if (!window) return;
 
     const mouseMouse = (e: MouseEvent) => {
@@ -79,14 +81,6 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
   const numberOfInputSlotsAsArray = useMemo(() => Array.from(Array(numberOfInputSlots)), [numberOfInputSlots]);
   const numberOfOutputSlotsAsArray = useMemo(() => Array.from(Array(numberOfOutputSlots)), [numberOfOutputSlots]);
 
-  const highlightInputSlots = useMemo(() => {
-    return dragLineData?.type === 'end';
-  }, [dragLineData?.type]);
-
-  const highlightOutputSlots = useMemo(() => {
-    return dragLineData?.type === 'start';
-  }, [dragLineData?.type]);
-
 
   return (
     <div
@@ -96,11 +90,9 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
       style={{ width: width, height: height, transform: containerTranslate }}
     >
       {numberOfInputSlotsAsArray.map((_, index) => (
-        <span
-          style={{ top: index * 16 }}
-          onMouseDown={e => e.stopPropagation()}
-          className={'draggable-container-input'}
-          data-is-line-dragging={highlightInputSlots}
+        <Slot
+          type='start'
+          position={index}
         />
       ))}
 
@@ -109,11 +101,9 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
       </div>
 
       {numberOfOutputSlotsAsArray.map((_, index) => (
-        <span
-          style={{ bottom: index * 16 }}
-          onMouseDown={e => e.stopPropagation()}
-          className={'draggable-container-output'}
-          data-is-line-dragging={highlightOutputSlots}
+        <Slot
+          type='end'
+          position={index}
         />
       ))}
     </div>
