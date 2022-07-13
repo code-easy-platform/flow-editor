@@ -140,7 +140,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
               key={line.id.value}
 
               lineIdObservable={line.id}
-              blockIdObservable={line.blockId}
+              blockIdObservable={line.nodeId}
 
               top1Observable={line.top1}
               top2Observable={line.top2}
@@ -164,23 +164,23 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
         </SVGBoardSizeAndZoomContainer>
 
         <BoardSizeAndZoomContainer>
-          {flow.map((block, _, allBlocks) => {
-            const relatedBlocks = allBlocks
-              .filter(relatedBlock => relatedBlock.id.value !== block.id.value)
-              .filter(relatedBlock => relatedBlock.connections.value.some(connection => connection.relatedId.value === block.id.value))
+          {flow.map((node, _, allNodes) => {
+            const relatedNodes = allNodes
+              .filter(relatedNode => relatedNode.id.value !== node.id.value)
+              .filter(relatedNode => relatedNode.connections.value.some(connection => connection.relatedId.value === node.id.value))
 
             return (
               <DraggableContainer
-                numberOfOutputSlots={block.connections.value.length}
-                numberOfInputSlots={relatedBlocks.length}
-                heightObservable={block.height}
-                widthObservable={block.width}
-                leftObservable={block.left}
-                topObservable={block.top}
-                idObservable={block.id}
-                render={block.render}
+                numberOfOutputSlots={node.connections.value.length}
+                numberOfInputSlots={relatedNodes.length}
+                heightObservable={node.height}
+                widthObservable={node.width}
+                leftObservable={node.left}
+                topObservable={node.top}
+                idObservable={node.id}
+                render={node.render}
 
-                key={block.id.value}
+                key={node.id.value}
               />
             );
           })}

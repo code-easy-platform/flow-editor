@@ -31,7 +31,7 @@ export interface INode {
 
 export interface ILine {
   id: IObservable<TId>;
-  blockId: IObservable<TId>;
+  nodeId: IObservable<TId>;
   top1: IObservable<number>;
   top2: IObservable<number>;
   left1: IObservable<number>;
@@ -42,7 +42,7 @@ export interface ILine {
   height1: IObservable<number>;
   inputSlot: IObservable<number>;
   outputSlot: IObservable<number>;
-  relatedBlockId: IObservable<TId>;
+  relatedNodeId: IObservable<TId>;
 }
 
 interface IItemsContextData {
@@ -66,31 +66,31 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
       const lines: ILine[] = [];
 
       get(flow)
-        .forEach((block, _, allBlocks) => {
+        .forEach((node, _, allNodes) => {
 
-          get(block.connections)
+          get(node.connections)
             .forEach(connection => {
-              const relatedBlock = allBlocks.find(block => get(connection.relatedId) === get(block.id))
+              const relatedNode = allNodes.find(node => get(connection.relatedId) === get(node.id))
 
-              if (!relatedBlock) return;
+              if (!relatedNode) return;
 
               lines.push({
-                top1: block.top,
-                left1: block.left,
-                top2: relatedBlock.top,
-                left2: relatedBlock.left,
+                top1: node.top,
+                left1: node.left,
+                top2: relatedNode.top,
+                left2: relatedNode.left,
 
-                width1: block.width,
-                height1: block.height,
-                width2: relatedBlock.width,
-                height2: relatedBlock.height,
+                width1: node.width,
+                height1: node.height,
+                width2: relatedNode.width,
+                height2: relatedNode.height,
 
                 inputSlot: connection.inputSlot,
                 outputSlot: connection.outputSlot,
 
                 id: connection.id,
-                blockId: block.id,
-                relatedBlockId: relatedBlock.id,
+                nodeId: node.id,
+                relatedNodeId: relatedNode.id,
               });
             });
         });
@@ -183,7 +183,7 @@ export const useToggleSelectedItem = () => {
             .filter(id => !linesStore.value.some(line => line.id.value === id));
 
           const linesId = linesStore.value
-            .filter(line => result.includes(line.blockId.value) && result.includes(line.relatedBlockId.value))
+            .filter(line => result.includes(line.nodeId.value) && result.includes(line.relatedNodeId.value))
             .map(line => line.id.value);
 
           return [...result, ...linesId];
@@ -196,7 +196,7 @@ export const useToggleSelectedItem = () => {
           ];
 
           const linesId = linesStore.value
-            .filter(line => result.includes(line.blockId.value) && result.includes(line.relatedBlockId.value))
+            .filter(line => result.includes(line.nodeId.value) && result.includes(line.relatedNodeId.value))
             .map(line => line.id.value);
 
           return [...result, ...linesId];
@@ -208,7 +208,7 @@ export const useToggleSelectedItem = () => {
       const result = [...id];
 
       const linesId = linesStore.value
-        .filter(line => result.includes(line.blockId.value) && result.includes(line.relatedBlockId.value))
+        .filter(line => result.includes(line.nodeId.value) && result.includes(line.relatedNodeId.value))
         .map(line => line.id.value);
 
       set(selectedItemsId, [...result, ...linesId]);
