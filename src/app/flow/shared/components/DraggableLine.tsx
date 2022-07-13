@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSetObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { useBoardScrollContext, useDragLineContext, useSnapGridContext } from '../context';
+import { useBoardScrollContext, useDragLineContext, useSnapGridContext, useToggleSelectedItem } from '../context';
 import { gridSnap } from '../services';
 import { TId } from '../types';
 
@@ -21,6 +21,7 @@ interface IDraggableLineProps {
 }
 export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, height, width, inputSlot, outputSlot, ...rest }) => {
   const setDragLine = useSetObserver(useDragLineContext());
+  const addSelectedItem = useToggleSelectedItem();
   const scrollObject = useBoardScrollContext();
   const snapGrid = useSnapGridContext();
   const { window } = useFrame();
@@ -71,6 +72,7 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, h
 
   const cliquedLocationFlowItem = useRef({ top: 0, left: 0 });
   const handleStartMouseDown = useCallback((e: React.MouseEvent) => {
+    addSelectedItem([lineId], false);
     if (!window) return;
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -99,6 +101,7 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, h
   }, [setDragLine, window, scrollObject, top1, left1, rest.left1, rest.top1, nodeId, lineId]);
 
   const handleEndMouseDown = useCallback((e: React.MouseEvent) => {
+    addSelectedItem([lineId], false);
     if (!window) return;
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -138,8 +141,8 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, h
         <path
           d={pathD}
           fill="none"
-          stroke="#333"
           strokeWidth="4"
+          stroke="#0f77bf"
           strokeLinecap="round"
         />
       )}

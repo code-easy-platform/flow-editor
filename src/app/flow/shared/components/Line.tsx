@@ -1,10 +1,12 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { IObservable, useObserverValue } from 'react-observing';
 
-import { useSnapGridContext } from '../context';
+import { useIsSelectedItemById, useSnapGridContext, useToggleSelectedItem } from '../context';
+import { getCtrlKeyBySystem } from '../services';
 import { gridSnap } from '../services/GridSnap';
 import { DraggableLine } from './DraggableLine';
 import { TId } from '../types';
+
 
 interface IDraggableContainerProps {
   lineIdObservable: IObservable<TId>;
@@ -24,8 +26,6 @@ interface IDraggableContainerProps {
   outputSlotObservable: IObservable<number>;
 }
 export const Line: React.FC<IDraggableContainerProps> = ({ lineIdObservable, blockIdObservable, left1Observable, top1Observable, left2Observable, width1Observable, height1Observable, top2Observable, inputSlotObservable, outputSlotObservable }) => {
-  const snapGrid = useSnapGridContext();
-
   const top1 = useObserverValue(top1Observable);
   const top2 = useObserverValue(top2Observable);
   const left1 = useObserverValue(left1Observable);
@@ -36,6 +36,10 @@ export const Line: React.FC<IDraggableContainerProps> = ({ lineIdObservable, blo
   const height1 = useObserverValue(height1Observable);
   const inputSlot = useObserverValue(inputSlotObservable);
   const outputSlot = useObserverValue(outputSlotObservable);
+
+  const isSelected = useIsSelectedItemById(lineId);
+  const addSelectedItem = useToggleSelectedItem();
+  const snapGrid = useSnapGridContext();
 
 
   const resolvedLeft2 = useMemo(() => gridSnap(left2, snapGrid) - 5, [left2, snapGrid]);
@@ -68,14 +72,20 @@ export const Line: React.FC<IDraggableContainerProps> = ({ lineIdObservable, blo
   }, [resolvedLeft1, resolvedTop1, resolvedLeft2, resolvedTop2, retreat]);
 
 
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    addSelectedItem(lineId, getCtrlKeyBySystem(e.nativeEvent));
+  }, [lineId]);
+
   return (
     <>
       <path
         d={pathD}
         fill="none"
-        stroke="#333"
         strokeWidth="4"
         strokeLinecap="round"
+        onMouseDown={handleMouseDown}
+        style={{ pointerEvents: 'auto' }}
+        stroke={isSelected ? "#0f77bf" : "#333"}
       />
 
       <DraggableLine

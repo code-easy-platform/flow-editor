@@ -3,7 +3,7 @@ import { useObserverValue, useSetObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
 import { BoardSizeAndZoomContainer, SVGBoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea, ICoords } from './shared/components';
-import { INode, useBoardScrollContext, useBoardZoomContext, useItemsContext } from './shared/context';
+import { INode, useBoardScrollContext, useBoardZoomContext, useItemsContext, useToggleSelectedItem } from './shared/context';
 import { getCtrlKeyBySystem } from './shared/services';
 
 
@@ -21,8 +21,9 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
   const setScrollX = useSetObserver(scrollObject.left);
   const setScrollY = useSetObserver(scrollObject.top);
 
+
   const { flowStore, linesStore, selectedItemsId } = useItemsContext();
-  const setSelectedItemsId = useSetObserver(selectedItemsId);
+  const addSelectedItem = useToggleSelectedItem();
   const lines = useObserverValue(linesStore);
   const flow = useObserverValue(flowStore);
 
@@ -46,7 +47,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
     const handleCtrlA = (e: KeyboardEvent) => {
       if (getCtrlKeyBySystem(e) && e.key === 'a') {
-        setSelectedItemsId(flowStore.value.map(node => node.id.value));
+        addSelectedItem(flowStore.value.map(node => node.id.value));
       }
     }
 
@@ -112,8 +113,8 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
     const ids = flow.filter(item => selectItemByCoords(item)).map(node => node.id.value);
 
-    setSelectedItemsId(ids);
-  }, [flow, setSelectedItemsId]);
+    addSelectedItem(ids);
+  }, [flow, addSelectedItem]);
 
 
   return (
@@ -131,7 +132,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
         ref={boardRef}
         className='panel'
         onScroll={e => { setScrollY(-e.currentTarget.scrollTop); setScrollX(-e.currentTarget.scrollLeft) }}
-        onMouseDown={e => boardRef.current?.isSameNode(e.target as any) ? setSelectedItemsId([]) : undefined}
+        onMouseDown={e => boardRef.current?.isSameNode(e.target as any) ? addSelectedItem([]) : undefined}
       >
         <SVGBoardSizeAndZoomContainer>
           {lines.map(line => (

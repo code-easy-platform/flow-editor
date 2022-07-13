@@ -42,6 +42,7 @@ export interface ILine {
   height1: IObservable<number>;
   inputSlot: IObservable<number>;
   outputSlot: IObservable<number>;
+  relatedBlockId: IObservable<TId>;
 }
 
 interface IItemsContextData {
@@ -87,8 +88,9 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
                 inputSlot: connection.inputSlot,
                 outputSlot: connection.outputSlot,
 
-                blockId: block.id,
                 id: connection.id,
+                blockId: block.id,
+                relatedBlockId: relatedBlock.id,
               });
             });
         });
@@ -168,17 +170,48 @@ export const useIsSelectedItemById = (id: TId) => {
 };
 
 export const useToggleSelectedItem = () => {
-  const { selectedItemsId } = useItemsContext();
+  const { selectedItemsId, linesStore } = useItemsContext();
 
-  return useCallback((id: TId, keepSelected = false) => {
-    if (selectedItemsId.value.some(itemId => itemId === id) && !keepSelected) return;
+  return useCallback((id: TId | TId[], keepSelected = false) => {
+    if (typeof id === 'string') {
+      if (selectedItemsId.value.some(itemId => itemId === id) && !keepSelected) return;
 
-    if (selectedItemsId.value.some(itemId => itemId === id)) {
-      set(selectedItemsId, old => old.filter(itemId => itemId !== id));
-    } else if (keepSelected) {
-      set(selectedItemsId, old => [...old, id]);
+      if (selectedItemsId.value.some(itemId => itemId === id)) {
+        set(selectedItemsId, old => {
+          const result = old
+            .filter(itemId => itemId !== id)
+            .filter(id => !linesStore.value.some(line => line.id.value === id));
+
+          const linesId = linesStore.value
+            .filter(line => result.includes(line.blockId.value) && result.includes(line.relatedBlockId.value))
+            .map(line => line.id.value);
+
+          return [...result, ...linesId];
+        });
+      } else if (keepSelected) {
+        set(selectedItemsId, old => {
+          const result = [
+            ...old.filter(id => !linesStore.value.some(line => line.id.value === id)),
+            id,
+          ];
+
+          const linesId = linesStore.value
+            .filter(line => result.includes(line.blockId.value) && result.includes(line.relatedBlockId.value))
+            .map(line => line.id.value);
+
+          return [...result, ...linesId];
+        });
+      } else {
+        set(selectedItemsId, [id]);
+      }
     } else {
-      set(selectedItemsId, [id]);
+      const result = [...id];
+
+      const linesId = linesStore.value
+        .filter(line => result.includes(line.blockId.value) && result.includes(line.relatedBlockId.value))
+        .map(line => line.id.value);
+
+      set(selectedItemsId, [...result, ...linesId]);
     }
   }, [selectedItemsId]);
 };
