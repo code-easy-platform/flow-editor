@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import Frame from 'react-frame-component';
 
 import { BoardZoomProvider, DragLineProvider, INode, ItemsProvider, SnapGridProvider } from './shared/context';
-import { DraggableContainerCss } from './shared/components/DraggableContainer.styles';
+import { DraggableContainerCss } from './shared/components/draggable-container/DraggableContainer.styles';
 import { FlowEditorBoardCss } from './FlowEditorBoard.styles';
 import { FlowEditorBoard } from './FlowEditorBoard';
 

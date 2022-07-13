@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useBoardSizes, useBoardZoomContext } from '../context';
+import { useBoardSizes, useBoardZoomContext } from '../../context';
 
 
-
-export const BoardSizeAndZoomContainer = ({ children }: { children: React.ReactNode }) => {
+export const SVGBoardSizeAndZoomContainer = ({ children }: { children: React.ReactNode }) => {
   const { height: heightObservable, width: widthObservable } = useBoardSizes();
   const zoomObservable = useBoardZoomContext();
 
@@ -27,8 +26,16 @@ export const BoardSizeAndZoomContainer = ({ children }: { children: React.ReactN
 
 
   return (
-    <div style={{ zoom, height: height + 500, width: width + 500, pointerEvents: 'none' }}>
+    <svg style={{
+      zoom,
+      minWidth: '100vw',
+      minHeight: '100vh',
+      width: width + 500,
+      position: 'absolute',
+      height: height + 500,
+      pointerEvents: 'none',
+    }}>
       {children}
-    </div>
+    </svg>
   );
 };

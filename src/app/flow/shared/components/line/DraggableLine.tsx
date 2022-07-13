@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSetObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { useBoardScrollContext, useDragLineContext, useSnapGridContext, useToggleSelectedItem } from '../context';
-import { gridSnap } from '../services';
-import { TId } from '../types';
+import { useBoardScrollContext, useDragLineContext, useSnapGridContext, useToggleSelectedItem } from '../../context';
+import { gridSnap } from '../../services';
+import { TId } from '../../types';
 
 
 interface IDraggableLineProps {

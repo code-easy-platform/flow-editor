@@ -2,9 +2,9 @@ import { ReactNode, useCallback, useMemo, useRef } from 'react';
 import { IObservable, useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { INodeRenderProps, useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useDragLineContext } from '../context';
-import { gridSnap, getCtrlKeyBySystem } from '../services';
-import { TId } from '../types';
+import { INodeRenderProps, useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useDragLineContext } from '../../context';
+import { gridSnap, getCtrlKeyBySystem } from '../../services';
+import { TId } from '../../types';
 
 
 interface IDraggableContainerProps {

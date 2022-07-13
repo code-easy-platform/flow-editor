@@ -1,11 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import { IObservable, useObserverValue } from 'react-observing';
 
-import { useIsSelectedItemById, useSnapGridContext, useToggleSelectedItem } from '../context';
-import { getCtrlKeyBySystem } from '../services';
-import { gridSnap } from '../services/GridSnap';
+import { useIsSelectedItemById, useSnapGridContext, useToggleSelectedItem } from '../../context';
+import { getCtrlKeyBySystem } from '../../services';
+import { gridSnap } from '../../services/GridSnap';
 import { DraggableLine } from './DraggableLine';
-import { TId } from '../types';
+import { TId } from '../../types';
 
 
 interface IDraggableContainerProps {
