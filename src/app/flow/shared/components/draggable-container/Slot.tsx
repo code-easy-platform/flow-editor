@@ -26,6 +26,8 @@ export const Slot: React.FC<ISlotProps> = ({ position, type, nodeId }) => {
 
   const handleDropLine = useCallback(() => {
     if (!dragLineData) return;
+    if (dragLineData.nodeId === nodeId) return;
+    if (dragLineData.type !== connectTo) return;
 
 
     for (const item of flowStore.value) {
@@ -49,12 +51,11 @@ export const Slot: React.FC<ISlotProps> = ({ position, type, nodeId }) => {
           const removedConnection = oldConnections.find(connection => connection.id.value === dragLineData.lineId);
           if (!removedConnection) return oldConnections;
 
+          if (removedConnection.relatedId.value === nodeId) return oldConnections;
+
           const itemToReceiveConnection = flowStore.value.find(item => item.id.value === nodeId);
           if (!itemToReceiveConnection) return oldConnections;
 
-          console.log('itemToReceiveConnection', itemToReceiveConnection);
-          console.log('removedConnection', removedConnection);
-          console.log('dragLineData', dragLineData);
 
           set(itemToReceiveConnection.connections, oldConnections => [
             ...oldConnections,
@@ -73,7 +74,7 @@ export const Slot: React.FC<ISlotProps> = ({ position, type, nodeId }) => {
         return;
       }
     }
-  }, [dragLineData, nodeId, position]);
+  }, [dragLineData, connectTo, nodeId, position]);
 
 
   return (
