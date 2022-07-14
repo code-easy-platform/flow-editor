@@ -22,7 +22,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
   const setScrollY = useSetObserver(scrollObject.top);
 
 
-  const { flowStore, linesStore, selectedItemsId } = useItemsContext();
+  const { flowStore, linesStore } = useItemsContext();
   const addSelectedItem = useToggleSelectedItem();
   const lines = useObserverValue(linesStore);
   const flow = useObserverValue(flowStore);
@@ -137,7 +137,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
         <SVGBoardSizeAndZoomContainer>
           {lines.map(line => (
             <Line
-              key={line.id.value}
+              key={line.key}
 
               lineIdObservable={line.id}
               blockIdObservable={line.nodeId}

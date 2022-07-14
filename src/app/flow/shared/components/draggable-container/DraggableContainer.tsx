@@ -91,6 +91,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
     >
       {numberOfInputSlotsAsArray.map((_, index) => (
         <Slot
+          nodeId={id}
           type='start'
           position={index}
         />
@@ -103,6 +104,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
       {numberOfOutputSlotsAsArray.map((_, index) => (
         <Slot
           type='end'
+          nodeId={id}
           position={index}
         />
       ))}

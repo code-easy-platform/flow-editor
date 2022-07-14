@@ -30,6 +30,7 @@ export interface INode {
 }
 
 export interface ILine {
+  key: string;
   id: IObservable<TId>;
   nodeId: IObservable<TId>;
   top1: IObservable<number>;
@@ -88,9 +89,11 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
                 inputSlot: connection.inputSlot,
                 outputSlot: connection.outputSlot,
 
-                id: connection.id,
                 nodeId: node.id,
+                id: connection.id,
                 relatedNodeId: relatedNode.id,
+
+                key: `line_key_${get(node.id)}_${get(relatedNode.id)}`,
               });
             });
         });
