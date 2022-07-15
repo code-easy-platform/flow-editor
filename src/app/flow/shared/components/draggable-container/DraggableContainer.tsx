@@ -1,29 +1,19 @@
 import { ReactNode, useCallback, useMemo, useRef } from 'react';
-import { IObservable, useObserver, useObserverValue } from 'react-observing';
+import { useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { INodeRenderProps, useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useDragLineContext, useItemsContext } from '../../context';
+import { INodeRenderProps, useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useItemsContext, INode } from '../../context';
 import { gridSnap, getCtrlKeyBySystem } from '../../services';
-import { TId } from '../../types';
 import { Slot } from './Slot';
 
 
 interface IDraggableContainerProps {
-  render: (props: INodeRenderProps) => ReactNode;
-
-  idObservable: IObservable<TId>;
-  topObservable: IObservable<number>;
-  leftObservable: IObservable<number>;
-  widthObservable: IObservable<number>;
-  heightObservable: IObservable<number>;
-
-  numberOfInputSlots: number;
-  numberOfOutputSlots: number;
+  node: INode;
 }
-export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render, idObservable, numberOfInputSlots, numberOfOutputSlots, leftObservable, topObservable, heightObservable, widthObservable }) => {
+export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node }) => {
   const { window } = useFrame();
 
-  const id = useObserverValue(idObservable);
+  const id = useObserverValue(node.id);
 
   const dragAllSelectedItems = useDragSelectedItems();
   const addSelectedItem = useToggleSelectedItem();
@@ -32,10 +22,12 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
   const isSelected = useIsSelectedItemById(id);
   const snapGrid = useSnapGridContext();
 
-  const [left, setLeft] = useObserver(leftObservable);
-  const [top, setTop] = useObserver(topObservable);
-  const height = useObserverValue(heightObservable);
-  const width = useObserverValue(widthObservable);
+  const [outputSlots] = useObserver(node.outputSlots);
+  const [inputSlots] = useObserver(node.inputSlots);
+  const [left, setLeft] = useObserver(node.left);
+  const height = useObserverValue(node.height);
+  const [top, setTop] = useObserver(node.top);
+  const width = useObserverValue(node.width);
 
   const cliquedLocationFlowItem = useRef({ top: 0, left: 0 });
 
@@ -49,8 +41,8 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
     const mouseMouse = (e: MouseEvent) => {
       const newLeft = (e.pageX - scrollObject.left.value) - cliquedLocationFlowItem.current.left;
       const newTop = (e.pageY - scrollObject.top.value) - cliquedLocationFlowItem.current.top;
-      const movementX = newLeft - leftObservable.value;
-      const movementY = newTop - topObservable.value;
+      const movementX = newLeft - node.left.value;
+      const movementY = newTop - node.top.value;
 
       dragAllSelectedItems(movementX, movementY);
     }
@@ -66,46 +58,45 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ render,
     }
     window.addEventListener('mousemove', mouseMouse);
     window.addEventListener('mouseup', mouseUp);
-  }, [setLeft, setTop, addSelectedItem, dragAllSelectedItems, id, window, scrollObject, leftObservable, topObservable]);
+  }, [setLeft, setTop, addSelectedItem, dragAllSelectedItems, id, window, scrollObject, node.left, node.top]);
 
 
   const content = useMemo(() => {
-    return render({
-      width: widthObservable,
-      height: heightObservable,
+    return node.render({
+      width: node.width,
+      height: node.height,
     });
-  }, [render, widthObservable, heightObservable]);
+  }, [node.render, node.width, node.height]);
 
   const containerTranslate = useMemo(() => `translate(${gridSnap(left, snapGrid)}px, ${gridSnap(top, snapGrid)}px)`, [left, top, snapGrid]);
-
-  const numberOfInputSlotsAsArray = useMemo(() => Array.from(Array(numberOfInputSlots)), [numberOfInputSlots]);
-  const numberOfOutputSlotsAsArray = useMemo(() => Array.from(Array(numberOfOutputSlots)), [numberOfOutputSlots]);
 
 
   return (
     <div
       data-selected={isSelected}
       onMouseDown={handleMouseDown}
-      className={'draggable-container'}
+      className='draggable-container'
       style={{ width: width, height: height, transform: containerTranslate }}
     >
-      {numberOfInputSlotsAsArray.map((_, index) => (
+      {inputSlots.map((slot, index) => (
         <Slot
           nodeId={id}
           type='start'
           position={index}
+          key={slot.id.value}
         />
       ))}
 
-      <div className={'draggable-container-content'}>
+      <div className='draggable-container-content'>
         {content}
       </div>
 
-      {numberOfOutputSlotsAsArray.map((_, index) => (
+      {outputSlots.map((slot, index) => (
         <Slot
           type='end'
           nodeId={id}
           position={index}
+          key={slot.id.value}
         />
       ))}
     </div>

@@ -48,6 +48,13 @@ const itemsMock: INode[] = [
     width: observe(170),
     height: observe(120),
     render: (props: any) => <ContentElement {...props} title="Start" />,
+    inputSlots: observe([]),
+    outputSlots: observe([
+      {
+        ordem: observe(0),
+        id: observe('slot_1'),
+      }
+    ]),
     connections: observe([
       {
         inputSlot: observe(0),
@@ -64,6 +71,26 @@ const itemsMock: INode[] = [
     width: observe(100),
     height: observe(100),
     render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'brown' }}>Node</span>,
+    inputSlots: observe([
+      {
+        ordem: observe(0),
+        id: observe('input_slot_0'),
+      },
+    ]),
+    outputSlots: observe([
+      {
+        ordem: observe(0),
+        id: observe('slot_2'),
+      },
+      {
+        ordem: observe(1),
+        id: observe('slot_3'),
+      },
+      {
+        ordem: observe(2),
+        id: observe('slot_4'),
+      },
+    ]),
     connections: observe([
       {
         inputSlot: observe(1),
@@ -92,6 +119,18 @@ const itemsMock: INode[] = [
     width: observe(60),
     height: observe(120),
     render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'blue' }}>Teste</span>,
+    inputSlots: observe([
+      {
+        ordem: observe(0),
+        id: observe('input_slot_1'),
+      },
+    ]),
+    outputSlots: observe([
+      {
+        ordem: observe(0),
+        id: observe('slot_5'),
+      },
+    ]),
     connections: observe([
       {
         inputSlot: observe(0),
@@ -108,6 +147,18 @@ const itemsMock: INode[] = [
     width: observe(120),
     height: observe(40),
     render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'gray' }}>Testando</span>,
+    inputSlots: observe([
+      {
+        ordem: observe(0),
+        id: observe('input_slot_2'),
+      },
+    ]),
+    outputSlots: observe([
+      {
+        ordem: observe(0),
+        id: observe('slot_5'),
+      },
+    ]),
     connections: observe([
       {
         inputSlot: observe(2),
@@ -125,5 +176,20 @@ const itemsMock: INode[] = [
     height: observe(50),
     connections: observe([]),
     render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'red', alignItems: 'center', justifyContent: 'center', display: 'flex' }}>End</span>,
+    inputSlots: observe([
+      {
+        ordem: observe(0),
+        id: observe('input_slot_3'),
+      },
+      {
+        ordem: observe(1),
+        id: observe('input_slot_4'),
+      },
+      {
+        ordem: observe(2),
+        id: observe('input_slot_5'),
+      },
+    ]),
+    outputSlots: observe([]),
   },
 ];

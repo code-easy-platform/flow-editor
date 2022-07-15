@@ -169,20 +169,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
               .filter(relatedNode => relatedNode.id.value !== node.id.value)
               .filter(relatedNode => relatedNode.connections.value.some(connection => connection.relatedId.value === node.id.value))
 
-            return (
-              <DraggableContainer
-                numberOfOutputSlots={node.connections.value.length}
-                numberOfInputSlots={relatedNodes.length}
-                heightObservable={node.height}
-                widthObservable={node.width}
-                leftObservable={node.left}
-                topObservable={node.top}
-                idObservable={node.id}
-                render={node.render}
-
-                key={node.id.value}
-              />
-            );
+            return <DraggableContainer node={node} key={node.id.value} />;
           })}
         </BoardSizeAndZoomContainer>
       </div>

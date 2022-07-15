@@ -13,6 +13,10 @@ export interface INodeRenderProps {
   width: IObservable<number>;
   height: IObservable<number>;
 }
+export interface INodeSlot {
+  id: IObservable<TId>;
+  ordem: IObservable<number>;
+}
 export interface INodeConnection {
   id: IObservable<TId>;
   relatedId: IObservable<TId>;
@@ -25,6 +29,8 @@ export interface INode {
   left: IObservable<number>;
   width: IObservable<number>;
   height: IObservable<number>;
+  inputSlots: IObservable<INodeSlot[]>;
+  outputSlots: IObservable<INodeSlot[]>;
   connections: IObservable<INodeConnection[]>;
   render: (props: INodeRenderProps) => ReactNode;
 }
