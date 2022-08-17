@@ -8,7 +8,7 @@ export const App: React.FC = () => {
   return (
     <div style={{ width: '90vw', height: '90vh', margin: 20, border: '2px solid green', flex: 1 }}>
       <FlowEditor
-        snapGridSize={1}
+        snapGridSize={15}
         items={itemsMock}
         backgroundSize={30}
 

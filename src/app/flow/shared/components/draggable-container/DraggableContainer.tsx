@@ -39,8 +39,10 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
     const mouseMouse = (e: MouseEvent) => {
       const newLeft = (e.pageX - scrollObject.left.value) - cliquedLocationFlowItem.current.left;
       const newTop = (e.pageY - scrollObject.top.value) - cliquedLocationFlowItem.current.top;
-      const movementX = newLeft - node.left.value;
-      const movementY = newTop - node.top.value;
+      const movementX = gridSnap(newLeft, snapGrid) - node.left.value;
+      const movementY = gridSnap(newTop, snapGrid) - node.top.value;
+
+      if (movementX === 0 && movementY === 0) return;
 
       dragAllSelectedItems(movementX, movementY);
     }
@@ -56,7 +58,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
     }
     window.addEventListener('mousemove', mouseMouse);
     window.addEventListener('mouseup', mouseUp);
-  }, [setLeft, setTop, addSelectedItem, dragAllSelectedItems, id, window, scrollObject, node.left, node.top]);
+  }, [setLeft, setTop, addSelectedItem, dragAllSelectedItems, gridSnap, snapGrid, id, window, scrollObject, node.left, node.top]);
 
 
   const content = useMemo(() => {
@@ -67,7 +69,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
     });
   }, [node.render, node.width, node.height, isSelected]);
 
-  const containerTranslate = useMemo(() => `translate(${gridSnap(left, snapGrid)}px, ${gridSnap(top, snapGrid)}px)`, [left, top, snapGrid]);
+  const containerTranslate = useMemo(() => `translate(${(left)}px, ${(top)}px)`, [left, top]);
 
 
   return (

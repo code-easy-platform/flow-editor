@@ -1,9 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { IObservable, useObserverValue } from 'react-observing';
 
-import { useIsSelectedItemById, useSnapGridContext, useToggleSelectedItem } from '../../context';
+import { useIsSelectedItemById, useToggleSelectedItem } from '../../context';
 import { getCtrlKeyBySystem } from '../../services';
-import { gridSnap } from '../../services/GridSnap';
 import { DraggableLine } from './DraggableLine';
 import { TId } from '../../types';
 
@@ -38,21 +37,20 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
 
   const isSelected = useIsSelectedItemById(lineId);
   const addSelectedItem = useToggleSelectedItem();
-  const snapGrid = useSnapGridContext();
 
 
   const extraSpace = useMemo(() => 4, []);
   const arrowSize = useMemo(() => 2.5, []);
   const lineWidth = useMemo(() => 1, []);
 
+  const top1 = useMemo(() => rawTop1 - extraSpace, [rawTop1, extraSpace]);
+  const top2 = useMemo(() => rawTop2 - extraSpace, [rawTop2, extraSpace]);
+  const left1 = useMemo(() => rawLeft1 - extraSpace, [rawLeft1, extraSpace]);
+  const left2 = useMemo(() => rawLeft2 - extraSpace, [rawLeft2, extraSpace]);
   const width1 = useMemo(() => rawWidth1 + (extraSpace * 2), [rawWidth1, extraSpace]);
   const width2 = useMemo(() => rawWidth2 + (extraSpace * 2), [rawWidth2, extraSpace]);
   const height1 = useMemo(() => rawHeight1 + (extraSpace * 2), [rawHeight1, extraSpace]);
   const height2 = useMemo(() => rawHeight2 + (extraSpace * 2), [rawHeight2, extraSpace]);
-  const top1 = useMemo(() => gridSnap(rawTop1, snapGrid) - extraSpace, [rawTop1, snapGrid, extraSpace]);
-  const top2 = useMemo(() => gridSnap(rawTop2, snapGrid) - extraSpace, [rawTop2, snapGrid, extraSpace]);
-  const left1 = useMemo(() => gridSnap(rawLeft1, snapGrid) - extraSpace, [rawLeft1, snapGrid, extraSpace]);
-  const left2 = useMemo(() => gridSnap(rawLeft2, snapGrid) - extraSpace, [rawLeft2, snapGrid, extraSpace]);
 
 
   const angle = useMemo(() => {

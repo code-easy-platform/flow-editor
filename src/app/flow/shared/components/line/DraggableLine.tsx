@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSetObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { useBoardScrollContext, useDragLineContext, useSnapGridContext, useToggleSelectedItem } from '../../context';
-import { gridSnap } from '../../services';
+import { useBoardScrollContext, useDragLineContext, useToggleSelectedItem } from '../../context';
 import { TId } from '../../types';
 
 
@@ -27,7 +26,6 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, l
   const setDragLine = useSetObserver(useDragLineContext());
   const addSelectedItem = useToggleSelectedItem();
   const scrollObject = useBoardScrollContext();
-  const snapGrid = useSnapGridContext();
   const { window } = useFrame();;
 
   const [rawTop1, setRawTop1] = useState(rest.top1);
@@ -49,10 +47,10 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, l
   const width2 = useMemo(() => rest.width2 + (extraSpace * 2), [rest.width2, extraSpace]);
   const height1 = useMemo(() => rest.height1 + (extraSpace * 2), [rest.height1, extraSpace]);
   const height2 = useMemo(() => rest.height2 + (extraSpace * 2), [rest.height2, extraSpace]);
-  const top1 = useMemo(() => gridSnap(rawTop1, snapGrid) - extraSpace, [rawTop1, snapGrid, extraSpace]);
-  const top2 = useMemo(() => gridSnap(rawTop2, snapGrid) - extraSpace, [rawTop2, snapGrid, extraSpace]);
-  const left1 = useMemo(() => gridSnap(rawLeft1, snapGrid) - extraSpace, [rawLeft1, snapGrid, extraSpace]);
-  const left2 = useMemo(() => gridSnap(rawLeft2, snapGrid) - extraSpace, [rawLeft2, snapGrid, extraSpace]);
+  const top1 = useMemo(() => rawTop1 - extraSpace, [rawTop1, extraSpace]);
+  const top2 = useMemo(() => rawTop2 - extraSpace, [rawTop2, extraSpace]);
+  const left1 = useMemo(() => rawLeft1 - extraSpace, [rawLeft1, extraSpace]);
+  const left2 = useMemo(() => rawLeft2 - extraSpace, [rawLeft2, extraSpace]);
 
 
   const angle = useMemo(() => {
