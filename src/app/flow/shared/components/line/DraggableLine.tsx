@@ -191,13 +191,15 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, o
     }
 
     cliquedLocationFlowItem.current = {
-      top: e.nativeEvent.pageY - rawTop1 - scrollObject.top.value,
-      left: e.nativeEvent.pageX - rawLeft1 - scrollObject.left.value - 10,
+      top: e.nativeEvent.pageY - y1 - scrollObject.top.value,
+      left: e.nativeEvent.pageX - x1 - scrollObject.left.value - 10,
     }
+    handleMouseMove(e.nativeEvent);
+
     setDragLine({ type: 'start', nodeId, lineId });
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, rawTop1, rawLeft1, rest.left1, rest.top1, nodeId, lineId]);
+  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, rawTop1, rawLeft1, y1, x1, rest.left1, rest.top1, nodeId, lineId]);
 
   const handleEndMouseDown = useCallback((e: React.MouseEvent) => {
     addSelectedItem([lineId], false);
@@ -224,13 +226,15 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, o
     }
 
     cliquedLocationFlowItem.current = {
-      top: e.nativeEvent.pageY - rawTop2 - scrollObject.top.value,
-      left: e.nativeEvent.pageX - rawLeft2 - scrollObject.left.value + 10,
+      top: e.nativeEvent.pageY - y2 - scrollObject.top.value,
+      left: e.nativeEvent.pageX - x2 - scrollObject.left.value + 10,
     }
+    handleMouseMove(e.nativeEvent);
+
     setDragLine({ type: 'end', nodeId, lineId });
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseup', handleMouseUp)
-  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, rawTop2, rawLeft2, rest.left2, rest.top2, nodeId, lineId, width1, height1]);
+  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, y2, x2, rest.left2, rest.top2, nodeId, lineId, width1, height1]);
 
 
   return (
@@ -242,11 +246,11 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, o
           stroke="#0f77bf"
           strokeLinecap="round"
           style={{ pointerEvents: 'none' }}
-          y2={showDragLine === 'end' ? rawTop2 : y2}
-          x2={showDragLine === 'end' ? rawLeft2 : x2}
-          y1={showDragLine === 'start' ? rawTop1 : y1}
-          x1={showDragLine === 'start' ? rawLeft1 : x1}
           markerEnd={`url(#end-line-arrow-${lineId})`}
+          y1={showDragLine === 'start' ? rawTop1 : y1}
+          y2={showDragLine === 'end' ? rawTop2 - (extraSpace / 2) : y2}
+          x2={showDragLine === 'end' ? rawLeft2 + (extraSpace / 2) : x2}
+          x1={showDragLine === 'start' ? rawLeft1 - (extraSpace / 2) : x1}
         />
       )}
 
