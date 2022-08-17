@@ -31,7 +31,7 @@ const LogicComponent = ({ title, isSelected }: ILogicComponentProps) => {
 
   return (
     <span style={{ flex: 1, display: 'flex', padding: 1, flexDirection: 'column', gap: 0, alignItems: 'center', overflow: 'hidden' }}>
-      <p style={{ fontFamily: 'sans-serif', fontSize: 12, color: 'white', padding: 0, margin: 0, textAlign: "center" }}>
+      <p style={{ fontFamily: 'sans-serif', fontSize: 12, color: 'white', padding: 0, margin: 0, textAlign: "center", opacity: 0.8 }}>
         {title}
       </p>
 
