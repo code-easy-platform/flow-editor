@@ -113,6 +113,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
     const ids = flow.filter(item => selectItemByCoords(item)).map(node => node.id.value);
 
+    if (ids.length === 0) return;
     addSelectedItem(ids);
   }, [flow, addSelectedItem]);
 
@@ -121,11 +122,11 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
     <div
       className='panel-wrapper'
       style={{
-        backgroundSize: `${backgroundSize / devicePixelRatio}px ${backgroundSize / devicePixelRatio}px`,
         ...({
           '--color-panel-paper': backgroundColorPaper,
           '--color-panel-default': backgroundColorDefault,
         }) as any,
+        backgroundSize: `${backgroundSize / devicePixelRatio}px ${backgroundSize / devicePixelRatio}px`,
       }}
     >
       <div
