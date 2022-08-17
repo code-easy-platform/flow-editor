@@ -4,6 +4,7 @@ import { useFrame } from 'react-frame-component';
 
 import { useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useItemsContext, INode } from '../../context';
 import { gridSnap, getCtrlKeyBySystem } from '../../services';
+import { Slot } from './Slot';
 
 
 interface IDraggableContainerProps {
@@ -78,6 +79,12 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
       <div className='draggable-container-content'>
         {content}
       </div>
+
+      <Slot
+        nodeId={id}
+        width={width}
+        height={height}
+      />
     </div>
   );
 }

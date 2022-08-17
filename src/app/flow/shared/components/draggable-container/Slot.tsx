@@ -7,28 +7,17 @@ import { TId } from '../../types';
 
 interface ISlotProps {
   nodeId: TId;
-  position: number;
-  type: 'start' | 'end';
+  width: number;
+  height: number;
 }
-export const Slot: React.FC<ISlotProps> = ({ position, type, nodeId }) => {
+export const Slot: React.FC<ISlotProps> = ({ nodeId, height, width }) => {
   const dragLineData = useObserverValue(useDragLineContext());
   const { flowStore } = useItemsContext();
-
-
-  const connectTo = useMemo(() => {
-    return type === 'start' ? 'end' : 'start';
-  }, [type]);
-
-  const highlightSlot = useMemo(() => {
-    return dragLineData?.type === connectTo;
-  }, [dragLineData?.type, connectTo]);
 
 
   const handleDropLine = useCallback(() => {
     if (!dragLineData) return;
     if (dragLineData.nodeId === nodeId) return;
-    if (dragLineData.type !== connectTo) return;
-
 
     for (const item of flowStore.value) {
       if (item.id.value === dragLineData.nodeId) {
@@ -37,7 +26,6 @@ export const Slot: React.FC<ISlotProps> = ({ position, type, nodeId }) => {
           set(item.connections, oldConnections => {
             oldConnections.forEach(connection => {
               if (connection.id.value === dragLineData.lineId) {
-                connection.inputSlot = observe(position);
                 connection.relatedId = observe(nodeId);
               }
             });
@@ -62,8 +50,6 @@ export const Slot: React.FC<ISlotProps> = ({ position, type, nodeId }) => {
             {
               id: removedConnection.id,
               relatedId: removedConnection.relatedId,
-              inputSlot: dragLineData.type === 'start' ? observe(position) : removedConnection.inputSlot,
-              outputSlot: dragLineData.type === 'start' ? removedConnection.outputSlot : observe(position),
             },
           ]);
 
@@ -74,17 +60,23 @@ export const Slot: React.FC<ISlotProps> = ({ position, type, nodeId }) => {
         return;
       }
     }
-  }, [dragLineData, connectTo, nodeId, position]);
+  }, [dragLineData, nodeId]);
 
 
   return (
     <>
       <span
         onMouseUp={handleDropLine}
-        data-is-line-dragging={highlightSlot}
         onMouseDown={e => e.stopPropagation()}
-        style={{ [type === 'end' ? 'bottom' : 'top']: position * 16 }}
-        className={`draggable-container-${type === 'end' ? 'output' : 'input'}`}
+        style={{
+          top: -4,
+          left: -4,
+          width: width + 8,
+          height: height + 8,
+          position: 'absolute',
+          //backgroundColor: 'red',
+          pointerEvents: dragLineData ? 'auto' : 'none',
+        }}
       />
     </>
   );

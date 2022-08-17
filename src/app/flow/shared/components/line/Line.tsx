@@ -17,13 +17,10 @@ interface IDraggableContainerProps {
   top2Observable: IObservable<number>;
   left2Observable: IObservable<number>;
 
-  height1Observable: IObservable<number>;
   width1Observable: IObservable<number>;
-  height2Observable: IObservable<number>;
   width2Observable: IObservable<number>;
-
-  inputSlotObservable: IObservable<number>;
-  outputSlotObservable: IObservable<number>;
+  height1Observable: IObservable<number>;
+  height2Observable: IObservable<number>;
 }
 export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
   const [isDraggingLine, setIsDraggingLine] = useState(false);
@@ -167,6 +164,10 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
   }, [currentSide, top2, height2, getPositionByAngle]);
 
 
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    addSelectedItem(lineId, getCtrlKeyBySystem(e.nativeEvent));
+  }, [lineId]);
+
   return (
     <>
       <defs>
@@ -198,8 +199,8 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
             strokeWidth="14"
             stroke="transparent"
             strokeLinecap="round"
+            onClick={handleMouseDown}
             style={{ pointerEvents: 'auto' }}
-            onClick={() => addSelectedItem(lineId)}
           />
         </>
       )}

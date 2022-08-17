@@ -1,5 +1,5 @@
-import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { IObservable, observe, selector, set, useObserver, useObserverValue } from "react-observing";
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { IObservable, observe, selector, set } from "react-observing";
 
 import { TId } from "../types";
 
@@ -20,8 +20,6 @@ export interface INodeSlot {
 export interface INodeConnection {
   id: IObservable<TId>;
   relatedId: IObservable<TId>;
-  inputSlot: IObservable<number>;
-  outputSlot: IObservable<number>;
 }
 export interface INode {
   id: IObservable<TId>;
@@ -29,8 +27,6 @@ export interface INode {
   left: IObservable<number>;
   width: IObservable<number>;
   height: IObservable<number>;
-  inputSlots: IObservable<INodeSlot[]>;
-  outputSlots: IObservable<INodeSlot[]>;
   connections: IObservable<INodeConnection[]>;
   render: (props: INodeRenderProps) => ReactNode;
 }
@@ -47,8 +43,6 @@ export interface ILine {
   width2: IObservable<number>;
   height2: IObservable<number>;
   height1: IObservable<number>;
-  inputSlot: IObservable<number>;
-  outputSlot: IObservable<number>;
   relatedNodeId: IObservable<TId>;
 }
 
@@ -91,9 +85,6 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
                 height1: node.height,
                 width2: relatedNode.width,
                 height2: relatedNode.height,
-
-                inputSlot: connection.inputSlot,
-                outputSlot: connection.outputSlot,
 
                 nodeId: node.id,
                 id: connection.id,

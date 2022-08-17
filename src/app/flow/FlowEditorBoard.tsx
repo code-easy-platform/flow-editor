@@ -151,9 +151,6 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
               width2Observable={line.width2}
               height1Observable={line.height1}
               height2Observable={line.height2}
-
-              inputSlotObservable={line.inputSlot}
-              outputSlotObservable={line.outputSlot}
             />
           ))}
 
@@ -164,13 +161,9 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
         </SVGBoardSizeAndZoomContainer>
 
         <BoardSizeAndZoomContainer>
-          {flow.map((node, _, allNodes) => {
-            const relatedNodes = allNodes
-              .filter(relatedNode => relatedNode.id.value !== node.id.value)
-              .filter(relatedNode => relatedNode.connections.value.some(connection => connection.relatedId.value === node.id.value))
-
-            return <DraggableContainer node={node} key={node.id.value} />;
-          })}
+          {flow.map(node => (
+            <DraggableContainer node={node} key={node.id.value} />
+          ))}
         </BoardSizeAndZoomContainer>
       </div>
     </div>
