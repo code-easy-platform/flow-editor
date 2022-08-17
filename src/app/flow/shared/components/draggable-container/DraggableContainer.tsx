@@ -1,10 +1,9 @@
-import { ReactNode, useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { INodeRenderProps, useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useItemsContext, INode } from '../../context';
+import { useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useItemsContext, INode } from '../../context';
 import { gridSnap, getCtrlKeyBySystem } from '../../services';
-import { Slot } from './Slot';
 
 
 interface IDraggableContainerProps {
@@ -22,8 +21,6 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
   const isSelected = useIsSelectedItemById(id);
   const snapGrid = useSnapGridContext();
 
-  const [outputSlots] = useObserver(node.outputSlots);
-  const [inputSlots] = useObserver(node.inputSlots);
   const [left, setLeft] = useObserver(node.left);
   const height = useObserverValue(node.height);
   const [top, setTop] = useObserver(node.top);
@@ -78,27 +75,9 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
       className='draggable-container'
       style={{ width: width, height: height, transform: containerTranslate }}
     >
-      {inputSlots.map((slot, index) => (
-        <Slot
-          nodeId={id}
-          type='start'
-          position={index}
-          key={slot.id.value}
-        />
-      ))}
-
       <div className='draggable-container-content'>
         {content}
       </div>
-
-      {outputSlots.map((slot, index) => (
-        <Slot
-          type='end'
-          nodeId={id}
-          position={index}
-          key={slot.id.value}
-        />
-      ))}
     </div>
   );
 }
