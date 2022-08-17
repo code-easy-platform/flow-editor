@@ -51,9 +51,17 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
       }
     }
 
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        addSelectedItem([]);
+      }
+    }
+
+    document.addEventListener('keydown', handleEsc, { passive: false });
     document.addEventListener('keydown', handleCtrlA, { passive: false });
     document.addEventListener('wheel', handleMouseWheel, { passive: false });
     return () => {
+      document.removeEventListener('keydown', handleEsc);
       document.removeEventListener('keydown', handleCtrlA);
       document.removeEventListener('wheel', handleMouseWheel);
     }
