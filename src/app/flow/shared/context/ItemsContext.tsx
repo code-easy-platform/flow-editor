@@ -10,6 +10,7 @@ interface IBoardSizes {
 }
 
 export interface INodeRenderProps {
+  isSelected: boolean;
   width: IObservable<number>;
   height: IObservable<number>;
 }

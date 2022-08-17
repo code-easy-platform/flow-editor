@@ -41,8 +41,9 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
   const snapGrid = useSnapGridContext();
 
 
-  const extraSpace = useMemo(() => 8, []);
-  const arrowSize = useMemo(() => 1.5, []);
+  const extraSpace = useMemo(() => 4, []);
+  const arrowSize = useMemo(() => 2.5, []);
+  const lineWidth = useMemo(() => 1, []);
 
   const width1 = useMemo(() => rawWidth1 + (extraSpace * 2), [rawWidth1, extraSpace]);
   const width2 = useMemo(() => rawWidth2 + (extraSpace * 2), [rawWidth2, extraSpace]);
@@ -172,7 +173,7 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
     <>
       <defs>
         <marker orient="auto" refX={2.8 * arrowSize} refY={2.4 * arrowSize} markerWidth={10 * arrowSize} markerHeight={8 * arrowSize} id={`end-line-arrow-${lineId}`}>
-          <polygon points={`0 ${1 * arrowSize}, ${3 * arrowSize} ${2.4 * arrowSize}, 0 ${4 * arrowSize}`} stroke={isSelected ? "#0f77bf" : "#333"} fill={isSelected ? "#0f77bf" : "#333"} />
+          <polygon points={`0 ${1 * arrowSize}, ${3 * arrowSize} ${2.4 * arrowSize}, 0 ${4 * arrowSize}`} stroke={isSelected ? "#0f77bf" : "gray"} fill={isSelected ? "#0f77bf" : "gray"} />
         </marker>
       </defs>
 
@@ -184,10 +185,10 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
             x1={x1}
             x2={x2}
             fill="none"
-            strokeWidth="2"
             strokeLinecap="round"
+            strokeWidth={lineWidth}
             style={{ pointerEvents: 'none' }}
-            stroke={isSelected ? "#0f77bf" : "#333"}
+            stroke={isSelected ? "#0f77bf" : "gray"}
             markerEnd={`url(#end-line-arrow-${lineId})`}
           />
           <line
@@ -216,6 +217,9 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
         width2={rawWidth2}
         height1={rawHeight1}
         height2={rawHeight2}
+
+        lineWidth={lineWidth}
+        extraSpace={extraSpace}
 
         onDragLineEnd={() => setIsDraggingLine(false)}
         onDragLineStart={() => setIsDraggingLine(true)}

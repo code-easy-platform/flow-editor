@@ -61,17 +61,17 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
 
   const content = useMemo(() => {
     return node.render({
+      isSelected,
       width: node.width,
       height: node.height,
     });
-  }, [node.render, node.width, node.height]);
+  }, [node.render, node.width, node.height, isSelected]);
 
   const containerTranslate = useMemo(() => `translate(${gridSnap(left, snapGrid)}px, ${gridSnap(top, snapGrid)}px)`, [left, top, snapGrid]);
 
 
   return (
     <div
-      data-selected={isSelected}
       onMouseDown={handleMouseDown}
       className='draggable-container'
       style={{ width: width, height: height, transform: containerTranslate }}

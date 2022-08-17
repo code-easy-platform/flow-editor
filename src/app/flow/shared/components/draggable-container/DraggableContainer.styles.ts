@@ -12,11 +12,6 @@ export const DraggableContainerCss = `
   border: thin solid transparent;
 }
 
-.draggable-container[data-selected=true] {
-  border-radius: 4px;
-  border: thin solid #0f77bf;
-}
-
 .draggable-container-content {
   flex: 1;
   display: flex;

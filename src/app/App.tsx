@@ -22,6 +22,29 @@ export const App: React.FC = () => {
   );
 }
 
+
+interface ILogicComponentProps {
+  title: string;
+  isSelected: boolean;
+}
+const LogicComponent = ({ title, isSelected }: ILogicComponentProps) => {
+
+  return (
+    <span style={{ flex: 1, display: 'flex', padding: 1, flexDirection: 'column', gap: 0, alignItems: 'center', overflow: 'hidden' }}>
+      <p style={{ fontFamily: 'sans-serif', fontSize: 12, color: 'white', padding: 0, margin: 0, textAlign: "center" }}>
+        {title}
+      </p>
+
+      <img
+        draggable={false}
+        src='https://code-easy-bfe83.web.app/static/media/start~hMHmYmIv.1e357883.svg'
+        style={{ flex: 1, maxHeight: 40, pointerEvents: 'none', backgroundColor: '#1e1e1e', border: !isSelected ? 'thin solid transparent' : 'thin solid #0f77bf' }}
+      />
+    </span>
+  );
+}
+
+
 const itemsMock: INode[] = [
   {
     id: observe('1'),
@@ -29,7 +52,7 @@ const itemsMock: INode[] = [
     left: observe(50),
     width: observe(50),
     height: observe(60),
-    render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'green', border: '3px solid green' }}></span>,
+    render: (props) => <LogicComponent title='Start' {...props} />,
     connections: observe([
       {
         inputSlot: observe(0),
@@ -45,7 +68,7 @@ const itemsMock: INode[] = [
     left: observe(250),
     width: observe(50),
     height: observe(60),
-    render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'green', border: '3px solid green' }}></span>,
+    render: (props) => <LogicComponent title='If' {...props} />,
     connections: observe([
       {
         inputSlot: observe(1),
@@ -73,7 +96,7 @@ const itemsMock: INode[] = [
     left: observe(550),
     width: observe(50),
     height: observe(60),
-    render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'green', border: '3px solid green' }}></span>,
+    render: (props) => <LogicComponent title='Switch' {...props} />,
     connections: observe([
       {
         inputSlot: observe(0),
@@ -89,7 +112,7 @@ const itemsMock: INode[] = [
     left: observe(500),
     width: observe(50),
     height: observe(60),
-    render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'green', border: '3px solid green' }}></span>,
+    render: (props) => <LogicComponent title='ForEach' {...props} />,
     connections: observe([
       {
         inputSlot: observe(2),
@@ -106,6 +129,6 @@ const itemsMock: INode[] = [
     width: observe(50),
     height: observe(60),
     connections: observe([]),
-    render: () => <span style={{ flex: 1, padding: 8, backgroundColor: 'green', border: '3px solid green' }}></span>,
+    render: (props) => <LogicComponent title='End' {...props} />,
   },
 ];

@@ -18,10 +18,12 @@ interface IDraggableLineProps {
   width2: number;
   height1: number;
   height2: number;
+  lineWidth: number;
+  extraSpace: number;
   onDragLineEnd: () => void;
   onDragLineStart: () => void;
 }
-export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, onDragLineEnd, onDragLineStart, ...rest }) => {
+export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, lineWidth, extraSpace, onDragLineEnd, onDragLineStart, ...rest }) => {
   const setDragLine = useSetObserver(useDragLineContext());
   const addSelectedItem = useToggleSelectedItem();
   const scrollObject = useBoardScrollContext();
@@ -42,8 +44,6 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, o
     setRawLeft2(rest.left2);
   }, [rest.top1, rest.top2, rest.left1, rest.left2]);
 
-
-  const extraSpace = useMemo(() => 8, []);
 
   const width1 = useMemo(() => rest.width1 + (extraSpace * 2), [rest.width1, extraSpace]);
   const width2 = useMemo(() => rest.width2 + (extraSpace * 2), [rest.width2, extraSpace]);
@@ -242,9 +242,9 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, o
       {showDragLine && (
         <line
           fill="none"
-          strokeWidth="2"
           stroke="#0f77bf"
           strokeLinecap="round"
+          strokeWidth={lineWidth}
           style={{ pointerEvents: 'none' }}
           markerEnd={`url(#end-line-arrow-${lineId})`}
           y1={showDragLine === 'start' ? rawTop1 : y1}
