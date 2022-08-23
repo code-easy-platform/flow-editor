@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useObserverValue, useSetObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
+import { INode, useBoardScrollContext, useBoardZoomContext, useDragSelectedItems, useItemsContext, useToggleSelectedItem } from './shared/context';
 import { BoardSizeAndZoomContainer, SVGBoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea, ICoords } from './shared/components';
-import { INode, useBoardScrollContext, useBoardZoomContext, useItemsContext, useToggleSelectedItem } from './shared/context';
 import { getCtrlKeyBySystem } from './shared/services';
 import { TId } from './shared/types';
 
@@ -26,6 +26,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
 
   const { flowStore, linesStore, selectedItemsId } = useItemsContext();
+  const dragAllSelectedItems = useDragSelectedItems();
   const addSelectedItem = useToggleSelectedItem();
   const lines = useObserverValue(linesStore);
   const flow = useObserverValue(flowStore);
@@ -66,17 +67,33 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
       }
     }
 
+    const handleArrow = (e: KeyboardEvent) => {
+      const distance = e.altKey ? 30 : 15;
+
+      if (e.key === 'ArrowUp') {
+        dragAllSelectedItems(0, -distance);
+      } else if (e.key === 'ArrowRight') {
+        dragAllSelectedItems(distance, 0);
+      } else if (e.key === 'ArrowDown') {
+        dragAllSelectedItems(0, distance);
+      } else if (e.key === 'ArrowLeft') {
+        dragAllSelectedItems(-distance, 0);
+      }
+    }
+
     document.addEventListener('keydown', handleEsc, { passive: false });
+    document.addEventListener('keydown', handleArrow, { passive: false });
     document.addEventListener('keydown', handleCtrlA, { passive: false });
     document.addEventListener('keydown', handleDelete, { passive: false });
     document.addEventListener('wheel', handleMouseWheel, { passive: false });
     return () => {
       document.removeEventListener('keydown', handleEsc);
+      document.removeEventListener('keydown', handleArrow);
       document.removeEventListener('keydown', handleCtrlA);
       document.removeEventListener('keydown', handleDelete);
       document.removeEventListener('wheel', handleMouseWheel);
     }
-  }, [setZoom, document, onRemove, selectedItemsId]);
+  }, [setZoom, document, selectedItemsId, onRemove, dragAllSelectedItems]);
 
 
   const handleOnCoordsChange = useCallback((coords: ICoords) => {

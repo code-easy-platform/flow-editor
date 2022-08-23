@@ -152,10 +152,12 @@ const itemsMock: INode[] = [
     width: observe(150),
     height: observe(60),
     connections: observe([]),
-    render: (props) => (
-      <textarea style={{ backgroundColor: 'green', padding: 8, /* flex: 1 */ }} onMouseDown={e => e.stopPropagation()}>
+    render: ({ isSelected }) => (
+      <div style={{ flex: 1, border: !isSelected ? '2px solid transparent' : '2px solid #0f77bf' }}>
+        <textarea style={{ backgroundColor: 'green', padding: 8 }} onMouseDown={e => e.stopPropagation()}>
 
-      </textarea>
+        </textarea>
+      </div>
     ),
   },
 ];
