@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useBoardSizes, useBoardZoomContext } from '../../context';
 
+import { useBoardSizes, useBoardZoomContext } from '../../context';
 
 
 export const BoardSizeAndZoomContainer = ({ children }: { children: React.ReactNode }) => {
@@ -14,6 +14,10 @@ export const BoardSizeAndZoomContainer = ({ children }: { children: React.ReactN
 
 
   useEffect(() => {
+    setHeight(heightObservable.value);
+    setWidth(widthObservable.value);
+    setZoom(zoomObservable.value);
+
     const subscriptionHeight = heightObservable.subscribe(newValue => setHeight(old => old !== newValue ? newValue : old));
     const subscriptionWidth = widthObservable.subscribe(newValue => setWidth(old => old !== newValue ? newValue : old));
     const subscriptionZoom = zoomObservable.subscribe(newValue => setZoom(old => old !== newValue ? newValue : old));

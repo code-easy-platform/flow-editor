@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 import Frame from 'react-frame-component';
 
-import { BoardZoomProvider, DragLineProvider, INode, ItemsProvider, SnapGridProvider } from './shared/context';
+import { BoardScrollProvider, BoardZoomProvider, DragLineProvider, INode, ItemsProvider, SnapGridProvider } from './shared/context';
 import { DraggableContainerCss } from './shared/components/draggable-container/DraggableContainer.styles';
 import { FlowEditorBoardCss } from './FlowEditorBoard.styles';
 import { FlowEditorBoard } from './FlowEditorBoard';
+import { TId } from './shared/types';
 
 
 export type { INode, ILine, INodeConnection, INodeRenderProps } from './shared/context';
@@ -18,6 +19,7 @@ export interface IFlowEditorProps {
   snapGridSize?: number;
   backgroundSize?: number;
   backgroundColorPaper?: string;
+  onRemove?: (ids: TId[]) => void;
   backgroundColorDefault?: string;
 }
 export const FlowEditor: React.FC<IFlowEditorProps> = ({ snapGridSize = 15, items, customCSS = '', ...rest }) => {
@@ -50,7 +52,9 @@ export const FlowEditor: React.FC<IFlowEditorProps> = ({ snapGridSize = 15, item
         <SnapGridProvider value={snapGridSize}>
           <BoardZoomProvider value={1}>
             <DragLineProvider>
-              <FlowEditorBoard {...rest} />
+              <BoardScrollProvider>
+                <FlowEditorBoard {...rest} />
+              </BoardScrollProvider>
             </DragLineProvider>
           </BoardZoomProvider>
         </SnapGridProvider>

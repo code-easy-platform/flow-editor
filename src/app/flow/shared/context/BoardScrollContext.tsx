@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useMemo } from "react";
-import { observe } from "react-observing";
+import { IObservable, observe } from "react-observing";
 
 
-const BoardScrollContext = createContext({
-  top: observe(0),
-  left: observe(0),
-});
+interface IBoardScrollData {
+  top: IObservable<number>;
+  left: IObservable<number>;
+}
+const BoardScrollContext = createContext({} as IBoardScrollData);
 
 export const BoardScrollProvider = ({ children }: { children: React.ReactNode }) => {
   const scroll = useMemo(() => ({

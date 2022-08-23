@@ -1,18 +1,32 @@
-import React from 'react';
-import { observe } from 'react-observing';
+import React, { useState } from 'react';
+import { observe, set } from 'react-observing';
 
 import { FlowEditor, INode } from './flow';
 import './App.css';
 
 export const App: React.FC = () => {
+  const [items, setItems] = useState(itemsMock);
+
+
   return (
     <div style={{ width: '90vw', height: '90vh', margin: 20, border: '2px solid green', flex: 1 }}>
       <FlowEditor
         snapGridSize={15}
-        items={itemsMock}
+        items={items}
         backgroundSize={30}
 
+        onRemove={ids => setItems(oldItems => {
+          const newItems = oldItems.filter(item => !ids.includes(item.id.value))
 
+          newItems.forEach(item => {
+            const newConnections = item.connections.value.filter(connection => !ids.includes(connection.id.value))
+            if (item.connections.value.length === newConnections.length) return;
+
+            set(item.connections, newConnections);
+          });
+
+          return newItems;
+        })}
 
 
       // backgroundColorPaper='black'
@@ -130,5 +144,18 @@ const itemsMock: INode[] = [
     height: observe(60),
     connections: observe([]),
     render: (props) => <LogicComponent title='End' {...props} />,
+  },
+  {
+    id: observe('6'),
+    top: observe(250),
+    left: observe(850),
+    width: observe(150),
+    height: observe(60),
+    connections: observe([]),
+    render: (props) => (
+      <textarea style={{ backgroundColor: 'green', padding: 8, /* flex: 1 */ }} onMouseDown={e => e.stopPropagation()}>
+
+      </textarea>
+    ),
   },
 ];

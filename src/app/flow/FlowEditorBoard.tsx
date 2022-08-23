@@ -5,14 +5,17 @@ import { useFrame } from 'react-frame-component';
 import { BoardSizeAndZoomContainer, SVGBoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea, ICoords } from './shared/components';
 import { INode, useBoardScrollContext, useBoardZoomContext, useItemsContext, useToggleSelectedItem } from './shared/context';
 import { getCtrlKeyBySystem } from './shared/services';
+import { TId } from './shared/types';
 
 
 interface IFlowEditorBoardProps {
+  onRemove?: (ids: TId[]) => void;
+
   backgroundSize?: number;
   backgroundColorPaper?: string;
   backgroundColorDefault?: string;
 }
-export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundSize = 30 }) => {
+export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundSize = 30, onRemove }) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const { document } = useFrame();
 
@@ -22,7 +25,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
   const setScrollY = useSetObserver(scrollObject.top);
 
 
-  const { flowStore, linesStore } = useItemsContext();
+  const { flowStore, linesStore, selectedItemsId } = useItemsContext();
   const addSelectedItem = useToggleSelectedItem();
   const lines = useObserverValue(linesStore);
   const flow = useObserverValue(flowStore);
@@ -57,15 +60,23 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
       }
     }
 
+    const handleDelete = (e: KeyboardEvent) => {
+      if (e.key === 'Delete' && selectedItemsId.value.length > 0) {
+        onRemove?.(selectedItemsId.value);
+      }
+    }
+
     document.addEventListener('keydown', handleEsc, { passive: false });
     document.addEventListener('keydown', handleCtrlA, { passive: false });
+    document.addEventListener('keydown', handleDelete, { passive: false });
     document.addEventListener('wheel', handleMouseWheel, { passive: false });
     return () => {
       document.removeEventListener('keydown', handleEsc);
       document.removeEventListener('keydown', handleCtrlA);
+      document.removeEventListener('keydown', handleDelete);
       document.removeEventListener('wheel', handleMouseWheel);
     }
-  }, [setZoom, document]);
+  }, [setZoom, document, onRemove, selectedItemsId]);
 
 
   const handleOnCoordsChange = useCallback((coords: ICoords) => {
