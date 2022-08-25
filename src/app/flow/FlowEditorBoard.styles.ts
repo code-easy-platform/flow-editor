@@ -2,6 +2,7 @@ export const FlowEditorBoardCss = `
 :root {
   --color-panel-paper: #484848;
   --color-panel-default: #1e1e1e;
+  --color-panel-dot: #1e1e1e;
 }
 
 html, body {
@@ -19,7 +20,7 @@ html, body {
   display: block;
   position: fixed;
   overflow: hidden;
-  background-image: radial-gradient(var(--color-panel-paper) 5%, var(--color-panel-default) 5%);
+  background-image: radial-gradient(var(--color-panel-dot) 5%, var(--color-panel-default) 5%);
 }
 
 .panel {

@@ -12,10 +12,11 @@ interface IFlowEditorBoardProps {
   onRemove?: (ids: TId[]) => void;
 
   backgroundSize?: number;
+  backgroundDotColor?: string;
   backgroundColorPaper?: string;
   backgroundColorDefault?: string;
 }
-export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundSize = 30, onRemove }) => {
+export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundDotColor = '#484848', backgroundSize = 30, onRemove }) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const { document } = useFrame();
 
@@ -159,6 +160,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
       className='panel-wrapper'
       style={{
         ...({
+          '--color-panel-dot': backgroundDotColor,
           '--color-panel-paper': backgroundColorPaper,
           '--color-panel-default': backgroundColorDefault,
         }) as any,

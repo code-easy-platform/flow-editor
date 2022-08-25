@@ -18,6 +18,7 @@ export interface IFlowEditorProps {
   customCSS?: string;
   snapGridSize?: number;
   backgroundSize?: number;
+  backgroundDotColor?: string;
   backgroundColorPaper?: string;
   onRemove?: (ids: TId[]) => void;
   backgroundColorDefault?: string;
