@@ -8,7 +8,6 @@ import { TId } from '../../types';
 
 interface IDraggableLineProps {
   nodeId: TId;
-  lineId: TId;
   top1: number;
   top2: number;
   left1: number;
@@ -19,14 +18,17 @@ interface IDraggableLineProps {
   height2: number;
   lineWidth: number;
   extraSpace: number;
-  onDragLineEnd: () => void;
-  onDragLineStart: () => void;
+  newConnection?: boolean;
+  lineId: TId | undefined;
+  onDragLineEnd?: () => void;
+  onDragLineStart?: () => void;
 }
-export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, lineWidth, extraSpace, onDragLineEnd, onDragLineStart, ...rest }) => {
+export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnection = false, nodeId, lineWidth, extraSpace, onDragLineEnd, onDragLineStart, ...rest }) => {
   const setDragLine = useSetObserver(useDragLineContext());
   const addSelectedItem = useToggleSelectedItem();
   const scrollObject = useBoardScrollContext();
-  const { window } = useFrame();;
+  const { window } = useFrame();
+
 
   const [rawTop1, setRawTop1] = useState(rest.top1);
   const [rawTop2, setRawTop2] = useState(rest.top2);
@@ -43,14 +45,14 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, l
   }, [rest.top1, rest.top2, rest.left1, rest.left2]);
 
 
-  const width1 = useMemo(() => rest.width1 + (extraSpace * 2), [rest.width1, extraSpace]);
-  const width2 = useMemo(() => rest.width2 + (extraSpace * 2), [rest.width2, extraSpace]);
-  const height1 = useMemo(() => rest.height1 + (extraSpace * 2), [rest.height1, extraSpace]);
-  const height2 = useMemo(() => rest.height2 + (extraSpace * 2), [rest.height2, extraSpace]);
   const top1 = useMemo(() => rawTop1 - extraSpace, [rawTop1, extraSpace]);
   const top2 = useMemo(() => rawTop2 - extraSpace, [rawTop2, extraSpace]);
   const left1 = useMemo(() => rawLeft1 - extraSpace, [rawLeft1, extraSpace]);
   const left2 = useMemo(() => rawLeft2 - extraSpace, [rawLeft2, extraSpace]);
+  const width1 = useMemo(() => rest.width1 + (extraSpace * 2), [rest.width1, extraSpace]);
+  const width2 = useMemo(() => rest.width2 + (extraSpace * 2), [rest.width2, extraSpace]);
+  const height1 = useMemo(() => rest.height1 + (extraSpace * 2), [rest.height1, extraSpace]);
+  const height2 = useMemo(() => rest.height2 + (extraSpace * 2), [rest.height2, extraSpace]);
 
 
   const angle = useMemo(() => {
@@ -165,9 +167,9 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, l
 
   const cliquedLocationFlowItem = useRef({ top: 0, left: 0 });
   const handleStartMouseDown = useCallback((e: React.MouseEvent) => {
-    addSelectedItem([lineId], false);
+    if (lineId) addSelectedItem([lineId], false);
     setShowDragLine('start');
-    onDragLineStart();
+    onDragLineStart?.();
     if (!window) return;
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -183,7 +185,7 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, l
       setRawLeft1(rest.left1);
       setDragLine(undefined);
       setRawTop1(rest.top1);
-      onDragLineEnd();
+      onDragLineEnd?.();
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
     }
@@ -200,9 +202,9 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, l
   }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, rawTop1, rawLeft1, y1, x1, rest.left1, rest.top1, nodeId, lineId]);
 
   const handleEndMouseDown = useCallback((e: React.MouseEvent) => {
-    addSelectedItem([lineId], false);
+    if (lineId) addSelectedItem([lineId], false);
     setShowDragLine('end');
-    onDragLineStart();
+    onDragLineStart?.();
     if (!window) return;
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -218,7 +220,7 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, l
       setRawLeft2(rest.left2);
       setDragLine(undefined);
       setRawTop2(rest.top2);
-      onDragLineEnd();
+      onDragLineEnd?.();
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
     }
@@ -252,7 +254,19 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, nodeId, l
         />
       )}
 
-      {!showDragLine && (
+      {newConnection && (
+        <rect
+          width={width1}
+          x={rawLeft1 - 3}
+          fill='transparent'
+          height={(height1 / 2)}
+          y={rawTop1 + (height1 / 2) + 2}
+          onMouseDown={handleEndMouseDown}
+          style={{ cursor: 'crosshair', pointerEvents: showDragLine ? 'none' : 'auto' }}
+        />
+      )}
+
+      {(!showDragLine && !newConnection) && (
         <>
           <rect
             width={20}

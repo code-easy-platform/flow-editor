@@ -4,6 +4,7 @@ import { useFrame } from 'react-frame-component';
 
 import { INode, useBoardScrollContext, useBoardZoomContext, useDragSelectedItems, useItemsContext, useToggleSelectedItem } from './shared/context';
 import { BoardSizeAndZoomContainer, SVGBoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea, ICoords } from './shared/components';
+import { NewConnection } from './shared/components/line/NewConnection';
 import { getCtrlKeyBySystem } from './shared/services';
 import { TId } from './shared/types';
 
@@ -150,7 +151,6 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
     const ids = flow.filter(item => selectItemByCoords(item)).map(node => node.id.value);
 
-    if (ids.length === 0) return;
     addSelectedItem(ids);
   }, [flow, addSelectedItem]);
 
@@ -174,6 +174,10 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
         onMouseDown={e => boardRef.current?.isSameNode(e.target as any) ? addSelectedItem([]) : undefined}
       >
         <SVGBoardSizeAndZoomContainer>
+          {flow.map(node => (
+            <NewConnection node={node} />
+          ))}
+
           {lines.map(line => (
             <Line
               key={line.key}

@@ -6,8 +6,8 @@ import { TId } from '../types';
 
 interface IDragLineContextData {
   nodeId: TId;
-  lineId: TId;
   type: 'start' | 'end';
+  lineId: TId | undefined;
 }
 
 const DragLineContext = createContext<IObservable<IDragLineContextData | undefined>>(observe(undefined));

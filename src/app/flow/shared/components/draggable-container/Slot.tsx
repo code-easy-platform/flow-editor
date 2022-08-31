@@ -1,5 +1,6 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { observe, set, useObserverValue } from 'react-observing';
+import { v4 as uuid } from 'uuid';
 
 import { useDragLineContext, useItemsContext } from '../../context';
 import { TId } from '../../types';
@@ -23,6 +24,17 @@ export const Slot: React.FC<ISlotProps> = ({ nodeId, height, width }) => {
       if (item.id.value === dragLineData.nodeId) {
 
         if (dragLineData.type === 'end') {
+          if (!dragLineData.lineId) {
+            set(item.connections, oldConnections => [
+              ...oldConnections,
+              {
+                id: observe(uuid()),
+                relatedId: observe(nodeId),
+              }
+            ]);
+            return;
+          }
+
           set(item.connections, oldConnections => {
             oldConnections.forEach(connection => {
               if (connection.id.value === dragLineData.lineId) {

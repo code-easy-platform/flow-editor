@@ -206,6 +206,8 @@ export const useToggleSelectedItem = () => {
         set(selectedItemsId, [id]);
       }
     } else {
+      if (id.length === 0 && linesStore.value.length === 0) return;
+
       const result = [...id];
 
       const linesId = linesStore.value

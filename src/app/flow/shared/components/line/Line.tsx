@@ -26,17 +26,17 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
 
   const rawTop1 = useObserverValue(lineProps.top1Observable);
   const rawTop2 = useObserverValue(lineProps.top2Observable);
+  const lineId = useObserverValue(lineProps.lineIdObservable);
   const rawLeft1 = useObserverValue(lineProps.left1Observable);
   const rawLeft2 = useObserverValue(lineProps.left2Observable);
-  const lineId = useObserverValue(lineProps.lineIdObservable);
   const blockId = useObserverValue(lineProps.blockIdObservable);
   const rawWidth1 = useObserverValue(lineProps.width1Observable);
   const rawWidth2 = useObserverValue(lineProps.width2Observable);
   const rawHeight1 = useObserverValue(lineProps.height1Observable);
   const rawHeight2 = useObserverValue(lineProps.height2Observable);
 
-  const isSelected = useIsSelectedItemById(lineId);
   const addSelectedItem = useToggleSelectedItem();
+  const isSelected = useIsSelectedItemById(lineId);
 
 
   const extraSpace = useMemo(() => 4, []);
@@ -166,6 +166,7 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     addSelectedItem(lineId, getCtrlKeyBySystem(e.nativeEvent));
   }, [lineId]);
+
 
   return (
     <>

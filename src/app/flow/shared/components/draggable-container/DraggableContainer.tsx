@@ -76,7 +76,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
     <div
       onMouseDown={handleMouseDown}
       className='draggable-container'
-      style={{ width: width, height: height, transform: containerTranslate }}
+      style={{ width, height, transform: containerTranslate }}
     >
       <div className='draggable-container-content'>
         {content}
