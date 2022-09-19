@@ -4,6 +4,7 @@ import { IObservable, useObserverValue } from 'react-observing';
 import { useIsSelectedItemById, useToggleSelectedItem } from '../../context';
 import { getCtrlKeyBySystem } from '../../services';
 import { DraggableLine } from './DraggableLine';
+import { useLinePath } from './UseLinePath';
 import { TId } from '../../types';
 
 
@@ -20,6 +21,8 @@ interface IDraggableContainerProps {
   width2Observable: IObservable<number>;
   height1Observable: IObservable<number>;
   height2Observable: IObservable<number>;
+
+  isCurvedObservable: IObservable<boolean>;
 }
 export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
   const [isDraggingLine, setIsDraggingLine] = useState(false);
@@ -32,6 +35,7 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
   const blockId = useObserverValue(lineProps.blockIdObservable);
   const rawWidth1 = useObserverValue(lineProps.width1Observable);
   const rawWidth2 = useObserverValue(lineProps.width2Observable);
+  const isCurved = useObserverValue(lineProps.isCurvedObservable);
   const rawHeight1 = useObserverValue(lineProps.height1Observable);
   const rawHeight2 = useObserverValue(lineProps.height2Observable);
 
@@ -39,133 +43,66 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
   const isSelected = useIsSelectedItemById(lineId);
 
 
-  const extraSpace = useMemo(() => 4, []);
   const arrowSize = useMemo(() => 2.5, []);
   const lineWidth = useMemo(() => 1, []);
 
-  const top1 = useMemo(() => rawTop1 - extraSpace, [rawTop1, extraSpace]);
-  const top2 = useMemo(() => rawTop2 - extraSpace, [rawTop2, extraSpace]);
-  const left1 = useMemo(() => rawLeft1 - extraSpace, [rawLeft1, extraSpace]);
-  const left2 = useMemo(() => rawLeft2 - extraSpace, [rawLeft2, extraSpace]);
-  const width1 = useMemo(() => rawWidth1 + (extraSpace * 2), [rawWidth1, extraSpace]);
-  const width2 = useMemo(() => rawWidth2 + (extraSpace * 2), [rawWidth2, extraSpace]);
-  const height1 = useMemo(() => rawHeight1 + (extraSpace * 2), [rawHeight1, extraSpace]);
-  const height2 = useMemo(() => rawHeight2 + (extraSpace * 2), [rawHeight2, extraSpace]);
 
-
-  const angle = useMemo(() => {
-    let angle = Math.atan2(left1 - left2, top1 - top2) * (180 / Math.PI);
-
-    if (angle < 0) {
-      angle = Math.abs(angle);
-    } else {
-      angle = 360 - angle;
-    }
-
-    return angle;
-  }, [left2, top2, left1, top1]);
-
-  const sideAngle = useMemo(() => {
-    if (angle >= 45 && angle <= 135) {// Left
-      return angle - 45;
-    } else if (angle >= 135 && angle <= 225) {// Top
-      return angle - 135;
-    } else if (angle >= 225 && angle <= 315) {// Right
-      return angle - 225;
-    } else if ((angle >= 315 && angle <= 360) || (angle >= 0 && angle <= 45)) {// Bottom
-      if (angle >= 315 && angle <= 360) {// Bottom - Left
-        return angle - 315;
-      } else {// Bottom - Right
-        return angle + 45;
-      }
-    } else {
-      return 0;
-    }
-  }, [angle]);
-
-  const currentSide = useMemo(() => {
-    if (angle >= 45 && angle <= 135) {// Left
-      return 'left';
-    } else if (angle >= 135 && angle <= 225) {// Top
-      return 'top';
-    } else if (angle >= 225 && angle <= 315) {// Right
-      return 'right';
-    } else if ((angle >= 315 && angle <= 360) || (angle >= 0 && angle <= 45)) {// Bottom
-      return 'bottom';
-    }
-  }, [angle]);
-
-
-  const getPositionByAngle = useCallback((value: number, space: number) => {
-    const sideAnglePercent = (sideAngle * 100) / 90;
-
-    const spaceBySideAnglePercent = (space * sideAnglePercent) / 100;
-
-    return value - spaceBySideAnglePercent;
-  }, [sideAngle]);
-
-
-  const x1 = useMemo(() => {
-    switch (currentSide) {
-      case 'left':
-        return left1 + width1;
-      case 'top':
-        return getPositionByAngle(left1 + width1, width1);
-      case 'right':
-        return left1;
-      case 'bottom':
-        return getPositionByAngle(left1, -width1);
-      default:
-        return 0;
-    }
-  }, [currentSide, left1, width1, getPositionByAngle]);
-  const y1 = useMemo(() => {
-    switch (currentSide) {
-      case 'left':
-        return getPositionByAngle(top1, -height1);
-      case 'top':
-        return top1 + height1;
-      case 'right':
-        return getPositionByAngle(top1 + height1, height1);
-      case 'bottom':
-        return top1;
-      default:
-        return 0;
-    }
-  }, [currentSide, top1, height1, getPositionByAngle]);
-  const x2 = useMemo(() => {
-    switch (currentSide) {
-      case 'left':
-        return left2;
-      case 'top':
-        return getPositionByAngle(left2, -width2);
-      case 'right':
-        return left2 + width2;
-      case 'bottom':
-        return getPositionByAngle(left2 + width2, width2);
-      default:
-        return 0;
-    }
-  }, [currentSide, left2, width2, getPositionByAngle]);
-  const y2 = useMemo(() => {
-    switch (currentSide) {
-      case 'left':
-        return getPositionByAngle(top2 + height2, height2);
-      case 'top':
-        return top2;
-      case 'right':
-        return getPositionByAngle(top2, -height2);
-      case 'bottom':
-        return top2 + height2;
-      default:
-        return 0;
-    }
-  }, [currentSide, top2, height2, getPositionByAngle]);
+  const linePath = useLinePath({
+    isCurved,
+    top1: rawTop1,
+    top2: rawTop2,
+    left1: rawLeft1,
+    left2: rawLeft2,
+    width1: rawWidth1,
+    width2: rawWidth2,
+    height1: rawHeight1,
+    height2: rawHeight2,
+  });
 
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     addSelectedItem(lineId, getCtrlKeyBySystem(e.nativeEvent));
   }, [lineId]);
+
+
+  const pathD = useMemo(() => {
+    const getValueByAngle = (space: number) => {
+      const sideAnglePercent = (linePath.sideAngle * 100) / 90;
+
+      const spaceBySideAnglePercent = (space * sideAnglePercent) / 100;
+
+      return /* space -  */spaceBySideAnglePercent;
+    };
+
+
+    if (lineId === 'line-id_0') console.log(getValueByAngle(20));
+
+    let retreat = 0;
+    switch (linePath.currentSide) {
+      case 'left':
+        retreat = getValueByAngle(-20);
+        break;
+      case 'right':
+        retreat = (20);
+        break;
+      case 'top':
+        retreat = getValueByAngle(-20);
+        break;
+      case 'bottom':
+        retreat = (20);
+        break;
+
+      default: break;
+    }
+
+    const retreatX = (retreat / 2) * -1;
+    const topCentralize = linePath.y1 + ((linePath.y2 - linePath.y1) / 2) + retreat;
+    const leftCentralize = linePath.x1 + ((linePath.x2 - linePath.x1) / 2) + retreatX;
+
+    const curve = `Q ${leftCentralize} ${topCentralize}`;
+
+    return `M ${linePath.x1} ${linePath.y1} ${curve} ${linePath.x2} ${linePath.y2}`;
+  }, [linePath.x1, lineId, linePath.y1, linePath.x2, linePath.y2, linePath.currentSide, linePath.sideAngle, linePath.angle]);
 
 
   return (
@@ -176,14 +113,14 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
         </marker>
       </defs>
 
-      {!isDraggingLine && (
+      {(!isDraggingLine && !isCurved) && (
         <>
           <line
-            y1={y1}
-            y2={y2}
-            x1={x1}
-            x2={x2}
             fill="none"
+            y1={linePath.y1}
+            y2={linePath.y2}
+            x1={linePath.x1}
+            x2={linePath.x2}
             strokeLinecap="round"
             strokeWidth={lineWidth}
             style={{ pointerEvents: 'none' }}
@@ -191,17 +128,46 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
             markerEnd={`url(#end-line-arrow-${lineId})`}
           />
           <line
-            y1={y1}
-            y2={y2}
-            x1={x1}
-            x2={x2}
             fill="none"
+            y1={linePath.y1}
+            y2={linePath.y2}
+            x1={linePath.x1}
+            x2={linePath.x2}
             strokeWidth="14"
             stroke="transparent"
             strokeLinecap="round"
             onClick={handleMouseDown}
             style={{ pointerEvents: 'auto' }}
           />
+        </>
+      )}
+
+      {(!isDraggingLine && isCurved) && (
+        <>
+          <path
+            d={pathD}
+            fill="none"
+            strokeLinecap="round"
+            strokeWidth={lineWidth}
+            stroke={isSelected ? "#0f77bf" : "gray"}
+            markerEnd={`url(#end-line-arrow-${lineId})`}
+          />
+          <path
+            d={pathD}
+            fill="none"
+            strokeWidth={14}
+            stroke="transparent"
+            strokeLinecap="round"
+            onClick={handleMouseDown}
+            style={{ pointerEvents: 'auto' }}
+          />
+          {/* <rect
+            fill='red'
+            width={20}
+            height={20}
+            y={linePath.y1 + ((linePath.y2 - linePath.y1) / 2) - 10}
+            x={linePath.x1 + ((linePath.x2 - linePath.x1) / 2) - 10}
+          /> */}
         </>
       )}
 
@@ -218,7 +184,8 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
         height2={rawHeight2}
 
         lineWidth={lineWidth}
-        extraSpace={extraSpace}
+
+        disableStartDraggable={isCurved}
 
         onDragLineEnd={() => setIsDraggingLine(false)}
         onDragLineStart={() => setIsDraggingLine(true)}

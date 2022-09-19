@@ -16,12 +16,19 @@ export const NewConnection: React.FC<INewConnectionProps> = ({ node }) => {
   const id = useObserverValue(node.id);
 
 
+  const arrowSize = useMemo(() => 2.5, []);
   const extraSpace = useMemo(() => 4, []);
   const lineWidth = useMemo(() => 1, []);
 
 
   return (
     <>
+      <defs>
+        <marker orient="auto" refX={2.8 * arrowSize} refY={2.4 * arrowSize} markerWidth={10 * arrowSize} markerHeight={8 * arrowSize} id={`end-line-arrow-${undefined}`}>
+          <polygon points={`0 ${1 * arrowSize}, ${3 * arrowSize} ${2.4 * arrowSize}, 0 ${4 * arrowSize}`} stroke="#0f77bf" fill="#0f77bf" />
+        </marker>
+      </defs>
+
       <DraggableLine
         top2={top}
         top1={top}
@@ -36,7 +43,6 @@ export const NewConnection: React.FC<INewConnectionProps> = ({ node }) => {
         newConnection={true}
 
         lineWidth={lineWidth}
-        extraSpace={extraSpace}
       />
     </>
   );

@@ -44,6 +44,7 @@ export interface ILine {
   width2: IObservable<number>;
   height2: IObservable<number>;
   height1: IObservable<number>;
+  isCurved: IObservable<boolean>;
   relatedNodeId: IObservable<TId>;
 }
 
@@ -92,6 +93,10 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
                 relatedNodeId: relatedNode.id,
 
                 key: `line_key_${get(node.id)}_${get(relatedNode.id)}`,
+
+                isCurved: selector(({ get }) => {
+                  return get(relatedNode.connections).some(connection => get(connection.relatedId) === get(node.id));
+                }),
               });
             });
         });

@@ -3,6 +3,7 @@ import { useSetObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
 import { useBoardScrollContext, useDragLineContext, useToggleSelectedItem } from '../../context';
+import { useLinePath } from './UseLinePath';
 import { TId } from '../../types';
 
 
@@ -17,13 +18,13 @@ interface IDraggableLineProps {
   height1: number;
   height2: number;
   lineWidth: number;
-  extraSpace: number;
   newConnection?: boolean;
   lineId: TId | undefined;
   onDragLineEnd?: () => void;
   onDragLineStart?: () => void;
+  disableStartDraggable?: boolean;
 }
-export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnection = false, nodeId, lineWidth, extraSpace, onDragLineEnd, onDragLineStart, ...rest }) => {
+export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnection = false, disableStartDraggable = false, nodeId, lineWidth, onDragLineEnd, onDragLineStart, ...rest }) => {
   const setDragLine = useSetObserver(useDragLineContext());
   const addSelectedItem = useToggleSelectedItem();
   const scrollObject = useBoardScrollContext();
@@ -45,124 +46,16 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnec
   }, [rest.top1, rest.top2, rest.left1, rest.left2]);
 
 
-  const top1 = useMemo(() => rawTop1 - extraSpace, [rawTop1, extraSpace]);
-  const top2 = useMemo(() => rawTop2 - extraSpace, [rawTop2, extraSpace]);
-  const left1 = useMemo(() => rawLeft1 - extraSpace, [rawLeft1, extraSpace]);
-  const left2 = useMemo(() => rawLeft2 - extraSpace, [rawLeft2, extraSpace]);
-  const width1 = useMemo(() => rest.width1 + (extraSpace * 2), [rest.width1, extraSpace]);
-  const width2 = useMemo(() => rest.width2 + (extraSpace * 2), [rest.width2, extraSpace]);
-  const height1 = useMemo(() => rest.height1 + (extraSpace * 2), [rest.height1, extraSpace]);
-  const height2 = useMemo(() => rest.height2 + (extraSpace * 2), [rest.height2, extraSpace]);
-
-
-  const angle = useMemo(() => {
-    let angle = Math.atan2(left1 - left2, top1 - top2) * (180 / Math.PI);
-
-    if (angle < 0) {
-      angle = Math.abs(angle);
-    } else {
-      angle = 360 - angle;
-    }
-
-    return angle;
-  }, [left2, top2, left1, top1]);
-
-  const sideAngle = useMemo(() => {
-    if (angle >= 45 && angle <= 135) {// Left
-      return angle - 45;
-    } else if (angle >= 135 && angle <= 225) {// Top
-      return angle - 135;
-    } else if (angle >= 225 && angle <= 315) {// Right
-      return angle - 225;
-    } else if ((angle >= 315 && angle <= 360) || (angle >= 0 && angle <= 45)) {// Bottom
-      if (angle >= 315 && angle <= 360) {// Bottom - Left
-        return angle - 315;
-      } else {// Bottom - Right
-        return angle + 45;
-      }
-    } else {
-      return 0;
-    }
-  }, [angle]);
-
-  const currentSide = useMemo(() => {
-    if (angle >= 45 && angle <= 135) {// Left
-      return 'left';
-    } else if (angle >= 135 && angle <= 225) {// Top
-      return 'top';
-    } else if (angle >= 225 && angle <= 315) {// Right
-      return 'right';
-    } else if ((angle >= 315 && angle <= 360) || (angle >= 0 && angle <= 45)) {// Bottom
-      return 'bottom';
-    }
-  }, [angle]);
-
-
-  const getPositionByAngle = useCallback((value: number, space: number) => {
-    const sideAnglePercent = (sideAngle * 100) / 90;
-
-    const spaceBySideAnglePercent = (space * sideAnglePercent) / 100;
-
-    return value - spaceBySideAnglePercent;
-  }, [sideAngle]);
-
-
-  const x1 = useMemo(() => {
-    switch (currentSide) {
-      case 'left':
-        return left1 + width1;
-      case 'top':
-        return getPositionByAngle(left1 + width1, width1);
-      case 'right':
-        return left1;
-      case 'bottom':
-        return getPositionByAngle(left1, -width1);
-      default:
-        return 0;
-    }
-  }, [currentSide, left1, width1, getPositionByAngle]);
-  const y1 = useMemo(() => {
-    switch (currentSide) {
-      case 'left':
-        return getPositionByAngle(top1, -height1);
-      case 'top':
-        return top1 + height1;
-      case 'right':
-        return getPositionByAngle(top1 + height1, height1);
-      case 'bottom':
-        return top1;
-      default:
-        return 0;
-    }
-  }, [currentSide, top1, height1, getPositionByAngle]);
-  const x2 = useMemo(() => {
-    switch (currentSide) {
-      case 'left':
-        return left2;
-      case 'top':
-        return getPositionByAngle(left2, -width2);
-      case 'right':
-        return left2 + width2;
-      case 'bottom':
-        return getPositionByAngle(left2 + width2, width2);
-      default:
-        return 0;
-    }
-  }, [currentSide, left2, width2, getPositionByAngle]);
-  const y2 = useMemo(() => {
-    switch (currentSide) {
-      case 'left':
-        return getPositionByAngle(top2 + height2, height2);
-      case 'top':
-        return top2;
-      case 'right':
-        return getPositionByAngle(top2, -height2);
-      case 'bottom':
-        return top2 + height2;
-      default:
-        return 0;
-    }
-  }, [currentSide, top2, height2, getPositionByAngle]);
+  const linePath = useLinePath({
+    top1: rawTop1,
+    top2: rawTop2,
+    left1: rawLeft1,
+    left2: rawLeft2,
+    width1: rest.width1,
+    width2: rest.width2,
+    height1: rest.height1,
+    height2: rest.height2,
+  });
 
 
   const cliquedLocationFlowItem = useRef({ top: 0, left: 0 });
@@ -191,15 +84,15 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnec
     }
 
     cliquedLocationFlowItem.current = {
-      top: e.nativeEvent.pageY - y1 - scrollObject.top.value,
-      left: e.nativeEvent.pageX - x1 - scrollObject.left.value - 10,
+      top: e.nativeEvent.pageY - linePath.y1 - scrollObject.top.value,
+      left: e.nativeEvent.pageX - linePath.x1 - scrollObject.left.value - 10,
     }
     handleMouseMove(e.nativeEvent);
 
     setDragLine({ type: 'start', nodeId, lineId });
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, rawTop1, rawLeft1, y1, x1, rest.left1, rest.top1, nodeId, lineId]);
+  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, rawTop1, rawLeft1, linePath.y1, linePath.x1, rest.left1, rest.top1, nodeId, lineId]);
 
   const handleEndMouseDown = useCallback((e: React.MouseEvent) => {
     if (lineId) addSelectedItem([lineId], false);
@@ -226,15 +119,15 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnec
     }
 
     cliquedLocationFlowItem.current = {
-      top: e.nativeEvent.pageY - y2 - scrollObject.top.value,
-      left: e.nativeEvent.pageX - x2 - scrollObject.left.value + 10,
+      top: e.nativeEvent.pageY - linePath.y2 - scrollObject.top.value,
+      left: e.nativeEvent.pageX - linePath.x2 - scrollObject.left.value + 10,
     }
     handleMouseMove(e.nativeEvent);
 
     setDragLine({ type: 'end', nodeId, lineId });
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseup', handleMouseUp)
-  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, y2, x2, rest.left2, rest.top2, nodeId, lineId, width1, height1]);
+  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, linePath.y2, linePath.x2, rest.left2, rest.top2, nodeId, lineId]);
 
 
   return (
@@ -247,43 +140,45 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnec
           strokeWidth={lineWidth}
           style={{ pointerEvents: 'none' }}
           markerEnd={`url(#end-line-arrow-${lineId})`}
-          y1={showDragLine === 'start' ? rawTop1 : y1}
-          y2={showDragLine === 'end' ? rawTop2 - (extraSpace / 2) : y2}
-          x2={showDragLine === 'end' ? rawLeft2 + (extraSpace / 2) : x2}
-          x1={showDragLine === 'start' ? rawLeft1 - (extraSpace / 2) : x1}
+          y1={showDragLine === 'start' ? rawTop1 : linePath.y1}
+          y2={showDragLine === 'end' ? rawTop2 - (linePath.extraSpace / 2) : linePath.y2}
+          x2={showDragLine === 'end' ? rawLeft2 + (linePath.extraSpace / 2) : linePath.x2}
+          x1={showDragLine === 'start' ? rawLeft1 - (linePath.extraSpace / 2) : linePath.x1}
         />
       )}
 
       {newConnection && (
         <rect
-          width={width1}
           x={rawLeft1 - 3}
           fill='transparent'
-          height={(height1 / 2)}
-          y={rawTop1 + (height1 / 2) + 2}
+          width={linePath.width1}
+          height={(linePath.height1 / 2)}
           onMouseDown={handleEndMouseDown}
+          y={rawTop1 + (linePath.height1 / 2) + 2}
           style={{ cursor: 'crosshair', pointerEvents: showDragLine ? 'none' : 'auto' }}
         />
       )}
 
       {(!showDragLine && !newConnection) && (
         <>
-          <rect
-            width={20}
-            height={20}
-            y={y1 - 10}
-            x={x1 - 10}
-            fill='transparent'
-            onMouseDown={handleStartMouseDown}
-            style={{ cursor: 'crosshair', pointerEvents: 'auto' }}
-          />
+          {!disableStartDraggable && (
+            <rect
+              width={20}
+              height={20}
+              fill='transparent'
+              y={linePath.y1 - 10}
+              x={linePath.x1 - 10}
+              onMouseDown={handleStartMouseDown}
+              style={{ cursor: 'crosshair', pointerEvents: 'auto' }}
+            />
+          )}
 
           <rect
             width={20}
             height={20}
-            y={y2 - 10}
-            x={x2 - 10}
             fill='transparent'
+            y={linePath.y2 - 10}
+            x={linePath.x2 - 10}
             onMouseDown={handleEndMouseDown}
             style={{ cursor: 'crosshair', pointerEvents: 'auto' }}
           />

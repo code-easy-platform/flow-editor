@@ -175,7 +175,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
       >
         <SVGBoardSizeAndZoomContainer>
           {flow.map(node => (
-            <NewConnection node={node} />
+            <NewConnection key={node.id.value} node={node} />
           ))}
 
           {lines.map(line => (
@@ -194,6 +194,8 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
               width2Observable={line.width2}
               height1Observable={line.height1}
               height2Observable={line.height2}
+
+              isCurvedObservable={line.isCurved}
             />
           ))}
 
