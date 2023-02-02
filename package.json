@@ -12,6 +12,7 @@
     "react-dom": "^18.0.0",
     "react-frame-component": "^5.2.3",
     "react-observing": "^2.5.14",
+    "react-use-drag-and-drop": "^0.0.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

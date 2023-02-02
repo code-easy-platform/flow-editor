@@ -1,4 +1,4 @@
-import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { IObservable, observe, selector, set } from "react-observing";
 
 import { TId } from "../types";
@@ -62,13 +62,18 @@ interface IItemsProviderProps {
   children: React.ReactNode;
 }
 export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
-  const flow = useMemo(() => observe(items), [items]);
+
+  const flowRef = useRef(observe(items));
+  useEffect(() => {
+    flowRef.current.value = items;
+  }, [items]);
+
 
   const lines = useMemo(() => selector<ILine[]>({
     get: ({ get }) => {
       const lines: ILine[] = [];
 
-      get(flow)
+      get(flowRef.current)
         .forEach((node, _, allNodes) => {
 
           get(node.connections)
@@ -103,12 +108,12 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
 
       return lines;
     }
-  }), [flow]);
+  }), []);
 
   const boardSizes = useMemo<IBoardSizes>(() => ({
     width: selector({
       get: ({ get }) => {
-        return get(flow).reduce((previous, current) => {
+        return get(flowRef.current).reduce((previous, current) => {
           const left = get(current.left) + get(current.width);
           if (left > previous) return left;
 
@@ -118,7 +123,7 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
     }),
     height: selector({
       get: ({ get }) => {
-        return get(flow).reduce((previous, current) => {
+        return get(flowRef.current).reduce((previous, current) => {
           const top = get(current.top) + get(current.height);
           if (top > previous) return top;
 
@@ -126,14 +131,14 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
         }, 0);
       }
     }),
-  }), [flow]);
+  }), []);
 
   const selectedItemsId = useMemo(() => observe([] as TId[]), []);
 
   const selectedItems = useMemo(() => {
     return selector({
       get: ({ get }) => {
-        const selectedItems = get(flow).filter(node => get(selectedItemsId).includes(get(node.id)))
+        const selectedItems = get(flowRef.current).filter(node => get(selectedItemsId).includes(get(node.id)))
         return selectedItems;
       }
     });
@@ -141,7 +146,7 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
 
 
   return (
-    <ItemsContext.Provider value={{ flowStore: flow, linesStore: lines, boardSizes, selectedItems, selectedItemsId }}>
+    <ItemsContext.Provider value={{ flowStore: flowRef.current, linesStore: lines, boardSizes, selectedItems, selectedItemsId }}>
       {children}
     </ItemsContext.Provider>
   );

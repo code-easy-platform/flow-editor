@@ -1,39 +1,74 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { useDrag } from 'react-use-drag-and-drop';
 import { observe, set } from 'react-observing';
+import { v4 as uuid } from 'uuid';
 
-import { FlowEditor, INode } from './flow';
+import { FlowEditor, IDroppedData, INode } from './flow';
 import './App.css';
 
 export const App: React.FC = () => {
   const [items, setItems] = useState(itemsMock);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+
+  const { isDragging } = useDrag({
+    id: uuid(),
+    data: 'Teste',
+    element: buttonRef,
+  });
+
+
+  const handleDrop = (data: IDroppedData<string>) => {
+    console.log(data);
+
+    setItems(old => {
+      return [
+        ...old,
+        {
+          width: observe(50),
+          height: observe(60),
+          id: observe(uuid()),
+          connections: observe([]),
+          top: observe(data.top - 35),
+          left: observe(data.left - 25),
+          render: (props) => <LogicComponent title={data.data} {...props} />,
+        },
+      ];
+    });
+  }
 
 
   return (
-    <div style={{ width: '90vw', height: '90vh', margin: 20, border: '2px solid green', flex: 1 }}>
-      <FlowEditor
-        items={items}
-        snapGridSize={15}
-        backgroundSize={30}
+    <>
+      <button ref={buttonRef}>{isDragging ? "Arrastando..." : "Arraste"}</button>
 
-        onRemove={ids => setItems(oldItems => {
-          const newItems = oldItems.filter(item => !ids.includes(item.id.value))
+      <div style={{ width: '90vw', height: '90vh', margin: 20, border: '2px solid green', flex: 1 }}>
+        <FlowEditor
+          items={items}
+          snapGridSize={15}
+          backgroundSize={30}
 
-          newItems.forEach(item => {
-            const newConnections = item.connections.value.filter(connection => !ids.includes(connection.id.value))
-            if (item.connections.value.length === newConnections.length) return;
+          onRemove={ids => setItems(oldItems => {
+            const newItems = oldItems.filter(item => !ids.includes(item.id.value))
 
-            set(item.connections, newConnections);
-          });
+            newItems.forEach(item => {
+              const newConnections = item.connections.value.filter(connection => !ids.includes(connection.id.value))
+              if (item.connections.value.length === newConnections.length) return;
 
-          return newItems;
-        })}
+              set(item.connections, newConnections);
+            });
 
+            return newItems;
+          })}
 
-      // backgroundDotColor='darkgray'
-      // backgroundColorPaper='black'
-      // backgroundColorDefault='#f3f4f6'
-      />
-    </div>
+          onDrop={handleDrop}
+
+        // backgroundDotColor='darkgray'
+        // backgroundColorPaper='black'
+        // backgroundColorDefault='#f3f4f6'
+        />
+      </div>
+    </>
   );
 }
 

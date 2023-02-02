@@ -3,12 +3,13 @@ import Frame from 'react-frame-component';
 
 import { BoardScrollProvider, BoardZoomProvider, DragLineProvider, INode, ItemsProvider, SnapGridProvider } from './shared/context';
 import { DraggableContainerCss } from './shared/components/draggable-container/DraggableContainer.styles';
+import { FlowEditorBoard, IDroppedData } from './FlowEditorBoard';
 import { FlowEditorBoardCss } from './FlowEditorBoard.styles';
-import { FlowEditorBoard } from './FlowEditorBoard';
 import { TId } from './shared/types';
 
 
 export type { INode, ILine, INodeConnection, INodeRenderProps } from './shared/context';
+export type { IDroppedData } from './FlowEditorBoard';
 
 
 const IFrame = Frame as any;
@@ -22,6 +23,7 @@ export interface IFlowEditorProps {
   backgroundColorPaper?: string;
   onRemove?: (ids: TId[]) => void;
   backgroundColorDefault?: string;
+  onDrop?: (data: IDroppedData<any>) => void;
 }
 export const FlowEditor: React.FC<IFlowEditorProps> = ({ snapGridSize = 15, items, customCSS = '', ...rest }) => {
 

@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useObserverValue, useSetObserver } from 'react-observing';
+import { useDrop } from 'react-use-drag-and-drop';
 import { useFrame } from 'react-frame-component';
+import { v4 as uuid } from 'uuid';
 
 import { INode, useBoardScrollContext, useBoardZoomContext, useDragSelectedItems, useItemsContext, useToggleSelectedItem } from './shared/context';
 import { BoardSizeAndZoomContainer, SVGBoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea, ICoords } from './shared/components';
@@ -9,16 +11,23 @@ import { getCtrlKeyBySystem } from './shared/services';
 import { TId } from './shared/types';
 
 
+export interface IDroppedData<T> {
+  data: T;
+  top: number;
+  left: number;
+}
 interface IFlowEditorBoardProps {
   onRemove?: (ids: TId[]) => void;
+  onDrop?: (data: IDroppedData<any>) => void;
 
   backgroundSize?: number;
   backgroundDotColor?: string;
   backgroundColorPaper?: string;
   backgroundColorDefault?: string;
 }
-export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundDotColor = '#484848', backgroundSize = 30, onRemove }) => {
+export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundDotColor = '#484848', backgroundSize = 30, onRemove, onDrop }) => {
   const boardRef = useRef<HTMLDivElement>(null);
+  const useDropIdRef = useRef(uuid());
   const { document } = useFrame();
 
   const scrollObject = useBoardScrollContext();
@@ -32,6 +41,17 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
   const addSelectedItem = useToggleSelectedItem();
   const lines = useObserverValue(linesStore);
   const flow = useObserverValue(flowStore);
+
+
+  useDrop({
+    element: boardRef,
+    id: useDropIdRef.current,
+    drop: (data, { x, y }) => onDrop?.({
+      data,
+      top: y + -scrollObject.top.value,
+      left: x + -scrollObject.left.value,
+    }),
+  });
 
 
   useEffect(() => {
