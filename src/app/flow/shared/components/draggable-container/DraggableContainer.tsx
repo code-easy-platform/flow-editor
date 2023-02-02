@@ -15,11 +15,11 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
 
   const id = useObserverValue(node.id);
 
+  const isSelectedObservable = useIsSelectedItemById(id);
   const dragAllSelectedItems = useDragSelectedItems();
   const addSelectedItem = useToggleSelectedItem();
   const { selectedItemsId } = useItemsContext();
   const scrollObject = useBoardScrollContext();
-  const isSelected = useIsSelectedItemById(id);
   const snapGrid = useSnapGridContext();
 
   const [left, setLeft] = useObserver(node.left);
@@ -63,11 +63,11 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
 
   const content = useMemo(() => {
     return node.render({
-      isSelected,
       width: node.width,
       height: node.height,
+      isSelected: isSelectedObservable,
     });
-  }, [node.render, node.width, node.height, isSelected]);
+  }, [node.render, node.width, node.height, isSelectedObservable]);
 
   const containerTranslate = useMemo(() => `translate(${(left)}px, ${(top)}px)`, [left, top]);
 

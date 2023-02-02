@@ -10,9 +10,9 @@ interface IBoardSizes {
 }
 
 export interface INodeRenderProps {
-  isSelected: boolean;
   width: IObservable<number>;
   height: IObservable<number>;
+  isSelected: IObservable<boolean>;
 }
 export interface INodeSlot {
   id: IObservable<TId>;
@@ -157,33 +157,34 @@ export const useItemsContext = () => useContext(ItemsContext);
 export const useBoardSizes = () => useItemsContext().boardSizes;
 
 export const useSelectedItemsId = () => {
-  const { selectedItemsId: selectedItems } = useItemsContext()
-
-  return selectedItems;
+  const { selectedItemsId } = useItemsContext()
+  return selectedItemsId;
 };
 
 export const useIsSelectedItemById = (id: TId) => {
   const { selectedItemsId } = useItemsContext();
 
-  const [isSelected, setIsSelected] = useState(selectedItemsId.value.includes(id));
+  const isSelectedObservable = useRef(observe(selectedItemsId.value.includes(id)));
+
 
   useEffect(() => {
     const subscription = selectedItemsId.subscribe(ids => {
       const isSelected = ids.includes(id);
-      setIsSelected(old => old !== isSelected ? isSelected : old);
+      set(isSelectedObservable.current, old => old !== isSelected ? isSelected : old);
     });
 
     return () => subscription.unsubscribe();
   }, [selectedItemsId, id]);
 
 
-  return isSelected;
+  return isSelectedObservable.current;
 };
 
 export const useToggleSelectedItem = () => {
   const { selectedItemsId, linesStore } = useItemsContext();
 
   return useCallback((id: TId | TId[], keepSelected = false) => {
+
     if (typeof id === 'string') {
       if (selectedItemsId.value.some(itemId => itemId === id) && !keepSelected) return;
 
@@ -216,13 +217,16 @@ export const useToggleSelectedItem = () => {
         set(selectedItemsId, [id]);
       }
     } else {
-      if (id.length === 0 && linesStore.value.length === 0) return;
+      if (id.sort().join() === selectedItemsId.value.sort().join()) return;
 
       const result = [...id];
 
       const linesId = linesStore.value
         .filter(line => result.includes(line.nodeId.value) && result.includes(line.relatedNodeId.value))
         .map(line => line.id.value);
+
+
+      if ([...result, ...linesId].sort().join() === selectedItemsId.value.sort().join()) return;
 
       set(selectedItemsId, [...result, ...linesId]);
     }

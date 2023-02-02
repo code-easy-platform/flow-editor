@@ -39,8 +39,8 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
   const rawHeight1 = useObserverValue(lineProps.height1Observable);
   const rawHeight2 = useObserverValue(lineProps.height2Observable);
 
+  const isSelected = useObserverValue(useIsSelectedItemById(lineId));
   const addSelectedItem = useToggleSelectedItem();
-  const isSelected = useIsSelectedItemById(lineId);
 
 
   const arrowSize = useMemo(() => 2.5, []);
@@ -74,8 +74,6 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
       return /* space -  */spaceBySideAnglePercent;
     };
 
-
-    if (lineId === 'line-id_0') console.log(getValueByAngle(20));
 
     let retreat = 0;
     switch (linePath.currentSide) {

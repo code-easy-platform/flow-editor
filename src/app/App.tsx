@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useDrag } from 'react-use-drag-and-drop';
-import { observe, set } from 'react-observing';
+import { IObservable, observe, set, useObserverValue } from 'react-observing';
 import { v4 as uuid } from 'uuid';
 
 import { FlowEditor, IDroppedData, INode } from './flow';
@@ -75,9 +75,10 @@ export const App: React.FC = () => {
 
 interface ILogicComponentProps {
   title: string;
-  isSelected: boolean;
+  isSelected: IObservable<boolean>;
 }
 const LogicComponent = ({ title, isSelected }: ILogicComponentProps) => {
+  const selected = useObserverValue(isSelected);
 
   return (
     <span style={{ flex: 1, display: 'flex', padding: 1, flexDirection: 'column', gap: 0, alignItems: 'center', overflow: 'hidden' }}>
@@ -88,7 +89,7 @@ const LogicComponent = ({ title, isSelected }: ILogicComponentProps) => {
       <img
         draggable={false}
         src='https://code-easy-bfe83.web.app/static/media/start~hMHmYmIv.1e357883.svg'
-        style={{ flex: 1, maxHeight: 40, pointerEvents: 'none', backgroundColor: '#1e1e1e', border: !isSelected ? 'thin solid transparent' : 'thin solid #0f77bf' }}
+        style={{ flex: 1, maxHeight: 40, pointerEvents: 'none', backgroundColor: '#1e1e1e', border: !selected ? 'thin solid transparent' : 'thin solid #0f77bf' }}
       />
     </span>
   );
@@ -189,7 +190,7 @@ const itemsMock: INode[] = [
     height: observe(60),
     connections: observe([]),
     render: ({ isSelected }) => (
-      <div style={{ flex: 1, border: !isSelected ? '2px solid transparent' : '2px solid #0f77bf' }}>
+      <div style={{ flex: 1, border: !isSelected.value ? '2px solid transparent' : '2px solid #0f77bf' }}>
         <textarea style={{ backgroundColor: 'green', padding: 8 }} onMouseDown={e => e.stopPropagation()}>
 
         </textarea>
