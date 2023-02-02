@@ -41,6 +41,7 @@ export const NewConnection: React.FC<INewConnectionProps> = ({ node }) => {
         height1={height}
         lineId={undefined}
         newConnection={true}
+        position1FromCenter={true}
 
         lineWidth={lineWidth}
       />

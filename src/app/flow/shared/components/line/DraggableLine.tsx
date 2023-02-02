@@ -22,9 +22,10 @@ interface IDraggableLineProps {
   lineId: TId | undefined;
   onDragLineEnd?: () => void;
   onDragLineStart?: () => void;
+  position1FromCenter?: boolean;
   disableStartDraggable?: boolean;
 }
-export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnection = false, disableStartDraggable = false, nodeId, lineWidth, onDragLineEnd, onDragLineStart, ...rest }) => {
+export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnection = false, position1FromCenter = false, disableStartDraggable = false, nodeId, lineWidth, onDragLineEnd, onDragLineStart, ...rest }) => {
   const setDragLine = useSetObserver(useDragLineContext());
   const addSelectedItem = useToggleSelectedItem();
   const scrollObject = useBoardScrollContext();
@@ -140,10 +141,10 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnec
           strokeWidth={lineWidth}
           style={{ pointerEvents: 'none' }}
           markerEnd={`url(#end-line-arrow-${lineId})`}
-          y1={showDragLine === 'start' ? rawTop1 : linePath.y1}
           y2={showDragLine === 'end' ? rawTop2 - (linePath.extraSpace / 2) : linePath.y2}
           x2={showDragLine === 'end' ? rawLeft2 + (linePath.extraSpace / 2) : linePath.x2}
-          x1={showDragLine === 'start' ? rawLeft1 - (linePath.extraSpace / 2) : linePath.x1}
+          y1={position1FromCenter ? rawTop1 + (rest.height1 / 2) : showDragLine === 'start' ? rawTop1 : linePath.y1}
+          x1={position1FromCenter ? rawLeft1 + (rest.width1 / 2) : showDragLine === 'start' ? rawLeft1 - (linePath.extraSpace / 2) : linePath.x1}
         />
       )}
 
