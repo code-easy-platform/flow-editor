@@ -16,13 +16,17 @@ const IFrame = Frame as any;
 
 export interface IFlowEditorProps {
   items: INode[];
+
+  disableDropInLines?: boolean;
+
   customCSS?: string;
   snapGridSize?: number;
   backgroundSize?: number;
   backgroundDotColor?: string;
   backgroundColorPaper?: string;
-  onRemove?: (ids: TId[]) => void;
   backgroundColorDefault?: string;
+
+  onRemove?: (ids: TId[]) => void;
   onDrop?: (data: IDroppedData<any>) => void;
 }
 export const FlowEditor: React.FC<IFlowEditorProps> = ({ snapGridSize = 15, items, customCSS = '', ...rest }) => {

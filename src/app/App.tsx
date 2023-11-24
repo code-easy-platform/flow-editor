@@ -3,7 +3,7 @@ import { useDrag } from 'react-use-drag-and-drop';
 import { IObservable, observe, set, useObserverValue } from 'react-observing';
 import { v4 as uuid } from 'uuid';
 
-import { FlowEditor, IDroppedData, INode } from './flow';
+import { FlowEditor, IDroppedData, INode, INodeConnection } from './flow';
 import './App.css';
 
 export const App: React.FC = () => {
@@ -21,20 +21,55 @@ export const App: React.FC = () => {
   const handleDrop = (data: IDroppedData<string>) => {
     console.log(data);
 
-    setItems(old => {
-      return [
-        ...old,
-        {
-          width: observe(50),
-          height: observe(60),
-          id: observe(uuid()),
-          connections: observe([]),
-          top: observe(data.top - 35),
-          left: observe(data.left - 25),
-          render: (props) => <LogicComponent title={data.data} {...props} />,
-        },
-      ];
-    });
+    if (data.target.type === 'board') {
+      setItems(old => {
+        return [
+          ...old,
+          {
+            width: observe(50),
+            height: observe(60),
+            id: observe(uuid()),
+            connections: observe([]),
+            top: observe(data.top - 35),
+            left: observe(data.left - 25),
+            render: (props) => <LogicComponent title={data.data} {...props} />,
+          },
+        ];
+      });
+    } else {
+      const node: INode = {
+        width: observe(50),
+        height: observe(60),
+        id: observe(uuid()),
+        connections: observe([]),
+        top: observe(data.top - 35),
+        left: observe(data.left - 25),
+        render: (props) => <LogicComponent title={data.data} {...props} />,
+      };
+
+      setItems(old => {
+        const targetNode = old.find(oldNode => oldNode.id.value === data.target.nodeId);
+        if (!targetNode) return old;
+
+        const targetLine = targetNode.connections.value.find(oldLine => oldLine.id.value === data.target.lineId);
+        if (!targetLine) return old;
+
+        const newLine: INodeConnection = {
+          id: observe(node.id.value),
+          relatedId: targetLine.relatedId,
+        }
+
+        targetLine.relatedId = observe(node.id.value);
+
+        return [
+          ...old,
+          {
+            ...node,
+            connections: observe([newLine]),
+          },
+        ];
+      });
+    }
   }
 
 
@@ -47,6 +82,8 @@ export const App: React.FC = () => {
           items={items}
           snapGridSize={15}
           backgroundSize={30}
+
+          //disableDropInLines
 
           onRemove={ids => setItems(oldItems => {
             const newItems = oldItems.filter(item => !ids.includes(item.id.value))

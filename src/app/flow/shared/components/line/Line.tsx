@@ -113,8 +113,8 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
   useDrop({
     element: lineRef,
     id: useRef(uuid()).current,
+    leave: () => !onDrop ? {} : setIsDraggingHoverLine(false),
     hover: () => setIsDraggingHoverLine(old => old ? old : true),
-    leave: () => setIsDraggingHoverLine(old => old ? false : old),
     drop: (data, { x, y }) => onDrop?.({
       data,
       top: y + -scrollObject.top.value,
@@ -148,7 +148,6 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
           />
           <line
             fill="none"
-            ref={lineRef}
             y1={linePath.y1}
             y2={linePath.y2}
             x1={linePath.x1}
@@ -158,6 +157,7 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
             strokeLinecap="round"
             onClick={handleMouseDown}
             style={{ pointerEvents: 'auto' }}
+            ref={onDrop ? lineRef : undefined}
           />
         </>
       )}
@@ -175,12 +175,12 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
           <path
             d={pathD}
             fill="none"
-            ref={lineRef}
             strokeWidth={14}
             stroke="transparent"
             strokeLinecap="round"
             onClick={handleMouseDown}
             style={{ pointerEvents: 'auto' }}
+            ref={onDrop ? lineRef : undefined}
           />
         </>
       )}

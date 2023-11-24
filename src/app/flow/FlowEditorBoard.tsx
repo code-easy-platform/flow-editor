@@ -22,15 +22,17 @@ export interface IDroppedData<T> {
   };
 }
 interface IFlowEditorBoardProps {
-  onRemove?: (ids: TId[]) => void;
-  onDrop?: (data: IDroppedData<any>) => void;
+  disableDropInLines?: boolean;
 
   backgroundSize?: number;
   backgroundDotColor?: string;
   backgroundColorPaper?: string;
   backgroundColorDefault?: string;
+
+  onRemove?: (ids: TId[]) => void;
+  onDrop?: (data: IDroppedData<any>) => void;
 }
-export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundDotColor = '#484848', backgroundSize = 30, onRemove, onDrop }) => {
+export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundDotColor = '#484848', backgroundSize = 30, disableDropInLines = false, onRemove, onDrop }) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const { document } = useFrame();
 
@@ -222,7 +224,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
               isCurvedObservable={line.isCurved}
 
-              onDrop={onDrop}
+              onDrop={disableDropInLines ? undefined : onDrop}
             />
           ))}
 
