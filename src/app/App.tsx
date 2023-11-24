@@ -234,4 +234,32 @@ const itemsMock: INode[] = [
       </div>
     ),
   },
+  {
+    id: observe('7'),
+    top: observe(450),
+    left: observe(50),
+    width: observe(100),
+    height: observe(80),
+    connections: observe([]),
+    disableCreateConnections: observe(true),
+    render: ({ isSelected }) => (
+      <div style={{ flex: 1, color: 'white', backgroundColor: '#ff000050' }}>
+        Disabled create connections
+      </div>
+    ),
+  },
+  {
+    id: observe('8'),
+    top: observe(450),
+    left: observe(200),
+    width: observe(100),
+    height: observe(80),
+    connections: observe([]),
+    disableDropConnections: observe(true),
+    render: ({ isSelected }) => (
+      <div style={{ flex: 1, color: 'white', backgroundColor: '#ff000050' }}>
+        Disabled drop connections
+      </div>
+    ),
+  },
 ];

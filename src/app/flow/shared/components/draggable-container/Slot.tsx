@@ -10,8 +10,9 @@ interface ISlotProps {
   nodeId: TId;
   width: number;
   height: number;
+  disableDropLine: boolean;
 }
-export const Slot: React.FC<ISlotProps> = ({ nodeId, height, width }) => {
+export const Slot: React.FC<ISlotProps> = ({ nodeId, disableDropLine, height, width }) => {
   const dragLineData = useObserverValue(useDragLineContext());
   const { flowStore } = useItemsContext();
 
@@ -78,8 +79,8 @@ export const Slot: React.FC<ISlotProps> = ({ nodeId, height, width }) => {
   return (
     <>
       <span
-        onMouseUp={handleDropLine}
         onMouseDown={e => e.stopPropagation()}
+        onMouseUp={!disableDropLine ? handleDropLine : undefined}
         style={{
           top: -4,
           left: -4,

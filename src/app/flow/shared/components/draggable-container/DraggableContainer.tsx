@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useRef } from 'react';
-import { useObserver, useObserverValue } from 'react-observing';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { isObservableProp, useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
 import { useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useItemsContext, INode } from '../../context';
@@ -11,16 +11,17 @@ interface IDraggableContainerProps {
   node: INode;
 }
 export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node }) => {
-  const { window } = useFrame();
+  const [disabledDropLine, setDisabledDropLine] = useState(false);
+
 
   const id = useObserverValue(node.id);
-
   const isSelectedObservable = useIsSelectedItemById(id);
   const dragAllSelectedItems = useDragSelectedItems();
   const addSelectedItem = useToggleSelectedItem();
   const { selectedItemsId } = useItemsContext();
   const scrollObject = useBoardScrollContext();
   const snapGrid = useSnapGridContext();
+  const { window } = useFrame();
 
   const [left, setLeft] = useObserver(node.left);
   const height = useObserverValue(node.height);
@@ -28,6 +29,21 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
   const width = useObserverValue(node.width);
 
   const cliquedLocationFlowItem = useRef({ top: 0, left: 0 });
+
+
+  useEffect(() => {
+    if (isObservableProp(node.disableDropConnections) && node.disableDropConnections) {
+      setDisabledDropLine(typeof node.disableDropConnections.value === 'function' ? node.disableDropConnections.value(node) : node.disableDropConnections.value);
+
+      const subscription = node.disableDropConnections.subscribe(value => {
+        setDisabledDropLine(typeof value === 'function' ? value(node) : value);
+      });
+
+      return () => subscription.unsubscribe();
+    } else {
+      setDisabledDropLine(old => old === false ? old : false);
+    }
+  }, [node]);
 
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -86,6 +102,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
         nodeId={id}
         width={width}
         height={height}
+        disableDropLine={disabledDropLine}
       />
     </div>
   );

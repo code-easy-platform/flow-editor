@@ -30,6 +30,8 @@ export interface INode {
   height: IObservable<number>;
   connections: IObservable<INodeConnection[]>;
   render: (props: INodeRenderProps) => ReactNode;
+  disableDropConnections?: IObservable<boolean | ((node: INode) => boolean)>;
+  disableCreateConnections?: IObservable<boolean | ((node: INode) => boolean)>;
 }
 
 export interface ILine {
