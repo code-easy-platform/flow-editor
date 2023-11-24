@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { isObservableProp, useObserverValue } from 'react-observing';
+import { useMemo } from 'react';
+import { useObserverValue } from 'react-observing';
 
 import { DraggableLine } from './DraggableLine';
 import { INode } from '../../context';
@@ -9,8 +9,6 @@ interface INewConnectionProps {
   node: INode;
 }
 export const NewConnection: React.FC<INewConnectionProps> = ({ node }) => {
-  const [disabled, setDisabled] = useState(false);
-
   const height = useObserverValue(node.height);
   const width = useObserverValue(node.width);
   const left = useObserverValue(node.left);
@@ -23,22 +21,7 @@ export const NewConnection: React.FC<INewConnectionProps> = ({ node }) => {
   const lineWidth = useMemo(() => 1, []);
 
 
-  useEffect(() => {
-    if (isObservableProp(node.disableCreateConnections) && node.disableCreateConnections) {
-      setDisabled(typeof node.disableCreateConnections.value === 'function' ? node.disableCreateConnections.value(node) : node.disableCreateConnections.value);
-
-      const subscription = node.disableCreateConnections.subscribe(value => {
-        setDisabled(typeof value === 'function' ? value(node) : value);
-      });
-
-      return () => subscription.unsubscribe();
-    } else {
-      setDisabled(old => old === false ? old : false);
-    }
-  }, [node]);
-
-
-  if (disabled) return null;
+  if (node.disableCreateConnections?.()) return null;
 
   return (
     <>

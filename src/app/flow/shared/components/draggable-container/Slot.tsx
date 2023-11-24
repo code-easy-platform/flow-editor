@@ -10,9 +10,10 @@ interface ISlotProps {
   nodeId: TId;
   width: number;
   height: number;
-  disableDropLine: boolean;
+  getIsDisabledDropConnection: () => boolean;
+  getIsDisabledCreateConnection: () => boolean;
 }
-export const Slot: React.FC<ISlotProps> = ({ nodeId, disableDropLine, height, width }) => {
+export const Slot: React.FC<ISlotProps> = ({ nodeId, height, width, getIsDisabledCreateConnection, getIsDisabledDropConnection }) => {
   const dragLineData = useObserverValue(useDragLineContext());
   const { flowStore } = useItemsContext();
 
@@ -25,6 +26,8 @@ export const Slot: React.FC<ISlotProps> = ({ nodeId, disableDropLine, height, wi
       if (item.id.value === dragLineData.nodeId) {
 
         if (dragLineData.type === 'end') {
+          if (getIsDisabledDropConnection()) return;
+
           if (!dragLineData.lineId) {
             set(item.connections, oldConnections => [
               ...oldConnections,
@@ -47,6 +50,8 @@ export const Slot: React.FC<ISlotProps> = ({ nodeId, disableDropLine, height, wi
           });
           return;
         }
+
+        if (getIsDisabledCreateConnection()) return;
 
         set(item.connections, oldConnections => {
           const removedConnection = oldConnections.find(connection => connection.id.value === dragLineData.lineId);
@@ -73,14 +78,14 @@ export const Slot: React.FC<ISlotProps> = ({ nodeId, disableDropLine, height, wi
         return;
       }
     }
-  }, [dragLineData, nodeId]);
+  }, [dragLineData, nodeId, getIsDisabledCreateConnection, getIsDisabledDropConnection]);
 
 
   return (
     <>
       <span
+        onMouseUp={handleDropLine}
         onMouseDown={e => e.stopPropagation()}
-        onMouseUp={!disableDropLine ? handleDropLine : undefined}
         style={{
           top: -4,
           left: -4,

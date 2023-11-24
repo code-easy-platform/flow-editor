@@ -241,7 +241,7 @@ const itemsMock: INode[] = [
     width: observe(100),
     height: observe(80),
     connections: observe([]),
-    disableCreateConnections: observe(true),
+    disableCreateConnections: () => true,
     render: ({ isSelected }) => (
       <div style={{ flex: 1, color: 'white', backgroundColor: '#ff000050' }}>
         Disabled create connections
@@ -255,7 +255,7 @@ const itemsMock: INode[] = [
     width: observe(100),
     height: observe(80),
     connections: observe([]),
-    disableDropConnections: observe(true),
+    disableDropConnections: () => true,
     render: ({ isSelected }) => (
       <div style={{ flex: 1, color: 'white', backgroundColor: '#ff000050' }}>
         Disabled drop connections

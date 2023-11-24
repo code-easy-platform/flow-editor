@@ -28,10 +28,10 @@ export interface INode {
   left: IObservable<number>;
   width: IObservable<number>;
   height: IObservable<number>;
+  disableDropConnections?: () => boolean;
+  disableCreateConnections?: () => boolean;
   connections: IObservable<INodeConnection[]>;
   render: (props: INodeRenderProps) => ReactNode;
-  disableDropConnections?: IObservable<boolean | ((node: INode) => boolean)>;
-  disableCreateConnections?: IObservable<boolean | ((node: INode) => boolean)>;
 }
 
 export interface ILine {
