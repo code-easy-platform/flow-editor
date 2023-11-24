@@ -1,7 +1,10 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { IObservable, useObserverValue } from 'react-observing';
+import { useDrop } from 'react-use-drag-and-drop';
+import { v4 as uuid } from 'uuid';
 
-import { useIsSelectedItemById, useToggleSelectedItem } from '../../context';
+import { useBoardScrollContext, useIsSelectedItemById, useToggleSelectedItem } from '../../context';
+import { IDroppedData } from '../../../FlowEditorBoard';
 import { getCtrlKeyBySystem } from '../../services';
 import { DraggableLine } from './DraggableLine';
 import { useLinePath } from './UseLinePath';
@@ -23,8 +26,11 @@ interface IDraggableContainerProps {
   height2Observable: IObservable<number>;
 
   isCurvedObservable: IObservable<boolean>;
+
+  onDrop?: (data: IDroppedData<any>) => void;
 }
-export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
+export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps }) => {
+  const [isDraggingHoverLine, setIsDraggingHoverLine] = useState(false);
   const [isDraggingLine, setIsDraggingLine] = useState(false);
 
   const rawTop1 = useObserverValue(lineProps.top1Observable);
@@ -102,6 +108,21 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
     return `M ${linePath.x1} ${linePath.y1} ${curve} ${linePath.x2} ${linePath.y2}`;
   }, [linePath.x1, lineId, linePath.y1, linePath.x2, linePath.y2, linePath.currentSide, linePath.sideAngle, linePath.angle]);
 
+  const lineRef = useRef<SVGLineElement>(null);
+  const scrollObject = useBoardScrollContext();
+  useDrop({
+    element: lineRef,
+    id: useRef(uuid()).current,
+    hover: () => setIsDraggingHoverLine(old => old ? old : true),
+    leave: () => setIsDraggingHoverLine(old => old ? false : old),
+    drop: (data, { x, y }) => onDrop?.({
+      data,
+      top: y + -scrollObject.top.value,
+      left: x + -scrollObject.left.value,
+      target: { type: 'line', lineId, nodeId: blockId },
+    }),
+  });
+
 
   return (
     <>
@@ -122,11 +143,12 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
             strokeLinecap="round"
             strokeWidth={lineWidth}
             style={{ pointerEvents: 'none' }}
-            stroke={isSelected ? "#0f77bf" : "gray"}
             markerEnd={`url(#end-line-arrow-${lineId})`}
+            stroke={(isSelected || isDraggingHoverLine) ? "#0f77bf" : "gray"}
           />
           <line
             fill="none"
+            ref={lineRef}
             y1={linePath.y1}
             y2={linePath.y2}
             x1={linePath.x1}
@@ -147,25 +169,19 @@ export const Line: React.FC<IDraggableContainerProps> = (lineProps) => {
             fill="none"
             strokeLinecap="round"
             strokeWidth={lineWidth}
-            stroke={isSelected ? "#0f77bf" : "gray"}
             markerEnd={`url(#end-line-arrow-${lineId})`}
+            stroke={(isSelected || isDraggingHoverLine) ? "#0f77bf" : "gray"}
           />
           <path
             d={pathD}
             fill="none"
+            ref={lineRef}
             strokeWidth={14}
             stroke="transparent"
             strokeLinecap="round"
             onClick={handleMouseDown}
             style={{ pointerEvents: 'auto' }}
           />
-          {/* <rect
-            fill='red'
-            width={20}
-            height={20}
-            y={linePath.y1 + ((linePath.y2 - linePath.y1) / 2) - 10}
-            x={linePath.x1 + ((linePath.x2 - linePath.x1) / 2) - 10}
-          /> */}
         </>
       )}
 

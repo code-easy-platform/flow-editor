@@ -35,6 +35,7 @@ export interface INode {
 export interface ILine {
   key: string;
   id: IObservable<TId>;
+  /** Node where the connection is fond */
   nodeId: IObservable<TId>;
   top1: IObservable<number>;
   top2: IObservable<number>;
@@ -45,6 +46,7 @@ export interface ILine {
   height2: IObservable<number>;
   height1: IObservable<number>;
   isCurved: IObservable<boolean>;
+  /** Node where the connection will target */
   relatedNodeId: IObservable<TId>;
 }
 

@@ -15,6 +15,11 @@ export interface IDroppedData<T> {
   data: T;
   top: number;
   left: number;
+  target: {
+    lineId?: TId;
+    nodeId?: TId;
+    type: 'board' | 'line';
+  };
 }
 interface IFlowEditorBoardProps {
   onRemove?: (ids: TId[]) => void;
@@ -27,7 +32,6 @@ interface IFlowEditorBoardProps {
 }
 export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundDotColor = '#484848', backgroundSize = 30, onRemove, onDrop }) => {
   const boardRef = useRef<HTMLDivElement>(null);
-  const useDropIdRef = useRef(uuid());
   const { document } = useFrame();
 
   const scrollObject = useBoardScrollContext();
@@ -45,9 +49,10 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
   useDrop({
     element: boardRef,
-    id: useDropIdRef.current,
+    id: useRef(uuid()).current,
     drop: (data, { x, y }) => onDrop?.({
       data,
+      target: { type: 'board' },
       top: y + -scrollObject.top.value,
       left: x + -scrollObject.left.value,
     }),
@@ -216,6 +221,8 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
               height2Observable={line.height2}
 
               isCurvedObservable={line.isCurved}
+
+              onDrop={onDrop}
             />
           ))}
 

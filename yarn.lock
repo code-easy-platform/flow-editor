@@ -686,10 +686,10 @@ react-refresh@^0.13.0:
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.13.0.tgz#cbd01a4482a177a5da8d44c9755ebb1f26d5a1c1"
   integrity sha512-XP8A9BT0CpRBD+NYLLeIhld/RqG9+gktUjW1FkE+Vm7OCinbG1SshcK5tb9ls4kzvjZr9mOQc7HYgBngEyPAXg==
 
-react-use-drag-and-drop@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/react-use-drag-and-drop/-/react-use-drag-and-drop-0.0.1.tgz#0d7931a13f580124e3fd256e72796f60d437d443"
-  integrity sha512-Ng/xJ09QTY6rUT8/EQ10mPun4FHxObcXH0nmQlKkeykXz0yOiln0qNDZ8UWFu6LthBXUZUV9wr3lmq8U64GEEA==
+react-use-drag-and-drop@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/react-use-drag-and-drop/-/react-use-drag-and-drop-0.0.2.tgz#eb2cfe6356213c782ae8053a4b1628424dbe4854"
+  integrity sha512-TDo6jK11HeVwdbmHu7BAVWJ+gKfalGR+17NIbxL4ae+sXlfubtL5K60B2RrvOZ9eBL2I8F4dWUWLGUBTLs6QVQ==
   dependencies:
     react-observing "^2.5.14"
     uuid "^9.0.0"
