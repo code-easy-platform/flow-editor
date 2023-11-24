@@ -55,11 +55,11 @@ export const App: React.FC = () => {
         if (!targetLine) return old;
 
         const newLine: INodeConnection = {
-          id: observe(node.id.value),
-          relatedId: targetLine.relatedId,
+          id: observe(uuid()),
+          relatedId: observe(targetLine.relatedId.value),
         }
 
-        targetLine.relatedId = observe(node.id.value);
+        set(targetLine.relatedId, node.id.value);
 
         return [
           ...old,

@@ -113,14 +113,17 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
   useDrop({
     element: lineRef,
     id: useRef(uuid()).current,
-    leave: () => !onDrop ? {} : setIsDraggingHoverLine(false),
+    leave: () => setIsDraggingHoverLine(false),
     hover: () => setIsDraggingHoverLine(old => old ? old : true),
-    drop: (data, { x, y }) => onDrop?.({
-      data,
-      top: y + -scrollObject.top.value,
-      left: x + -scrollObject.left.value,
-      target: { type: 'line', lineId, nodeId: blockId },
-    }),
+    drop: (data, { x, y }) => {
+      setIsDraggingHoverLine(false);
+      onDrop?.({
+        data,
+        top: y + -scrollObject.top.value,
+        left: x + -scrollObject.left.value,
+        target: { type: 'line', lineId, nodeId: blockId },
+      });
+    },
   });
 
 
