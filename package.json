@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "cd example && vite --port 3000 --force",
     "build": "tsc && vite build",
-    "postinstall": "cd example && yarn"
+    "postinstall": "[ -d example ] && cd example && yarn || true"
   },
   "dependencies": {
     "react-frame-component": "^5.2.6"
@@ -22,11 +22,10 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-observing": "^2.6.16",
-    "react-use-drag-and-drop": "^0.0.2",
-    "uuid": "^8.3.2"
+    "react-use-drag-and-drop": "^1.0.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "prop-types": "^15.8.1",
     "@types/node": "^20.12.5",
     "@types/react": "^18.2.74",
     "@types/react-dom": "^18.2.24",
@@ -34,9 +33,11 @@
     "@types/uuid": "^9.0.8",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-observing": "^2.6.16",
-    "react-use-drag-and-drop": "^0.0.2",
+    "react-use-drag-and-drop": "^1.0.0",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.4.4",
     "uuid": "^9.0.1",
