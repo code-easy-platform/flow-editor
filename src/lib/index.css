@@ -1,0 +1,95 @@
+.hide-number-spin::-webkit-outer-spin-button,
+.hide-number-spin::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.hide-number-spin {
+  -moz-appearance: textfield;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+input,
+select,
+textarea {
+  @apply p-2 bg-paper rounded outline-none text-text
+}
+
+input:focus,
+button:focus,
+select:focus,
+textarea:focus {
+  @apply ring-1 ring-primary
+}
+
+button {
+  @apply px-3 py-1 rounded-md text-text text-base outline-none
+}
+
+button:active {
+  @apply opacity-100
+}
+
+button:focus {
+  @apply opacity-90
+}
+
+button:hover {
+  @apply opacity-80
+}
+
+button.bg-primary {
+  @apply text-contrast-primary
+}
+
+
+.overflow-overlay {
+  overflow: overlay;
+}
+
+.overflow-primary::-webkit-scrollbar-thumb {
+  @apply bg-primary;
+}
+
+.overflow-track-transparent::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-button {
+  display: none;
+}
+
+*::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: var(--color-background);
+}
+
+*::-webkit-scrollbar-track {
+  background-color: var(--color-paper);
+}
+
+.scroll-theme-negative::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: var(--color-paper);
+}
+
+.scroll-theme-negative::-webkit-scrollbar-track {
+  background-color: var(--color-background);
+}
+
+.scroll-height-2::-webkit-scrollbar {
+  height: 16px;
+}
