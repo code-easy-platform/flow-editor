@@ -1,6 +1,8 @@
 import { useRef } from 'react';
 import { observe } from 'react-observing';
 
+import { FlowEditor } from 'flow-editor/src';
+
 import { FLOW } from './../Mock';
 import './../styles.css';
 
@@ -22,7 +24,10 @@ export const App = () => {
       <div className='p-2 flex flex-col gap-2'>
         Flow editor
 
-        <div className='w-[70vw] h-[90vh] bg-background rounded'>
+        <div className='w-[70vw] h-[90vh] bg-background rounded overflow-clip'>
+          <FlowEditor
+            items={flow.current.value}
+          />
         </div>
       </div>
     </div>
