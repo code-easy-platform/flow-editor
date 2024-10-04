@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { useObserverValue, useSetObserver } from 'react-observing';
+import { set, useObserverValue, useSetObserver } from 'react-observing';
 import { useDrop } from 'react-use-drag-and-drop';
 import { useFrame } from 'react-frame-component';
 import { v4 as uuid } from 'uuid';
@@ -37,7 +37,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
   const { document } = useFrame();
 
   const scrollObject = useBoardScrollContext();
-  const setZoom = useSetObserver(useBoardZoomContext());
+  const zoomObject = useBoardZoomContext();
   const setScrollX = useSetObserver(scrollObject.left);
   const setScrollY = useSetObserver(scrollObject.top);
 
@@ -55,10 +55,10 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
     drop: (data, { x, y }) => onDrop?.({
       data,
       target: { type: 'board' },
-      top: y + -scrollObject.top.value,
-      left: x + -scrollObject.left.value,
+      top: (y + -scrollObject.top.value) / zoomObject.value,
+      left: (x + -scrollObject.left.value) / zoomObject.value,
     }),
-  });
+  }, [scrollObject, zoomObject]);
 
 
   useEffect(() => {
@@ -71,9 +71,9 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
         e.preventDefault();
 
         if (e.deltaY < 0) {
-          setZoom(oldZoom => oldZoom >= 2 ? oldZoom : oldZoom + 0.1);
+          set(zoomObject, oldZoom => oldZoom >= 2 ? oldZoom : oldZoom + 0.1);
         } else {
-          setZoom(oldZoom => oldZoom <= 0.2 ? oldZoom : oldZoom - 0.1);
+          set(zoomObject, oldZoom => oldZoom <= 0.2 ? oldZoom : oldZoom - 0.1);
         }
       }
     }
@@ -122,7 +122,7 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
       document.removeEventListener('keydown', handleDelete);
       document.removeEventListener('wheel', handleMouseWheel);
     }
-  }, [setZoom, document, selectedItemsId, onRemove, dragAllSelectedItems]);
+  }, [zoomObject, document, selectedItemsId, onRemove, dragAllSelectedItems]);
 
 
   const handleOnCoordsChange = useCallback((coords: ICoords) => {
