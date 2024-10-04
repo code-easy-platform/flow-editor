@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useFrame } from 'react-frame-component';
 
-import { useBoardScrollContext } from '../context';
+import { useBoardScrollContext, useBoardZoomContext } from '../context';
 
 
 export interface ICoords {
@@ -20,6 +20,7 @@ interface SelectorAreaProps {
 }
 export const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSelectionStart, isDisabled = false, onCoordsChange, boardRef }) => {
   const scrollObject = useBoardScrollContext();
+  const zoomObject = useBoardZoomContext();
   const { window } = useFrame();
 
   const [startLeft, setStartLeft] = useState(0);
@@ -36,8 +37,8 @@ export const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSe
     onSelectionStart?.(e);
 
     const mouseMouse = (e: MouseEvent) => {
-      setEndLeft(e.pageX - scrollObject.left.value);
-      setEndTop(e.pageY - scrollObject.top.value);
+      setEndLeft((e.pageX - scrollObject.left.value) / zoomObject.value);
+      setEndTop((e.pageY - scrollObject.top.value) / zoomObject.value);
     }
 
     const mouseUp = (e: MouseEvent) => {
@@ -48,14 +49,14 @@ export const SelectorArea: React.FC<SelectorAreaProps> = ({ onSelectionEnd, onSe
     }
 
 
-    setStartLeft(e.offsetX - scrollObject.left.value);
-    setStartTop(e.offsetY - scrollObject.top.value);
-    setEndLeft(e.offsetX - scrollObject.left.value);
-    setEndTop(e.offsetY - scrollObject.top.value);
+    setStartLeft((e.offsetX - scrollObject.left.value) / zoomObject.value);
+    setStartTop((e.offsetY - scrollObject.top.value) / zoomObject.value);
+    setEndLeft((e.offsetX - scrollObject.left.value) / zoomObject.value);
+    setEndTop((e.offsetY - scrollObject.top.value) / zoomObject.value);
     setDisplay(true);
     window.addEventListener('mousemove', mouseMouse);
     window.addEventListener('mouseup', mouseUp);
-  }, [window, scrollObject, boardRef]);
+  }, [window, scrollObject, zoomObject, boardRef]);
 
 
   useEffect(() => {
