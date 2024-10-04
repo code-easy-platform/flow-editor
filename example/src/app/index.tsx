@@ -2,13 +2,15 @@ import { useRef } from 'react';
 import { observe } from 'react-observing';
 
 import { FlowEditor } from 'flow-editor/src';
+import { INode } from 'flow-editor';
 
+import { CustomNode } from './components/CustomNode';
 import { FLOW } from './../Mock';
 import './../styles.css';
 
 
 export const App = () => {
-  const flow = useRef(observe(FLOW));
+  const flow = useRef(observe(FLOW.map<INode>(item => ({ ...item, render: props => <CustomNode {...props} /> }))));
 
 
   return (
@@ -27,6 +29,14 @@ export const App = () => {
         <div className='w-[70vw] h-[90vh] bg-background rounded overflow-clip'>
           <FlowEditor
             items={flow.current.value}
+            customCSS={`
+              .bg-paper {
+                background-color: var(--color-background, #3a3a3a);
+              }
+              .border-selection {
+                border: thin solid var(--color-selection, #999fff);
+              }  
+            `}
           />
         </div>
       </div>
