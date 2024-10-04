@@ -79,7 +79,7 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
         sourceY: sy,
         targetX: tx,
         targetY: ty,
-      }, sx < tx ? -35 : 35);
+      }, { offset: 35 });
 
       return edgePath;
     } else {
