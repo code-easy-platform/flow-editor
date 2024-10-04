@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef } from 'react';
 import { useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
-import { useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useItemsContext, INode } from '../../context';
+import { useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useItemsContext, INode, useBoardZoomContext } from '../../context';
 import { gridSnap, getCtrlKeyBySystem } from '../../services';
 import { Slot } from './Slot';
 
@@ -17,6 +17,7 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
   const addSelectedItem = useToggleSelectedItem();
   const { selectedItemsId } = useItemsContext();
   const scrollObject = useBoardScrollContext();
+  const zoomObject = useBoardZoomContext();
   const snapGrid = useSnapGridContext();
   const { window } = useFrame();
 
@@ -35,8 +36,8 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
     if (!window) return;
 
     const mouseMouse = (e: MouseEvent) => {
-      const newLeft = (e.pageX - scrollObject.left.value) - cliquedLocationFlowItem.current.left;
-      const newTop = (e.pageY - scrollObject.top.value) - cliquedLocationFlowItem.current.top;
+      const newLeft = (((e.pageX - scrollObject.left.value) / zoomObject.value) - cliquedLocationFlowItem.current.left);
+      const newTop = (((e.pageY - scrollObject.top.value) / zoomObject.value) - cliquedLocationFlowItem.current.top);
       const movementX = gridSnap(newLeft, snapGrid) - node.left.value;
       const movementY = gridSnap(newTop, snapGrid) - node.top.value;
 
@@ -51,12 +52,12 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
     }
 
     cliquedLocationFlowItem.current = {
-      top: e.nativeEvent.pageY - top - scrollObject.top.value,
-      left: e.nativeEvent.pageX - left - scrollObject.left.value,
+      top: (e.nativeEvent.pageY / zoomObject.value) - top - scrollObject.top.value,
+      left: (e.nativeEvent.pageX / zoomObject.value) - left - scrollObject.left.value,
     }
     window.addEventListener('mousemove', mouseMouse);
     window.addEventListener('mouseup', mouseUp);
-  }, [setLeft, setTop, addSelectedItem, dragAllSelectedItems, gridSnap, snapGrid, id, window, scrollObject, node.left, node.top]);
+  }, [setLeft, setTop, addSelectedItem, dragAllSelectedItems, gridSnap, snapGrid, id, window, scrollObject, zoomObject, node.left, node.top]);
 
 
   const content = useMemo(() => {
