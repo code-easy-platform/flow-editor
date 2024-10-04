@@ -29,6 +29,7 @@ export const App = () => {
         <div className='w-[70vw] h-[90vh] bg-background rounded overflow-clip'>
           <FlowEditor
             items={flow.current.value}
+            snapGridSize={1}
             customCSS={`
               .bg-paper {
                 background-color: var(--color-background, #3a3a3a);

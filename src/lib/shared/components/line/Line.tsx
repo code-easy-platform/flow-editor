@@ -4,10 +4,9 @@ import { useDrop } from 'react-use-drag-and-drop';
 import { v4 as uuid } from 'uuid';
 
 import { useBoardScrollContext, useIsSelectedItemById, useToggleSelectedItem } from '../../context';
+import { getCtrlKeyBySystem, getEdgeParams, getCurvedPath, getStraightPath } from '../../services';
 import { IDroppedData } from '../../../FlowEditorBoard';
-import { getCtrlKeyBySystem } from '../../services';
 import { DraggableLine } from './DraggableLine';
-import { useLinePath } from './UseLinePath';
 import { TId } from '../../types';
 
 
@@ -53,60 +52,48 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
   const lineWidth = useMemo(() => 1, []);
 
 
-  const linePath = useLinePath({
-    isCurved,
-    top1: rawTop1,
-    top2: rawTop2,
-    left1: rawLeft1,
-    left2: rawLeft2,
-    width1: rawWidth1,
-    width2: rawWidth2,
-    height1: rawHeight1,
-    height2: rawHeight2,
-  });
-
-
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     addSelectedItem(lineId, getCtrlKeyBySystem(e.nativeEvent));
   }, [lineId]);
 
 
-  const pathD = useMemo(() => {
-    const getValueByAngle = (space: number) => {
-      const sideAnglePercent = (linePath.sideAngle * 100) / 90;
+  const linePath = useMemo(() => {
+    const { sx, sy, tx, ty } = getEdgeParams(
+      {
+        y: rawTop1 - 5,
+        x: rawLeft1 - 5,
+        width: rawWidth1 + 10,
+        height: rawHeight1 + 10,
+      },
+      {
+        y: rawTop2 - 5,
+        x: rawLeft2 - 5,
+        width: rawWidth2 + 10,
+        height: rawHeight2 + 10,
+      }
+    );
 
-      const spaceBySideAnglePercent = (space * sideAnglePercent) / 100;
+    if (isCurved) {
+      const edgePath = getCurvedPath({
+        sourceX: sx,
+        sourceY: sy,
+        targetX: tx,
+        targetY: ty,
+      }, sx < tx ? -35 : 35);
 
-      return /* space -  */spaceBySideAnglePercent;
-    };
+      return edgePath;
+    } else {
+      const [edgePath] = getStraightPath({
+        sourceX: sx,
+        sourceY: sy,
+        targetX: tx,
+        targetY: ty,
+      });
 
-
-    let retreat = 0;
-    switch (linePath.currentSide) {
-      case 'left':
-        retreat = getValueByAngle(-20);
-        break;
-      case 'right':
-        retreat = (20);
-        break;
-      case 'top':
-        retreat = getValueByAngle(-20);
-        break;
-      case 'bottom':
-        retreat = (20);
-        break;
-
-      default: break;
+      return edgePath;
     }
+  }, [isCurved, rawTop1, rawTop2, rawLeft1, rawLeft2, rawWidth1, rawWidth2, rawHeight1, rawHeight2]);
 
-    const retreatX = (retreat / 2) * -1;
-    const topCentralize = linePath.y1 + ((linePath.y2 - linePath.y1) / 2) + retreat;
-    const leftCentralize = linePath.x1 + ((linePath.x2 - linePath.x1) / 2) + retreatX;
-
-    const curve = `Q ${leftCentralize} ${topCentralize}`;
-
-    return `M ${linePath.x1} ${linePath.y1} ${curve} ${linePath.x2} ${linePath.y2}`;
-  }, [linePath.x1, lineId, linePath.y1, linePath.x2, linePath.y2, linePath.currentSide, linePath.sideAngle, linePath.angle]);
 
   const lineRef = useRef<SVGLineElement>(null);
   const scrollObject = useBoardScrollContext();
@@ -135,40 +122,10 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
         </marker>
       </defs>
 
-      {(!isDraggingLine && !isCurved) && (
-        <>
-          <line
-            fill="none"
-            y1={linePath.y1}
-            y2={linePath.y2}
-            x1={linePath.x1}
-            x2={linePath.x2}
-            strokeLinecap="round"
-            strokeWidth={lineWidth}
-            style={{ pointerEvents: 'none' }}
-            markerEnd={`url(#end-line-arrow-${lineId})`}
-            stroke={(isSelected || isDraggingHoverLine) ? "#0f77bf" : "gray"}
-          />
-          <line
-            fill="none"
-            y1={linePath.y1}
-            y2={linePath.y2}
-            x1={linePath.x1}
-            x2={linePath.x2}
-            strokeWidth="14"
-            stroke="transparent"
-            strokeLinecap="round"
-            onClick={handleMouseDown}
-            style={{ pointerEvents: 'auto' }}
-            ref={onDrop ? lineRef : undefined}
-          />
-        </>
-      )}
-
-      {(!isDraggingLine && isCurved) && (
+      {!isDraggingLine && (
         <>
           <path
-            d={pathD}
+            d={linePath}
             fill="none"
             strokeLinecap="round"
             strokeWidth={lineWidth}
@@ -176,7 +133,7 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
             stroke={(isSelected || isDraggingHoverLine) ? "#0f77bf" : "gray"}
           />
           <path
-            d={pathD}
+            d={linePath}
             fill="none"
             strokeWidth={14}
             stroke="transparent"
