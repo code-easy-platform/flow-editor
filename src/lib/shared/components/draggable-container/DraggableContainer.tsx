@@ -52,8 +52,8 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
     }
 
     cliquedLocationFlowItem.current = {
-      top: (e.nativeEvent.pageY / zoomObject.value) - top - scrollObject.top.value,
-      left: (e.nativeEvent.pageX / zoomObject.value) - left - scrollObject.left.value,
+      top: ((e.nativeEvent.pageY - scrollObject.top.value) / zoomObject.value) - top,
+      left: ((e.nativeEvent.pageX - scrollObject.left.value) / zoomObject.value) - left,
     }
     window.addEventListener('mousemove', mouseMouse);
     window.addEventListener('mouseup', mouseUp);
