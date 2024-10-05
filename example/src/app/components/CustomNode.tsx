@@ -14,7 +14,7 @@ export const CustomNode = (props: INodeRenderProps) => {
       style={{
         width: width - 2,
         height: height - 2,
-        backgroundColor: 'red',
+        backgroundColor: 'green',
         border: isSelected ? 'thin solid blue' : 'thin solid transparent',
       }}
     >
