@@ -5,4 +5,11 @@ export declare const getCurvedPath: ({ sourceX, sourceY, targetX, targetY }: {
     targetY: number;
 }, { offset }: {
     offset: number;
-}) => string;
+}) => readonly [`M ${number} ${number} Q ${number} ${number} ${number} ${number}`, {
+    readonly sourceX: number;
+    readonly sourceY: number;
+    readonly controlX: number;
+    readonly controlY: number;
+    readonly targetX: number;
+    readonly targetY: number;
+}];

@@ -5,11 +5,11 @@ interface IIntersectionNode {
     height: number;
 }
 export declare function getEdgeParams(source: IIntersectionNode, target: IIntersectionNode): {
-    sx: number;
-    sy: number;
-    tx: number;
-    ty: number;
     sourcePos: string;
     targetPos: string;
+    sourceX: number;
+    sourceY: number;
+    targetX: number;
+    targetY: number;
 };
 export {};

@@ -12,6 +12,7 @@ interface IDraggableLineProps {
     height1: number;
     height2: number;
     lineWidth: number;
+    isCurved?: boolean;
     newConnection?: boolean;
     lineId: TId | undefined;
     onDragLineEnd?: () => void;

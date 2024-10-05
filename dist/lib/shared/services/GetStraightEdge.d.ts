@@ -30,4 +30,9 @@ export type GetStraightPathParams = {
       targetPosition: Position.Left,
     });
  */
-export declare function getStraightPath({ sourceX, sourceY, targetX, targetY, }: GetStraightPathParams): [path: string, labelX: number, labelY: number, offsetX: number, offsetY: number];
+export declare function getStraightPath({ sourceX, sourceY, targetX, targetY, }: GetStraightPathParams): readonly [`M ${number},${number}L ${number},${number}`, {
+    readonly labelX: number;
+    readonly labelY: number;
+    readonly offsetX: number;
+    readonly offsetY: number;
+}];
