@@ -1,5 +1,8 @@
 
-export const getCurvedPath = ({ sourceX, sourceY, targetX, targetY }: { sourceX: number; sourceY: number; targetX: number; targetY: number; }, { offset }: { offset: number }) => {
+export const getCurvedPath = (
+  { sourceX, sourceY, targetX, targetY }: { sourceX: number; sourceY: number; targetX: number; targetY: number; },
+  { offset }: { offset: number }
+) => {
   const centerX = (sourceX + targetX) / 2;
   const centerY = (sourceY + targetY) / 2;
 
@@ -16,5 +19,8 @@ export const getCurvedPath = ({ sourceX, sourceY, targetX, targetY }: { sourceX:
   const controlX = centerX + offsetX;
   const controlY = centerY + offsetY;
 
-  return `M ${sourceX} ${sourceY} Q ${controlX} ${controlY} ${targetX} ${targetY}`;
+  return [
+    `M ${sourceX} ${sourceY} Q ${controlX} ${controlY} ${targetX} ${targetY}`,
+    { sourceX, sourceY, controlX, controlY, targetX, targetY }
+  ] as const;
 };

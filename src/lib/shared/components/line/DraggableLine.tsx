@@ -1,10 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSetObserver } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
 import { useBoardScrollContext, useBoardZoomContext, useDragLineContext, useToggleSelectedItem } from '../../context';
-import { getEdgeParams, getStraightPath } from '../../services';
-import { useLinePath } from './UseLinePath';
+import { getCtrlKeyBySystem, getCurvedPath, getEdgeParams, getStraightPath } from '../../services';
 import { TId } from '../../types';
 
 
@@ -19,6 +18,7 @@ interface IDraggableLineProps {
   height1: number;
   height2: number;
   lineWidth: number;
+  isCurved?: boolean;
   newConnection?: boolean;
   lineId: TId | undefined;
   onDragLineEnd?: () => void;
@@ -26,12 +26,14 @@ interface IDraggableLineProps {
   position1FromCenter?: boolean;
   disableStartDraggable?: boolean;
 }
-export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnection = false, position1FromCenter = false, disableStartDraggable = false, nodeId, lineWidth, onDragLineEnd, onDragLineStart, ...rest }) => {
+export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved, newConnection = false, position1FromCenter = false, disableStartDraggable = false, nodeId, lineWidth, onDragLineEnd, onDragLineStart, ...rest }) => {
   const setDragLine = useSetObserver(useDragLineContext());
   const addSelectedItem = useToggleSelectedItem();
   const scrollObject = useBoardScrollContext();
   const zoomObject = useBoardZoomContext();
   const { window } = useFrame();
+
+  const isDragging = useRef(false);
 
 
   const [rawTop1, setRawTop1] = useState(rest.top1);
@@ -49,52 +51,66 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnec
   }, [rest.top1, rest.top2, rest.left1, rest.left2]);
 
 
-  const linePath = useLinePath({
-    top1: rawTop1,
-    top2: rawTop2,
-    left1: rawLeft1,
-    left2: rawLeft2,
-    width1: rest.width1,
-    width2: rest.width2,
-    height1: rest.height1,
-    height2: rest.height2,
-  });
+  const intersectionPoints = useMemo(() => {
+    const dragAroundSpace = 20;
 
-
-  const linePath2 = useMemo(() => {
-    const { sx, sy, tx, ty } = getEdgeParams(
+    return getEdgeParams(
       {
-        y: rawTop1,
-        x: rawLeft1,
-        width: rest.width1 + 10,
-        height: rest.height1 + 10,
+        y: rawTop1 - (showDragLine === 'start' ? dragAroundSpace / 2 : 5),
+        x: rawLeft1 - (showDragLine === 'start' ? dragAroundSpace / 2 : 5),
+        width: showDragLine === 'start' ? dragAroundSpace : rest.width1 + 10,
+        height: showDragLine === 'start' ? dragAroundSpace : rest.height1 + 10,
       },
       {
-        y: rawTop2 - 5,
-        x: rawLeft2 - 5,
-        width: 10,
-        height: 10,
+        y: rawTop2 - (showDragLine === 'end' ? dragAroundSpace / 2 : 5),
+        x: rawLeft2 - (showDragLine === 'end' ? dragAroundSpace / 2 : 5),
+        width: showDragLine === 'end' ? dragAroundSpace : rest.width2 + 10,
+        height: showDragLine === 'end' ? dragAroundSpace : rest.height2 + 10,
       }
     );
+  }, [showDragLine, rawTop1, rawTop2, rawLeft1, rawLeft2, rest.width1, rest.height1, rest.width2, rest.height2]);
 
-    const [edgePath] = getStraightPath({
-      sourceX: sx,
-      sourceY: sy,
-      targetX: tx,
-      targetY: ty,
+
+  const [linePath] = useMemo(() => {
+    const path = getStraightPath({
+      sourceX: intersectionPoints.sourceX,
+      sourceY: intersectionPoints.sourceY,
+      targetX: intersectionPoints.targetX,
+      targetY: intersectionPoints.targetY,
     });
 
-    return edgePath;
-  }, [rawTop1, rawTop2, rawLeft1, rawLeft2, rest.width1, rest.width2, rest.height1, rest.height2]);
+    return path;
+  }, [intersectionPoints]);
+
+  const [curvedLinePath] = useMemo(() => {
+    const [path] = getCurvedPath(
+      {
+        sourceX: intersectionPoints.sourceX,
+        sourceY: intersectionPoints.sourceY,
+        targetX: intersectionPoints.targetX,
+        targetY: intersectionPoints.targetY,
+      },
+      { offset: 35 }
+    );
+
+
+    return [path];
+  }, [intersectionPoints]);
 
 
   const handleStartMouseDown = useCallback((e: React.MouseEvent) => {
-    if (lineId) addSelectedItem([lineId], false);
-    setShowDragLine('start');
-    onDragLineStart?.();
+    if (lineId) addSelectedItem([lineId], getCtrlKeyBySystem(e.nativeEvent));
     if (!window) return;
 
     const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) {
+        setShowDragLine('start');
+        onDragLineStart?.();
+        setDragLine({ type: 'start', nodeId, lineId });
+
+        isDragging.current = true;
+      }
+
       const newLeft = (e.pageX - scrollObject.left.value) / zoomObject.value;
       const newTop = (e.pageY - scrollObject.top.value) / zoomObject.value;
 
@@ -103,6 +119,8 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnec
     }
 
     const handleMouseUp = () => {
+      isDragging.current = false;
+
       setShowDragLine(undefined);
       setRawLeft1(rest.left1);
       setDragLine(undefined);
@@ -112,20 +130,24 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnec
       window.removeEventListener('mouseup', handleMouseUp)
     }
 
-    handleMouseMove(e.nativeEvent);
-
-    setDragLine({ type: 'start', nodeId, lineId });
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, zoomObject, rawTop1, rawLeft1, linePath.y1, linePath.x1, rest.left1, rest.top1, nodeId, lineId]);
+  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, zoomObject, rawTop1, rawLeft1, rest.left1, rest.top1, nodeId, lineId]);
 
   const handleEndMouseDown = useCallback((e: React.MouseEvent) => {
-    if (lineId) addSelectedItem([lineId], false);
-    setShowDragLine('end');
-    onDragLineStart?.();
+    if (lineId) addSelectedItem([lineId], getCtrlKeyBySystem(e.nativeEvent));
     if (!window) return;
 
+
     const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging.current) {
+        setShowDragLine('end');
+        onDragLineStart?.();
+        setDragLine({ type: 'end', nodeId, lineId });
+
+        isDragging.current = true;
+      }
+
       const newLeft = (e.pageX - scrollObject.left.value) / zoomObject.value;
       const newTop = (e.pageY - scrollObject.top.value) / zoomObject.value;
 
@@ -134,6 +156,8 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnec
     }
 
     const handleMouseUp = () => {
+      isDragging.current = false;
+
       setShowDragLine(undefined);
       setRawLeft2(rest.left2);
       setDragLine(undefined);
@@ -143,12 +167,43 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnec
       window.removeEventListener('mouseup', handleMouseUp)
     }
 
-    handleMouseMove(e.nativeEvent);
-
-    setDragLine({ type: 'end', nodeId, lineId });
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseup', handleMouseUp)
-  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, zoomObject, linePath.y2, linePath.x2, rest.left2, rest.top2, nodeId, lineId]);
+  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, zoomObject, rest.left2, rest.top2, nodeId, lineId]);
+
+  const handleMoveDown = useCallback((event: React.MouseEvent<SVGPathElement>) => {
+    const pathLength = event.currentTarget.getTotalLength();
+
+    const clickX = event.clientX;
+    const clickY = event.clientY;
+
+    let closestPointLength = 0;
+    let closestDistance = Infinity;
+
+    const segmentCount = 100;
+    for (let i = 0; i <= segmentCount; i++) {
+      const pointLength = (i / segmentCount) * pathLength;
+      const point = event.currentTarget.getPointAtLength(pointLength);
+
+      const distance = Math.sqrt(
+        Math.pow(clickX - point.x, 2) + Math.pow(clickY - point.y, 2)
+      );
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestPointLength = pointLength;
+      }
+    }
+
+    const halfPathLength = pathLength / 2;
+    const isCloserToStart = closestPointLength <= halfPathLength;
+
+    if (isCloserToStart) {
+      handleStartMouseDown(event);
+    } else {
+      handleEndMouseDown(event);
+    }
+  }, [handleStartMouseDown, handleEndMouseDown]);
 
 
   return (
@@ -156,7 +211,7 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnec
       {showDragLine && (
         <path
           fill="none"
-          d={linePath2}
+          d={linePath}
           stroke="#0f77bf"
           strokeLinecap="round"
           strokeWidth={lineWidth}
@@ -166,40 +221,25 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, newConnec
 
       {newConnection && (
         <rect
-          x={rawLeft1 - 3}
+          x={rawLeft1 - 6.5}
           fill='transparent'
-          width={linePath.width1}
-          height={(linePath.height1 / 2)}
+          width={rest.width1 + 15}
+          height={(rest.height1 / 2) + 15}
           onMouseDown={handleEndMouseDown}
-          y={rawTop1 + (linePath.height1 / 2) + 2}
+          y={rawTop1 + (rest.height1 / 2)}
           style={{ cursor: 'crosshair', pointerEvents: showDragLine ? 'none' : 'auto' }}
         />
       )}
 
       {(!showDragLine && !newConnection) && (
-        <>
-          {!disableStartDraggable && (
-            <rect
-              width={20}
-              height={20}
-              fill='transparent'
-              y={linePath.y1 - 10}
-              x={linePath.x1 - 10}
-              onMouseDown={handleStartMouseDown}
-              style={{ cursor: 'crosshair', pointerEvents: 'auto' }}
-            />
-          )}
-
-          <rect
-            width={20}
-            height={20}
-            fill='transparent'
-            y={linePath.y2 - 10}
-            x={linePath.x2 - 10}
-            onMouseDown={handleEndMouseDown}
-            style={{ cursor: 'crosshair', pointerEvents: 'auto' }}
-          />
-        </>
+        <path
+          fill="none"
+          strokeWidth={14}
+          stroke="transparent"
+          onMouseDown={handleMoveDown}
+          d={isCurved ? curvedLinePath : linePath}
+          style={{ cursor: 'crosshair', pointerEvents: 'auto' }}
+        />
       )}
     </>
   );

@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { IObservable, useObserverValue } from 'react-observing';
 import { useDrop } from 'react-use-drag-and-drop';
 import { v4 as uuid } from 'uuid';
 
-import { useBoardScrollContext, useIsSelectedItemById, useToggleSelectedItem } from '../../context';
-import { getCtrlKeyBySystem, getEdgeParams, getCurvedPath, getStraightPath } from '../../services';
+import { getEdgeParams, getCurvedPath, getStraightPath } from '../../services';
+import { useBoardScrollContext, useIsSelectedItemById } from '../../context';
 import { IDroppedData } from '../../../FlowEditorBoard';
 import { DraggableLine } from './DraggableLine';
 import { TId } from '../../types';
@@ -45,20 +45,14 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
   const rawHeight2 = useObserverValue(lineProps.height2Observable);
 
   const isSelected = useObserverValue(useIsSelectedItemById(lineId));
-  const addSelectedItem = useToggleSelectedItem();
 
 
   const arrowSize = useMemo(() => 2.5, []);
   const lineWidth = useMemo(() => 1, []);
 
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    addSelectedItem(lineId, getCtrlKeyBySystem(e.nativeEvent));
-  }, [lineId]);
-
-
-  const linePath = useMemo(() => {
-    const { sx, sy, tx, ty } = getEdgeParams(
+  const linePathFull = useMemo(() => {
+    const params = getEdgeParams(
       {
         y: rawTop1 - 5,
         x: rawLeft1 - 5,
@@ -74,23 +68,23 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
     );
 
     if (isCurved) {
-      const edgePath = getCurvedPath({
-        sourceX: sx,
-        sourceY: sy,
-        targetX: tx,
-        targetY: ty,
+      const [path] = getCurvedPath({
+        sourceX: params.sourceX,
+        sourceY: params.sourceY,
+        targetX: params.targetX,
+        targetY: params.targetY,
       }, { offset: 35 });
 
-      return edgePath;
+      return path;
     } else {
-      const [edgePath] = getStraightPath({
-        sourceX: sx,
-        sourceY: sy,
-        targetX: tx,
-        targetY: ty,
+      const [path] = getStraightPath({
+        sourceX: params.sourceX,
+        sourceY: params.sourceY,
+        targetX: params.targetX,
+        targetY: params.targetY,
       });
 
-      return edgePath;
+      return path;
     }
   }, [isCurved, rawTop1, rawTop2, rawLeft1, rawLeft2, rawWidth1, rawWidth2, rawHeight1, rawHeight2]);
 
@@ -123,26 +117,14 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
       </defs>
 
       {!isDraggingLine && (
-        <>
-          <path
-            d={linePath}
-            fill="none"
-            strokeLinecap="round"
-            strokeWidth={lineWidth}
-            markerEnd={`url(#end-line-arrow-${lineId})`}
-            stroke={(isSelected || isDraggingHoverLine) ? "#0f77bf" : "gray"}
-          />
-          <path
-            d={linePath}
-            fill="none"
-            strokeWidth={14}
-            stroke="transparent"
-            strokeLinecap="round"
-            onClick={handleMouseDown}
-            style={{ pointerEvents: 'auto' }}
-            ref={onDrop ? lineRef : undefined}
-          />
-        </>
+        <path
+          d={linePathFull}
+          fill="none"
+          strokeLinecap="round"
+          strokeWidth={lineWidth}
+          markerEnd={`url(#end-line-arrow-${lineId})`}
+          stroke={(isSelected || isDraggingHoverLine) ? "#0f77bf" : "gray"}
+        />
       )}
 
       <DraggableLine
@@ -154,6 +136,7 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
         nodeId={blockId}
         width1={rawWidth1}
         width2={rawWidth2}
+        isCurved={isCurved}
         height1={rawHeight1}
         height2={rawHeight2}
 

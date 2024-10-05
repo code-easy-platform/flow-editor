@@ -36,8 +36,7 @@ export type GetStraightPathParams = {
       targetPosition: Position.Left,
     });
  */
-export function getStraightPath({ sourceX, sourceY, targetX, targetY, }: GetStraightPathParams): [path: string, labelX: number, labelY: number, offsetX: number, offsetY: number] {
-
+export function getStraightPath({ sourceX, sourceY, targetX, targetY, }: GetStraightPathParams) {
   const [labelX, labelY, offsetX, offsetY] = getEdgeCenter({
     sourceX,
     sourceY,
@@ -45,5 +44,8 @@ export function getStraightPath({ sourceX, sourceY, targetX, targetY, }: GetStra
     targetY,
   });
 
-  return [`M ${sourceX},${sourceY}L ${targetX},${targetY}`, labelX, labelY, offsetX, offsetY];
+  return [
+    `M ${sourceX},${sourceY}L ${targetX},${targetY}`,
+    { labelX, labelY, offsetX, offsetY }
+  ] as const;
 }
