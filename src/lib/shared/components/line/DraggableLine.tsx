@@ -167,8 +167,8 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved,
   const handleMoveDown = useCallback((event: React.MouseEvent<SVGPathElement>) => {
     const pathLength = event.currentTarget.getTotalLength();
 
-    const clickX = event.clientX;
-    const clickY = event.clientY;
+    const clickX = (event.clientX - scrollObject.left.value) / zoomObject.value;
+    const clickY = (event.clientY - scrollObject.top.value) / zoomObject.value;
 
     let closestPointLength = 0;
     let closestDistance = Infinity;
@@ -192,11 +192,11 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved,
     const isCloserToStart = closestPointLength <= halfPathLength;
 
     if (isCloserToStart) {
-      handleStartMouseDown(event);
+      if (!disableStartDraggable) handleStartMouseDown(event);
     } else {
       handleEndMouseDown(event);
     }
-  }, [handleStartMouseDown, handleEndMouseDown]);
+  }, [handleStartMouseDown, handleEndMouseDown, disableStartDraggable, scrollObject, zoomObject]);
 
 
   return (
