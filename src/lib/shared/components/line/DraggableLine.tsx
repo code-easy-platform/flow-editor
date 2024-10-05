@@ -51,10 +51,10 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved,
   }, [rest.top1, rest.top2, rest.left1, rest.left2]);
 
 
-  const intersectionPoints = useMemo(() => {
+  const linePath = useMemo(() => {
     const dragAroundSpace = 20;
 
-    return getEdgeParams(
+    const params = getEdgeParams(
       {
         y: rawTop1 - (showDragLine === 'start' ? dragAroundSpace / 2 : 5),
         x: rawLeft1 - (showDragLine === 'start' ? dragAroundSpace / 2 : 5),
@@ -68,34 +68,27 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved,
         height: showDragLine === 'end' ? dragAroundSpace : rest.height2 + 10,
       }
     );
-  }, [showDragLine, rawTop1, rawTop2, rawLeft1, rawLeft2, rest.width1, rest.height1, rest.width2, rest.height2]);
 
+    if (isCurved && !showDragLine) {
+      const [path] = getCurvedPath({
+        sourceX: params.sourceX,
+        sourceY: params.sourceY,
+        targetX: params.targetX,
+        targetY: params.targetY,
+      }, { offset: 35 });
 
-  const [linePath] = useMemo(() => {
-    const path = getStraightPath({
-      sourceX: intersectionPoints.sourceX,
-      sourceY: intersectionPoints.sourceY,
-      targetX: intersectionPoints.targetX,
-      targetY: intersectionPoints.targetY,
-    });
+      return path;
+    } else {
+      const [path] = getStraightPath({
+        sourceX: params.sourceX,
+        sourceY: params.sourceY,
+        targetX: params.targetX,
+        targetY: params.targetY,
+      });
 
-    return path;
-  }, [intersectionPoints]);
-
-  const [curvedLinePath] = useMemo(() => {
-    const [path] = getCurvedPath(
-      {
-        sourceX: intersectionPoints.sourceX,
-        sourceY: intersectionPoints.sourceY,
-        targetX: intersectionPoints.targetX,
-        targetY: intersectionPoints.targetY,
-      },
-      { offset: 35 }
-    );
-
-
-    return [path];
-  }, [intersectionPoints]);
+      return path;
+    }
+  }, [isCurved, showDragLine, rawTop1, rawTop2, rawLeft1, rawLeft2, rest.width1, rest.height1, rest.width2, rest.height2]);
 
 
   const handleStartMouseDown = useCallback((e: React.MouseEvent) => {
@@ -234,10 +227,10 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved,
       {(!showDragLine && !newConnection) && (
         <path
           fill="none"
+          d={linePath}
           strokeWidth={14}
           stroke="transparent"
           onMouseDown={handleMoveDown}
-          d={isCurved ? curvedLinePath : linePath}
           style={{ cursor: 'crosshair', pointerEvents: 'auto' }}
         />
       )}
