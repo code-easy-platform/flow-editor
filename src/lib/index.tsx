@@ -11,6 +11,7 @@ import './index.css';
 
 export type { INode, ILine, INodeConnection, INodeRenderProps, ICustomLineProps } from './shared/context';
 export type { IDroppedData } from './shared/types';
+export { BaseLine } from './shared/components';
 
 
 const IFrame = Frame as any;

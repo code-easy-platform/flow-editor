@@ -1,7 +1,7 @@
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef } from "react";
-import { IObservable, observe, selector, set } from "react-observing";
+import { IObservable, ITransformedReadOnlyObservable, observe, selector, set } from "react-observing";
 
-import { IDroppedData, TId } from "../types";
+import { TId } from "../types";
 
 
 interface IBoardSizes {
@@ -15,6 +15,9 @@ export interface INodeRenderProps {
   isSelected: IObservable<boolean>;
 }
 export interface ICustomLineProps {
+  isDragging: ITransformedReadOnlyObservable<boolean>;
+  isSelected: ITransformedReadOnlyObservable<boolean>;
+
   /** Undefined for line add */
   lineId: IObservable<TId | undefined>;
 
@@ -25,8 +28,6 @@ export interface ICustomLineProps {
   /** Node where the connection will target */
   relatedNodeId: IObservable<TId>;
   nodeEnd: INode;
-
-  onDrop?: (data: IDroppedData<any>) => void;
 }
 export interface INodeSlot {
   id: IObservable<TId>;

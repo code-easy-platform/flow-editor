@@ -1,4 +1,7 @@
-import { ICustomLineProps, ILine } from '../../context';
+import { createElement, useMemo } from 'react';
+import { observe, selector, useObserverValue } from 'react-observing';
+
+import { ICustomLineProps, ILine, useDragLineContext, useSelectedItemsId } from '../../context';
 import { DefaultLine } from './DefaultLine';
 import { IDroppedData } from '../../types';
 
@@ -8,33 +11,65 @@ interface IDraggableContainerProps extends ILine {
   customLineComponent?: (props: ICustomLineProps) => React.ReactNode;
 }
 export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, customLineComponent: CustomLineComponent, ...lineProps }) => {
+  const dragLineContext = useDragLineContext();
+  const selectedIds = useSelectedItemsId();
+
+  const dragLineContextValue = useObserverValue(dragLineContext);
 
 
-  if (CustomLineComponent) return (
-    <CustomLineComponent
-      lineId={lineProps.id}
+  const nodeStart = useMemo(() => {
+    if (dragLineContextValue && dragLineContextValue.type === 'start' && dragLineContextValue.lineId === lineProps.id.value) {
+      return {
+        ...lineProps.nodeStart,
+        width: observe(1),
+        height: observe(1),
+        top: dragLineContextValue.top,
+        left: dragLineContextValue.left,
+      };
+    }
 
-      nodeId={lineProps.nodeId}
-      relatedNodeId={lineProps.relatedNodeId}
+    return lineProps.nodeStart;
+  }, [dragLineContextValue, lineProps.id, lineProps.nodeStart]);
 
-      nodeEnd={lineProps.nodeEnd}
-      nodeStart={lineProps.nodeStart}
+  const nodeEnd = useMemo(() => {
+    if (dragLineContextValue && dragLineContextValue.type === 'end' && dragLineContextValue.lineId === lineProps.id.value) {
+      return {
+        ...lineProps.nodeEnd,
+        width: observe(1),
+        height: observe(1),
+        top: dragLineContextValue.top,
+        left: dragLineContextValue.left,
+      };
+    }
 
-      onDrop={onDrop}
-    />
-  );
+    return lineProps.nodeEnd;
+  }, [dragLineContextValue, lineProps.id, lineProps.nodeEnd]);
 
-  return (
-    <DefaultLine
-      lineId={lineProps.id}
+  const isDragging = useMemo(() => {
+    return selector(({ get }) => {
+      const value = get(dragLineContext);
+      return value?.lineId === get(lineProps.id);
+    });
+  }, [dragLineContext, lineProps.id]);
 
-      nodeId={lineProps.nodeId}
-      relatedNodeId={lineProps.relatedNodeId}
+  const isSelected = useMemo(() => {
+    return selector(({ get }) => {
+      const value = get(selectedIds);
+      return value.includes(get(lineProps.id));
+    });
+  }, [selectedIds, lineProps.id]);
 
-      nodeEnd={lineProps.nodeEnd}
-      nodeStart={lineProps.nodeStart}
 
-      onDrop={onDrop}
-    />
-  );
+  return createElement(CustomLineComponent ? CustomLineComponent : DefaultLine, {
+    lineId: lineProps.id,
+
+    nodeId: lineProps.nodeId,
+    relatedNodeId: lineProps.relatedNodeId,
+
+    nodeEnd: nodeEnd,
+    nodeStart: nodeStart,
+
+    isDragging,
+    isSelected,
+  });
 }
