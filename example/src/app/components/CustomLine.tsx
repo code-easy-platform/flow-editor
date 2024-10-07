@@ -85,10 +85,19 @@ export const CustomLine = (lineProps: ICustomStraightLineProps) => {
 
         fill="none"
         d={linePath}
+        strokeDasharray="5,5"
+        strokeDashoffset="10"
         strokeWidth={lineWidth}
         stroke={isSelected ? "red" : "gray"}
         markerEnd={`url(#end-line-arrow-${lineId})`}
-      />
+      >
+        <animate
+          attributeName="stroke-dashoffset"
+          values="100;0"
+          dur="3s"
+          calcMode="linear"
+          repeatCount="indefinite" />
+      </BaseLine>
     </>
   );
 };
