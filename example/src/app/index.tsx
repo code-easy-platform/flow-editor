@@ -54,7 +54,7 @@ export const App = () => {
               items={value}
               snapGridSize={1}
               onDrop={handleDrop}
-              //customLineComponent={CustomLine}
+              customLineComponent={CustomLine}
               customCSS={`
               .bg-paper {
                 background-color: var(--color-background, #3a3a3a);
