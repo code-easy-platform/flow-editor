@@ -39,14 +39,18 @@ export interface ILine {
   id: IObservable<TId>;
   /** Node where the connection is fond */
   nodeId: IObservable<TId>;
-  top1: IObservable<number>;
-  top2: IObservable<number>;
-  left1: IObservable<number>;
-  left2: IObservable<number>;
-  width1: IObservable<number>;
-  width2: IObservable<number>;
-  height2: IObservable<number>;
-  height1: IObservable<number>;
+  nodeStart: {
+    top: IObservable<number>;
+    left: IObservable<number>;
+    width: IObservable<number>;
+    height: IObservable<number>;
+  };
+  nodeEnd: {
+    top: IObservable<number>;
+    left: IObservable<number>;
+    width: IObservable<number>;
+    height: IObservable<number>;
+  };
   isCurved: IObservable<boolean>;
   /** Node where the connection will target */
   relatedNodeId: IObservable<TId>;
@@ -87,15 +91,18 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
               if (!relatedNode) return;
 
               lines.push({
-                top1: node.top,
-                left1: node.left,
-                top2: relatedNode.top,
-                left2: relatedNode.left,
-
-                width1: node.width,
-                height1: node.height,
-                width2: relatedNode.width,
-                height2: relatedNode.height,
+                nodeStart: {
+                  top: node.top,
+                  left: node.left,
+                  width: node.width,
+                  height: node.height,
+                },
+                nodeEnd: {
+                  top: relatedNode.top,
+                  left: relatedNode.left,
+                  width: relatedNode.width,
+                  height: relatedNode.height,
+                },
 
                 nodeId: node.id,
                 id: connection.id,

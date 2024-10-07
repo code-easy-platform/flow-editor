@@ -4,7 +4,7 @@ import { useDrop } from 'react-use-drag-and-drop';
 import { v4 as uuid } from 'uuid';
 
 import { getEdgeParams, getCurvedPath, getStraightPath } from '../../services';
-import { useBoardScrollContext, useIsSelectedItemById } from '../../context';
+import { ILine, useBoardScrollContext, useIsSelectedItemById } from '../../context';
 import { IDroppedData } from '../../../FlowEditorBoard';
 import { DraggableLine } from './DraggableLine';
 import { TId } from '../../types';
@@ -14,15 +14,8 @@ interface IDraggableContainerProps {
   lineIdObservable: IObservable<TId>;
   blockIdObservable: IObservable<TId>;
 
-  top1Observable: IObservable<number>;
-  left1Observable: IObservable<number>;
-  top2Observable: IObservable<number>;
-  left2Observable: IObservable<number>;
-
-  width1Observable: IObservable<number>;
-  width2Observable: IObservable<number>;
-  height1Observable: IObservable<number>;
-  height2Observable: IObservable<number>;
+  nodeEnd: ILine['nodeEnd'];
+  nodeStart: ILine['nodeStart'];
 
   isCurvedObservable: IObservable<boolean>;
 
@@ -32,17 +25,18 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, ...lineProps 
   const [isDraggingHoverLine, setIsDraggingHoverLine] = useState(false);
   const [isDraggingLine, setIsDraggingLine] = useState(false);
 
-  const rawTop1 = useObserverValue(lineProps.top1Observable);
-  const rawTop2 = useObserverValue(lineProps.top2Observable);
+  const rawTop1 = useObserverValue(lineProps.nodeStart.top);
+  const rawLeft1 = useObserverValue(lineProps.nodeStart.left);
+  const rawWidth1 = useObserverValue(lineProps.nodeStart.width);
+  const rawHeight1 = useObserverValue(lineProps.nodeStart.height);
+  const rawTop2 = useObserverValue(lineProps.nodeEnd.top);
+  const rawLeft2 = useObserverValue(lineProps.nodeEnd.left);
+  const rawWidth2 = useObserverValue(lineProps.nodeEnd.width);
+  const rawHeight2 = useObserverValue(lineProps.nodeEnd.height);
+
   const lineId = useObserverValue(lineProps.lineIdObservable);
-  const rawLeft1 = useObserverValue(lineProps.left1Observable);
-  const rawLeft2 = useObserverValue(lineProps.left2Observable);
   const blockId = useObserverValue(lineProps.blockIdObservable);
-  const rawWidth1 = useObserverValue(lineProps.width1Observable);
-  const rawWidth2 = useObserverValue(lineProps.width2Observable);
   const isCurved = useObserverValue(lineProps.isCurvedObservable);
-  const rawHeight1 = useObserverValue(lineProps.height1Observable);
-  const rawHeight2 = useObserverValue(lineProps.height2Observable);
 
   const isSelected = useObserverValue(useIsSelectedItemById(lineId));
 

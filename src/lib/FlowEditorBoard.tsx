@@ -212,19 +212,12 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
               lineIdObservable={line.id}
               blockIdObservable={line.nodeId}
 
-              top1Observable={line.top1}
-              top2Observable={line.top2}
-              left1Observable={line.left1}
-              left2Observable={line.left2}
-
-              width1Observable={line.width1}
-              width2Observable={line.width2}
-              height1Observable={line.height1}
-              height2Observable={line.height2}
-
               isCurvedObservable={line.isCurved}
 
               onDrop={disableDropInLines ? undefined : onDrop}
+
+              nodeEnd={line.nodeEnd}
+              nodeStart={line.nodeStart}
             />
           ))}
 
