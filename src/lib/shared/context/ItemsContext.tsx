@@ -1,7 +1,7 @@
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { IObservable, observe, selector, set } from "react-observing";
 
-import { TId } from "../types";
+import { IDroppedData, TId } from "../types";
 
 
 interface IBoardSizes {
@@ -13,6 +13,20 @@ export interface INodeRenderProps {
   width: IObservable<number>;
   height: IObservable<number>;
   isSelected: IObservable<boolean>;
+}
+export interface ICustomLineProps {
+  /** Undefined for line add */
+  lineId: IObservable<TId | undefined>;
+
+  /** Node where the connection is fond */
+  nodeId: IObservable<TId>;
+  nodeStart: INode;
+
+  /** Node where the connection will target */
+  relatedNodeId: IObservable<TId>;
+  nodeEnd: INode;
+
+  onDrop?: (data: IDroppedData<any>) => void;
 }
 export interface INodeSlot {
   id: IObservable<TId>;
@@ -37,23 +51,14 @@ export interface INode {
 export interface ILine {
   key: string;
   id: IObservable<TId>;
+
   /** Node where the connection is fond */
   nodeId: IObservable<TId>;
-  nodeStart: {
-    top: IObservable<number>;
-    left: IObservable<number>;
-    width: IObservable<number>;
-    height: IObservable<number>;
-  };
-  nodeEnd: {
-    top: IObservable<number>;
-    left: IObservable<number>;
-    width: IObservable<number>;
-    height: IObservable<number>;
-  };
-  isCurved: IObservable<boolean>;
+  nodeStart: INode;
+
   /** Node where the connection will target */
   relatedNodeId: IObservable<TId>;
+  nodeEnd: INode;
 }
 
 interface IItemsContextData {
@@ -87,32 +92,18 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
           get(node.connections)
             .forEach(connection => {
               const relatedNode = allNodes.find(node => get(connection.relatedId) === get(node.id))
-
               if (!relatedNode) return;
 
               lines.push({
-                nodeStart: {
-                  top: node.top,
-                  left: node.left,
-                  width: node.width,
-                  height: node.height,
-                },
-                nodeEnd: {
-                  top: relatedNode.top,
-                  left: relatedNode.left,
-                  width: relatedNode.width,
-                  height: relatedNode.height,
-                },
+                id: connection.id,
+
+                nodeStart: node,
+                nodeEnd: relatedNode,
 
                 nodeId: node.id,
-                id: connection.id,
                 relatedNodeId: relatedNode.id,
 
                 key: `line_key_${get(node.id)}_${get(relatedNode.id)}`,
-
-                isCurved: selector(({ get }) => {
-                  return get(relatedNode.connections).some(connection => get(connection.relatedId) === get(node.id));
-                }),
               });
             });
         });

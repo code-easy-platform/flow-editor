@@ -4,23 +4,13 @@ import { useDrop } from 'react-use-drag-and-drop';
 import { useFrame } from 'react-frame-component';
 import { v4 as uuid } from 'uuid';
 
-import { INode, useBoardScrollContext, useBoardZoomContext, useDragSelectedItems, useItemsContext, useToggleSelectedItem } from './shared/context';
+import { ICustomLineProps, INode, useBoardScrollContext, useBoardZoomContext, useDragSelectedItems, useItemsContext, useToggleSelectedItem } from './shared/context';
 import { BoardSizeAndZoomContainer, SVGBoardSizeAndZoomContainer, DraggableContainer, Line, SelectorArea, ICoords } from './shared/components';
 import { NewConnection } from './shared/components/line/NewConnection';
 import { getCtrlKeyBySystem } from './shared/services';
-import { TId } from './shared/types';
+import { IDroppedData, TId } from './shared/types';
 
 
-export interface IDroppedData<T> {
-  data: T;
-  top: number;
-  left: number;
-  target: {
-    lineId?: TId;
-    nodeId?: TId;
-    type: 'board' | 'line';
-  };
-}
 interface IFlowEditorBoardProps {
   disableDropInLines?: boolean;
 
@@ -31,8 +21,9 @@ interface IFlowEditorBoardProps {
 
   onRemove?: (ids: TId[]) => void;
   onDrop?: (data: IDroppedData<any>) => void;
+  customLineComponent?: (props: ICustomLineProps) => React.ReactNode;
 }
-export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundDotColor = '#484848', backgroundSize = 30, disableDropInLines = false, onRemove, onDrop }) => {
+export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundColorDefault = '#1e1e1e', backgroundColorPaper = '#484848', backgroundDotColor = '#484848', backgroundSize = 30, disableDropInLines = false, onRemove, onDrop, customLineComponent }) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const { document } = useFrame();
 
@@ -207,17 +198,11 @@ export const FlowEditorBoard: React.FC<IFlowEditorBoardProps> = ({ backgroundCol
 
           {lines.map(line => (
             <Line
+              {...line}
+
               key={line.key}
-
-              lineIdObservable={line.id}
-              blockIdObservable={line.nodeId}
-
-              isCurvedObservable={line.isCurved}
-
+              customLineComponent={customLineComponent}
               onDrop={disableDropInLines ? undefined : onDrop}
-
-              nodeEnd={line.nodeEnd}
-              nodeStart={line.nodeStart}
             />
           ))}
 

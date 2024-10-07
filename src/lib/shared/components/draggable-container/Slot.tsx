@@ -22,14 +22,15 @@ export const Slot: React.FC<ISlotProps> = ({ nodeId, height, width, getIsDisable
     if (!dragLineData) return;
     if (dragLineData.nodeId === nodeId) return;
 
-    for (const item of flowStore.value) {
-      if (item.id.value === dragLineData.nodeId) {
+
+    for (const nodeItem of flowStore.value) {
+      if (nodeItem.id.value === dragLineData.nodeId) {
 
         if (dragLineData.type === 'end') {
           if (getIsDisabledDropConnection()) return;
 
           if (!dragLineData.lineId) {
-            set(item.connections, oldConnections => [
+            set(nodeItem.connections, oldConnections => [
               ...oldConnections,
               {
                 id: observe(uuid()),
@@ -39,7 +40,7 @@ export const Slot: React.FC<ISlotProps> = ({ nodeId, height, width, getIsDisable
             return;
           }
 
-          set(item.connections, oldConnections => {
+          set(nodeItem.connections, oldConnections => {
             oldConnections.forEach(connection => {
               if (connection.id.value === dragLineData.lineId) {
                 connection.relatedId = observe(nodeId);
@@ -48,12 +49,13 @@ export const Slot: React.FC<ISlotProps> = ({ nodeId, height, width, getIsDisable
 
             return [...oldConnections];
           });
+
           return;
         }
 
         if (getIsDisabledCreateConnection()) return;
 
-        set(item.connections, oldConnections => {
+        set(nodeItem.connections, oldConnections => {
           const removedConnection = oldConnections.find(connection => connection.id.value === dragLineData.lineId);
           if (!removedConnection) return oldConnections;
 
@@ -82,20 +84,18 @@ export const Slot: React.FC<ISlotProps> = ({ nodeId, height, width, getIsDisable
 
 
   return (
-    <>
-      <span
-        onMouseUp={handleDropLine}
-        onMouseDown={e => e.stopPropagation()}
-        style={{
-          top: -4,
-          left: -4,
-          width: width + 8,
-          height: height + 8,
-          position: 'absolute',
-          //backgroundColor: 'red',
-          pointerEvents: dragLineData ? 'auto' : 'none',
-        }}
-      />
-    </>
+    <span
+      onMouseUp={handleDropLine}
+      onMouseDown={e => e.stopPropagation()}
+      style={{
+        top: -4,
+        left: -4,
+        width: width + 8,
+        height: height + 8,
+        position: 'absolute',
+        //backgroundColor: 'red',
+        pointerEvents: dragLineData ? 'auto' : 'none',
+      }}
+    />
   );
 };

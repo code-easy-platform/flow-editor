@@ -1,54 +1,54 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSetObserver } from 'react-observing';
+import { useObserverValue, useSelectorValue, useSetObserver } from 'react-observing';
+import { useDrop } from 'react-use-drag-and-drop';
 import { useFrame } from 'react-frame-component';
+import { v4 as uuid } from 'uuid';
 
-import { useBoardScrollContext, useBoardZoomContext, useDragLineContext, useToggleSelectedItem } from '../../context';
+import { ICustomLineProps, useBoardScrollContext, useBoardZoomContext, useDragLineContext, useToggleSelectedItem } from '../../context';
 import { getCtrlKeyBySystem, getCurvedPath, getEdgeParams, getStraightPath } from '../../services';
-import { TId } from '../../types';
 
 
-interface IDraggableLineProps {
-  nodeId: TId;
-  top1: number;
-  top2: number;
-  left1: number;
-  left2: number;
-  width1: number;
-  width2: number;
-  height1: number;
-  height2: number;
-  lineWidth: number;
-  isCurved?: boolean;
-  newConnection?: boolean;
-  lineId: TId | undefined;
-  onDragLineEnd?: () => void;
-  onDragLineStart?: () => void;
-  position1FromCenter?: boolean;
-  disableStartDraggable?: boolean;
-}
-export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved, newConnection = false, position1FromCenter = false, disableStartDraggable = false, nodeId, lineWidth, onDragLineEnd, onDragLineStart, ...rest }) => {
-  const setDragLine = useSetObserver(useDragLineContext());
+export const DefaultLine: React.FC<ICustomLineProps & { isNewConnection?: boolean }> = (lineProps) => {
   const addSelectedItem = useToggleSelectedItem();
+  const dragLineContext = useDragLineContext();
   const scrollObject = useBoardScrollContext();
   const zoomObject = useBoardZoomContext();
   const { window } = useFrame();
 
+  const setDragLine = useSetObserver(dragLineContext)
+
+  const rawTop1Permanent = useObserverValue(lineProps.nodeStart.top);
+  const rawLeft1Permanent = useObserverValue(lineProps.nodeStart.left);
+  const rawWidth1Permanent = useObserverValue(lineProps.nodeStart.width);
+  const rawHeight1Permanent = useObserverValue(lineProps.nodeStart.height);
+  const rawTop2Permanent = useObserverValue(lineProps.nodeEnd.top);
+  const rawLeft2Permanent = useObserverValue(lineProps.nodeEnd.left);
+  const rawWidth2Permanent = useObserverValue(lineProps.nodeEnd.width);
+  const rawHeight2Permanent = useObserverValue(lineProps.nodeEnd.height);
+
+  const lineId = useObserverValue(lineProps.lineId);
+  const nodeId = useObserverValue(lineProps.nodeId);
+
+  const isCurved = useSelectorValue(({ get }) => {
+    return get(lineProps.nodeEnd.connections).some(connection => get(connection.relatedId) === get(lineProps.nodeStart.id));
+  }, [lineProps.nodeStart.id, lineProps.nodeEnd.connections])
+
+
   const isDragging = useRef(false);
 
-
-  const [rawTop1, setRawTop1] = useState(rest.top1);
-  const [rawTop2, setRawTop2] = useState(rest.top2);
-  const [rawLeft1, setRawLeft1] = useState(rest.left1);
-  const [rawLeft2, setRawLeft2] = useState(rest.left2);
+  const [rawTop1, setRawTop1] = useState(rawTop1Permanent);
+  const [rawTop2, setRawTop2] = useState(rawTop2Permanent);
+  const [rawLeft1, setRawLeft1] = useState(rawLeft1Permanent);
+  const [rawLeft2, setRawLeft2] = useState(rawLeft2Permanent);
   const [showDragLine, setShowDragLine] = useState<'start' | 'end'>();
 
 
   useEffect(() => {
-    setRawTop1(rest.top1);
-    setRawTop2(rest.top2);
-    setRawLeft1(rest.left1);
-    setRawLeft2(rest.left2);
-  }, [rest.top1, rest.top2, rest.left1, rest.left2]);
+    setRawTop1(rawTop1Permanent);
+    setRawTop2(rawTop2Permanent);
+    setRawLeft1(rawLeft1Permanent);
+    setRawLeft2(rawLeft2Permanent);
+  }, [rawTop1Permanent, rawTop2Permanent, rawLeft1Permanent, rawLeft2Permanent]);
 
 
   const linePath = useMemo(() => {
@@ -58,14 +58,14 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved,
       {
         y: rawTop1 - (showDragLine === 'start' ? dragAroundSpace / 2 : 5),
         x: rawLeft1 - (showDragLine === 'start' ? dragAroundSpace / 2 : 5),
-        width: showDragLine === 'start' ? dragAroundSpace : rest.width1 + 10,
-        height: showDragLine === 'start' ? dragAroundSpace : rest.height1 + 10,
+        width: showDragLine === 'start' ? dragAroundSpace : rawWidth1Permanent + 10,
+        height: showDragLine === 'start' ? dragAroundSpace : rawHeight1Permanent + 10,
       },
       {
         y: rawTop2 - (showDragLine === 'end' ? dragAroundSpace / 2 : 5),
         x: rawLeft2 - (showDragLine === 'end' ? dragAroundSpace / 2 : 5),
-        width: showDragLine === 'end' ? dragAroundSpace : rest.width2 + 10,
-        height: showDragLine === 'end' ? dragAroundSpace : rest.height2 + 10,
+        width: showDragLine === 'end' ? dragAroundSpace : rawWidth2Permanent + 10,
+        height: showDragLine === 'end' ? dragAroundSpace : rawHeight2Permanent + 10,
       }
     );
 
@@ -88,7 +88,10 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved,
 
       return path;
     }
-  }, [isCurved, showDragLine, rawTop1, rawTop2, rawLeft1, rawLeft2, rest.width1, rest.height1, rest.width2, rest.height2]);
+  }, [isCurved, showDragLine, rawTop1, rawTop2, rawLeft1, rawLeft2, rawWidth1Permanent, rawHeight1Permanent, rawWidth2Permanent, rawHeight2Permanent]);
+
+  const arrowSize = useMemo(() => 2.5, []);
+  const lineWidth = useMemo(() => 1, []);
 
 
   const handleStartMouseDown = useCallback((e: React.MouseEvent) => {
@@ -98,7 +101,6 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved,
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging.current) {
         setShowDragLine('start');
-        onDragLineStart?.();
         setDragLine({ type: 'start', nodeId, lineId });
 
         isDragging.current = true;
@@ -114,18 +116,17 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved,
     const handleMouseUp = () => {
       isDragging.current = false;
 
+      setRawLeft1(rawLeft1Permanent);
       setShowDragLine(undefined);
-      setRawLeft1(rest.left1);
+      setRawTop1(rawTop1Permanent);
       setDragLine(undefined);
-      setRawTop1(rest.top1);
-      onDragLineEnd?.();
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
     }
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, zoomObject, rawTop1, rawLeft1, rest.left1, rest.top1, nodeId, lineId]);
+  }, [setDragLine, window, scrollObject, zoomObject, rawTop1, rawLeft1, rawLeft1Permanent, rawTop1Permanent, nodeId, lineId]);
 
   const handleEndMouseDown = useCallback((e: React.MouseEvent) => {
     if (lineId) addSelectedItem([lineId], getCtrlKeyBySystem(e.nativeEvent));
@@ -135,7 +136,6 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved,
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging.current) {
         setShowDragLine('end');
-        onDragLineStart?.();
         setDragLine({ type: 'end', nodeId, lineId });
 
         isDragging.current = true;
@@ -151,18 +151,17 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved,
     const handleMouseUp = () => {
       isDragging.current = false;
 
+      setRawLeft2(rawLeft2Permanent);
+      setRawTop2(rawTop2Permanent);
       setShowDragLine(undefined);
-      setRawLeft2(rest.left2);
       setDragLine(undefined);
-      setRawTop2(rest.top2);
-      onDragLineEnd?.();
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
     }
 
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseup', handleMouseUp)
-  }, [setDragLine, onDragLineStart, onDragLineEnd, window, scrollObject, zoomObject, rest.left2, rest.top2, nodeId, lineId]);
+  }, [setDragLine, window, scrollObject, zoomObject, rawLeft2Permanent, rawTop2Permanent, nodeId, lineId]);
 
   const handleMoveDown = useCallback((event: React.MouseEvent<SVGPathElement>) => {
     const pathLength = event.currentTarget.getTotalLength();
@@ -192,42 +191,65 @@ export const DraggableLine: React.FC<IDraggableLineProps> = ({ lineId, isCurved,
     const isCloserToStart = closestPointLength <= halfPathLength;
 
     if (isCloserToStart) {
-      if (!disableStartDraggable) handleStartMouseDown(event);
+      handleStartMouseDown(event);
     } else {
       handleEndMouseDown(event);
     }
-  }, [handleStartMouseDown, handleEndMouseDown, disableStartDraggable, scrollObject, zoomObject]);
+  }, [handleStartMouseDown, handleEndMouseDown, scrollObject, zoomObject]);
+
+
+
+  const lineRef = useRef<SVGLineElement>(null);
+  useDrop({
+    element: lineRef,
+    id: useRef(uuid()).current,
+    //leave: () => setIsDraggingHoverLine(false),
+    //hover: () => setIsDraggingHoverLine(old => old ? old : true),
+    /* drop: (data, { x, y }) => {
+      //setIsDraggingHoverLine(false);
+      //onDrop?.({
+      //  data,
+      //  top: y + -scrollObject.top.value,
+      //  left: x + -scrollObject.left.value,
+      //  target: { type: 'line', lineId, nodeId: blockId },
+      //});
+    }, */
+  });
 
 
   return (
     <>
-      {showDragLine && (
-        <path
-          fill="none"
-          d={linePath}
-          stroke="#0f77bf"
-          strokeLinecap="round"
-          strokeWidth={lineWidth}
-          markerEnd={`url(#end-line-arrow-${lineId})`}
-        />
-      )}
+      <defs>
+        <marker orient="auto" refX={2.8 * arrowSize} refY={2.4 * arrowSize} markerWidth={10 * arrowSize} markerHeight={8 * arrowSize} id={`end-line-arrow-${lineId}`}>
+          <polygon points={`0 ${1 * arrowSize}, ${3 * arrowSize} ${2.4 * arrowSize}, 0 ${4 * arrowSize}`} stroke={true ? "#0f77bf" : "gray"} fill={true ? "#0f77bf" : "gray"} />
+        </marker>
+      </defs>
 
-      {newConnection && (
+      <path
+        fill="none"
+        d={linePath}
+        stroke="gray"
+        strokeWidth={lineWidth}
+        markerEnd={`url(#end-line-arrow-${lineId})`}
+      />
+
+      {lineProps.isNewConnection && (
         <rect
           x={rawLeft1 - 6.5}
           fill='transparent'
-          width={rest.width1 + 15}
-          height={(rest.height1 / 2) + 15}
+          width={rawWidth1Permanent + 15}
+          height={(rawHeight1Permanent / 2) + 15}
           onMouseDown={handleEndMouseDown}
-          y={rawTop1 + (rest.height1 / 2)}
+          y={rawTop1 + (rawHeight1Permanent / 2)}
           style={{ cursor: 'crosshair', pointerEvents: showDragLine ? 'none' : 'auto' }}
         />
       )}
 
-      {(!showDragLine && !newConnection) && (
+      {(!showDragLine && !lineProps.isNewConnection) && (
         <path
           fill="none"
           d={linePath}
+          ref={lineRef}
           strokeWidth={14}
           stroke="transparent"
           onMouseDown={handleMoveDown}

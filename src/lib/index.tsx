@@ -1,16 +1,16 @@
 import React, { useMemo } from 'react';
 import Frame from 'react-frame-component';
 
-import { BoardScrollProvider, BoardZoomProvider, DragLineProvider, INode, ItemsProvider, SnapGridProvider } from './shared/context';
+import { BoardScrollProvider, BoardZoomProvider, DragLineProvider, INode, ItemsProvider, ICustomLineProps, SnapGridProvider } from './shared/context';
 import { DraggableContainerCss } from './shared/components/draggable-container/DraggableContainer.styles';
-import { FlowEditorBoard, IDroppedData } from './FlowEditorBoard';
 import { FlowEditorBoardCss } from './FlowEditorBoard.styles';
-import { TId } from './shared/types';
+import { FlowEditorBoard } from './FlowEditorBoard';
+import { IDroppedData, TId } from './shared/types';
 import './index.css';
 
 
-export type { INode, ILine, INodeConnection, INodeRenderProps } from './shared/context';
-export type { IDroppedData } from './FlowEditorBoard';
+export type { INode, ILine, INodeConnection, INodeRenderProps, ICustomLineProps } from './shared/context';
+export type { IDroppedData } from './shared/types';
 
 
 const IFrame = Frame as any;
@@ -29,6 +29,7 @@ export interface IFlowEditorProps {
 
   onRemove?: (ids: TId[]) => void;
   onDrop?: (data: IDroppedData<any>) => void;
+  customLineComponent?: (props: ICustomLineProps) => React.ReactNode;
 }
 export const FlowEditor: React.FC<IFlowEditorProps> = ({ snapGridSize = 15, items, customCSS = '', ...rest }) => {
 

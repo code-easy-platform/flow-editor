@@ -7,6 +7,7 @@ import { INode } from 'flow-editor';
 
 import { DraggableItem } from './components/DraggableItem';
 import { CustomNode } from './components/CustomNode';
+import { CustomLine } from './components/CustomLine';
 import { FLOW } from './../Mock';
 import './../styles.css';
 
@@ -53,6 +54,7 @@ export const App = () => {
               items={value}
               snapGridSize={1}
               onDrop={handleDrop}
+              //customLineComponent={CustomLine}
               customCSS={`
               .bg-paper {
                 background-color: var(--color-background, #3a3a3a);
