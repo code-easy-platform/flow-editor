@@ -3,17 +3,16 @@ import { observe, set, useObserverValue } from 'react-observing';
 import { DragAndDropProvider } from 'react-use-drag-and-drop';
 
 import { FlowEditor, IDroppedData } from 'flow-editor/src';
-import { INode } from 'flow-editor';
 
+import { CustomStraightLine, CustomBezierLine } from './components/CustomLine';
 import { DraggableItem } from './components/DraggableItem';
 import { CustomNode } from './components/CustomNode';
-import { CustomLine } from './components/CustomLine';
 import { FLOW } from './../Mock';
 import './../styles.css';
 
 
 export const App = () => {
-  const flow = useRef(observe(FLOW.map<INode>(item => ({ ...item, render: props => <CustomNode {...props} /> }))));
+  const flow = useRef(observe(FLOW));
 
   const value = useObserverValue(flow.current);
 
@@ -28,7 +27,7 @@ export const App = () => {
         width: observe(100),
         left: observe(left - 50),
         top: observe(top - 50),
-        render: props => <CustomNode {...props} />,
+        render: props => <CustomNode {...props} type='text' />,
       },
     ]);
   }, []);
@@ -54,7 +53,7 @@ export const App = () => {
               items={value}
               snapGridSize={1}
               onDrop={handleDrop}
-              customLineComponent={CustomLine}
+              customLineComponent={CustomBezierLine}
               customCSS={`
               .bg-paper {
                 background-color: var(--color-background, #3a3a3a);

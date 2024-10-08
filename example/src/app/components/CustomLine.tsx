@@ -1,28 +1,25 @@
 import { useMemo } from 'react';
 import { useObserverValue, useSelectorValue } from 'react-observing';
 
-import { getCurvedPath, getEdgeParams, getStraightPath } from '../../../../src/lib/shared/services';
+import { getCurvedPath, getStraightEdgeParams, getStraightPath, getBezierPath, getEdgeCenter } from 'flow-editor/src';
 import { ICustomLineProps, BaseLine } from '../../../../src';
 
 
-interface ICustomStraightLineProps extends ICustomLineProps {
-  //children: React.ReactNode;
-}
-export const CustomLine = (lineProps: ICustomStraightLineProps) => {
+export const CustomStraightLine = (lineProps: ICustomLineProps) => {
   const lineId = useObserverValue(lineProps.lineId);
   const nodeId = useObserverValue(lineProps.nodeId);
 
   const isDragging = useObserverValue(lineProps.isDragging);
   const isSelected = useObserverValue(lineProps.isSelected);
 
-  const top1 = useObserverValue(lineProps.nodeStart.top);
-  const left1 = useObserverValue(lineProps.nodeStart.left);
-  const width1 = useObserverValue(lineProps.nodeStart.width);
-  const height1 = useObserverValue(lineProps.nodeStart.height);
-  const top2 = useObserverValue(lineProps.nodeEnd.top);
-  const left2 = useObserverValue(lineProps.nodeEnd.left);
-  const width2 = useObserverValue(lineProps.nodeEnd.width);
-  const eight2 = useObserverValue(lineProps.nodeEnd.height);
+  const top1 = useObserverValue(lineProps.nodeStartHandle.top);
+  const left1 = useObserverValue(lineProps.nodeStartHandle.left);
+  const width1 = useObserverValue(lineProps.nodeStartHandle.width);
+  const height1 = useObserverValue(lineProps.nodeStartHandle.height);
+  const top2 = useObserverValue(lineProps.nodeEndHandle.top);
+  const left2 = useObserverValue(lineProps.nodeEndHandle.left);
+  const width2 = useObserverValue(lineProps.nodeEndHandle.width);
+  const eight2 = useObserverValue(lineProps.nodeEndHandle.height);
 
 
   const isCurved = useSelectorValue(({ get }) => {
@@ -31,7 +28,7 @@ export const CustomLine = (lineProps: ICustomStraightLineProps) => {
 
 
   const linePath = useMemo(() => {
-    const params = getEdgeParams(
+    const params = getStraightEdgeParams(
       {
         y: top1 - 5,
         x: left1 - 5,
@@ -99,5 +96,64 @@ export const CustomLine = (lineProps: ICustomStraightLineProps) => {
           repeatCount="indefinite" />
       </BaseLine>
     </>
+  );
+};
+
+
+
+export const CustomBezierLine = (lineProps: ICustomLineProps) => {
+  const lineId = useObserverValue(lineProps.lineId);
+  const nodeId = useObserverValue(lineProps.nodeId);
+
+  const isDragging = useObserverValue(lineProps.isDragging);
+  const isSelected = useObserverValue(lineProps.isSelected);
+
+  const top1 = useObserverValue(lineProps.nodeStartHandle.top);
+  const left1 = useObserverValue(lineProps.nodeStartHandle.left);
+  const width1 = useObserverValue(lineProps.nodeStartHandle.width);
+  const height1 = useObserverValue(lineProps.nodeStartHandle.height);
+  const top2 = useObserverValue(lineProps.nodeEndHandle.top);
+  const left2 = useObserverValue(lineProps.nodeEndHandle.left);
+  const width2 = useObserverValue(lineProps.nodeEndHandle.width);
+  const eight2 = useObserverValue(lineProps.nodeEndHandle.height);
+
+
+  const linePath = useMemo(() => {
+
+    const [path] = getBezierPath({
+      sourceX: left1 + 5,
+      sourceY: top1 + 5,
+      targetX: left2 + 5,
+      targetY: top2 + 5,
+      curvature: 0.6,
+      sourcePosition: 'right',
+      targetPosition: 'left',
+    });
+
+    return path;
+  }, [isDragging, top1, top2, left1, left2, width1, height1, width2, eight2]);
+
+  const lineWidth = useMemo(() => 2, []);
+
+  return (
+    <BaseLine
+      lineId={lineId}
+      nodeId={nodeId}
+
+      fill="none"
+      d={linePath}
+      strokeDasharray="5,5"
+      strokeDashoffset="10"
+      strokeWidth={lineWidth}
+      stroke={isSelected ? "red" : "gray"}
+      markerEnd={`url(#end-line-arrow-${lineId})`}
+    >
+      <animate
+        attributeName="stroke-dashoffset"
+        values="100;0"
+        dur="3s"
+        calcMode="linear"
+        repeatCount="indefinite" />
+    </BaseLine>
   );
 };

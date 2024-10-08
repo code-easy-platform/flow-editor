@@ -15,7 +15,6 @@ export const DraggableContainerCss = `
 .draggable-container-content {
   flex: 1;
   display: flex;
-  overflow: auto;
   border-radius: 4px;
   pointer-events: auto;
   flex-direction: column;

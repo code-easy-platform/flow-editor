@@ -173,6 +173,7 @@ export const BaseLine = ({ onDragOver, onDragLeave, onDrop, lineId, nodeId, ...r
         stroke="transparent"
         markerEnd={undefined}
         markerStart={undefined}
+        strokeDasharray={undefined}
         onMouseDown={handleMoveDown}
         onClick={handleClick}
         style={{ cursor: 'crosshair', pointerEvents: 'auto' }}

@@ -1,6 +1,7 @@
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { IObservable, ITransformedReadOnlyObservable, observe, selector, set } from "react-observing";
 
+import { IHandle } from './HandlesContext';
 import { TId } from "../types";
 
 
@@ -24,18 +25,18 @@ export interface ICustomLineProps {
   /** Node where the connection is fond */
   nodeId: IObservable<TId>;
   nodeStart: INode;
+  nodeStartHandle: IHandle;
 
   /** Node where the connection will target */
   relatedNodeId: IObservable<TId>;
   nodeEnd: INode;
-}
-export interface INodeSlot {
-  id: IObservable<TId>;
-  ordem: IObservable<number>;
+  nodeEndHandle: IHandle;
 }
 export interface INodeConnection {
   id: IObservable<TId>;
   relatedId: IObservable<TId>;
+  endHandleId: IObservable<TId | undefined>;
+  startHandleId: IObservable<TId | undefined>;
 }
 export interface INode {
   id: IObservable<TId>;
@@ -56,10 +57,12 @@ export interface ILine {
   /** Node where the connection is fond */
   nodeId: IObservable<TId>;
   nodeStart: INode;
+  nodeStartHandleId: IObservable<TId | undefined>;
 
   /** Node where the connection will target */
   relatedNodeId: IObservable<TId>;
   nodeEnd: INode;
+  nodeEndHandleId: IObservable<TId | undefined>;
 }
 
 interface IItemsContextData {
@@ -98,11 +101,13 @@ export const ItemsProvider = ({ children, items }: IItemsProviderProps) => {
               lines.push({
                 id: connection.id,
 
-                nodeStart: node,
-                nodeEnd: relatedNode,
-
                 nodeId: node.id,
+                nodeStart: node,
+                nodeStartHandleId: connection.startHandleId,
+                
+                nodeEnd: relatedNode,
                 relatedNodeId: relatedNode.id,
+                nodeEndHandleId: connection.endHandleId,
 
                 key: `line_key_${get(node.id)}_${get(relatedNode.id)}`,
               });

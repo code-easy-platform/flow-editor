@@ -15,7 +15,7 @@ export const FLOW: INode[] = [
     width: observe(100),
     left: observe(50),
     top: observe(50),
-    render: CustomNode,
+    render: props => <CustomNode {...props} type="text" />,
   },
   {
     id: observe(crypto.randomUUID()),
@@ -23,11 +23,13 @@ export const FLOW: INode[] = [
     width: observe(100),
     left: observe(50),
     top: observe(200),
-    render: CustomNode,
+    render: props => <CustomNode {...props} type="text" />,
     connections: observe<INodeConnection[]>([
       {
         relatedId: forConnectionNode,
         id: observe(crypto.randomUUID()),
+        endHandleId: observe(undefined),
+        startHandleId: observe(undefined),
       }
     ]),
   },
@@ -38,7 +40,7 @@ export const FLOW: INode[] = [
     width: observe(100),
     left: observe(50),
     top: observe(300),
-    render: CustomNode,
+    render: props => <CustomNode {...props} type="if" />,
   },
   {
     id: observe(crypto.randomUUID()),
@@ -47,6 +49,6 @@ export const FLOW: INode[] = [
     width: observe(100),
     left: observe(250),
     top: observe(100),
-    render: CustomNode,
+    render: props => <CustomNode {...props} type="text" />,
   },
 ];

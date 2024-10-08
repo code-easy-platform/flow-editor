@@ -1,9 +1,8 @@
-import { INodeRenderProps } from 'flow-editor';
+import { Handle, INodeRenderProps, } from 'flow-editor/src';
 import { useObserver } from 'react-observing';
 
 
-
-export const CustomNode = (props: INodeRenderProps) => {
+export const CustomNode = (props: INodeRenderProps & { type: 'text' | 'if' }) => {
   const [isSelected] = useObserver(props.isSelected);
   const [height] = useObserver(props.height);
   const [width] = useObserver(props.width);
@@ -19,6 +18,12 @@ export const CustomNode = (props: INodeRenderProps) => {
       }}
     >
       CustomNode
+
+      <div style={{ display: 'flex', justifyContent: 'end' }}>
+        <Handle
+          position={props.type === 'if' ? 'left' : 'right'}
+        />
+      </div>
     </div>
   );
 };

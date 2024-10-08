@@ -4,3 +4,4 @@ export * from './board/BoardSizeAndZoomContainer';
 export * from './SelectorArea';
 export * from './line/Line';
 export * from './BaseLine';
+export * from './Handle';

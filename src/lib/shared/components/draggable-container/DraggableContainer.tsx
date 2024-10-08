@@ -3,6 +3,7 @@ import { useObserver, useObserverValue } from 'react-observing';
 import { useFrame } from 'react-frame-component';
 
 import { useToggleSelectedItem, useBoardScrollContext, useIsSelectedItemById, useSnapGridContext, useDragSelectedItems, useItemsContext, INode, useBoardZoomContext } from '../../context';
+import { DraggableContainerProvider } from './DraggableContainerContext';
 import { gridSnap, getCtrlKeyBySystem } from '../../services';
 
 
@@ -71,14 +72,16 @@ export const DraggableContainer: React.FC<IDraggableContainerProps> = ({ node })
 
 
   return (
-    <div
-      onMouseDown={handleMouseDown}
-      className='draggable-container'
-      style={{ width, height, transform: containerTranslate }}
-    >
-      <div className='draggable-container-content'>
-        {content}
+    <DraggableContainerProvider node={node}>
+      <div
+        onMouseDown={handleMouseDown}
+        className='draggable-container'
+        style={{ width, height, transform: containerTranslate }}
+      >
+        <div className='draggable-container-content'>
+          {content}
+        </div>
       </div>
-    </div>
+    </DraggableContainerProvider>
   );
 }

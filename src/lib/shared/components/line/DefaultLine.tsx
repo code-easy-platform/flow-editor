@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useObserverValue, useSelectorValue } from 'react-observing';
 
-import { getCurvedPath, getEdgeParams, getStraightPath } from '../../services';
+import { getCurvedPath, getStraightEdgeParams, getStraightPath } from '../../services';
 import { ICustomLineProps } from '../../context';
 import { BaseLine } from '../BaseLine';
 
@@ -29,7 +29,7 @@ export const DefaultLine: React.FC<ICustomLineProps> = (lineProps) => {
 
 
   const linePath = useMemo(() => {
-    const params = getEdgeParams(
+    const params = getStraightEdgeParams(
       {
         y: top1 - 5,
         x: left1 - 5,
