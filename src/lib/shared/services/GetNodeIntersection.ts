@@ -63,7 +63,7 @@ function getEdgePosition(node: IIntersectionNode, intersectionPoint: IIntersecti
 }
 
 // returns the parameters (sx, sy, tx, ty, sourcePos, targetPos) you need to create an edge
-export function getEdgeParams(source: IIntersectionNode, target: IIntersectionNode) {
+export function getStraightEdgeParams(source: IIntersectionNode, target: IIntersectionNode) {
   const sourceIntersectionPoint = getNodeIntersection(source, target);
   const targetIntersectionPoint = getNodeIntersection(target, source);
 
