@@ -77,9 +77,6 @@ export const CustomStraightLine = (lineProps: ICustomLineProps) => {
       </defs>
 
       <BaseLine
-        lineId={lineId}
-        nodeId={nodeId}
-
         fill="none"
         d={linePath}
         strokeDasharray="5,5"
@@ -137,9 +134,6 @@ export const CustomBezierLine = (lineProps: ICustomLineProps) => {
 
   return (
     <BaseLine
-      lineId={lineId}
-      nodeId={nodeId}
-
       fill="none"
       d={linePath}
       strokeDasharray="5,5"

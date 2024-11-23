@@ -1,8 +1,91 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { observe, useObserverValue } from 'react-observing';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { observe, set, useObserverValue } from 'react-observing';
 
 import { useDraggableContainerContext } from './draggable-container/DraggableContainerContext';
-import { useHandlesContext } from '../context';
+import { useDragLineContext, useHandlesContext, useItemsContext } from '../context';
+
+
+const useHandleDropLine = () => {
+  const { node } = useDraggableContainerContext();
+  const dragLineContext = useDragLineContext();
+  const { flowStore } = useItemsContext();
+
+
+  const handleDropLine = useCallback(() => {
+    const dragLineData = dragLineContext.value;
+
+    console.log('log', dragLineData);
+
+    if (!dragLineData) return;
+    if (dragLineData.nodeId === node.id.value) return;
+
+
+    for (const nodeItem of flowStore.value) {
+      if (nodeItem.id.value === dragLineData.nodeId) {
+
+        if (dragLineData.type === 'end') {
+          if (node.disableDropConnections?.()) return;
+
+          if (!dragLineData.lineId) {
+            set(nodeItem.connections, oldConnections => [
+              ...oldConnections,
+              {
+                id: observe(crypto.randomUUID()),
+                relatedId: observe(node.id.value),
+                endHandleId: observe(undefined),
+                startHandleId: observe(undefined),
+              }
+            ]);
+            return;
+          }
+
+          set(nodeItem.connections, oldConnections => {
+            oldConnections.forEach(connection => {
+              if (connection.id.value === dragLineData.lineId) {
+                connection.relatedId = observe(node.id.value);
+              }
+            });
+
+            return [...oldConnections];
+          });
+
+          return;
+        }
+
+        if (node.disableDropConnections?.()) return;
+
+        set(nodeItem.connections, oldConnections => {
+          const removedConnection = oldConnections.find(connection => connection.id.value === dragLineData.lineId);
+          if (!removedConnection) return oldConnections;
+
+          if (removedConnection.relatedId.value === node.id.value) return oldConnections;
+
+          const itemToReceiveConnection = flowStore.value.find(item => item.id.value === node.id.value);
+          if (!itemToReceiveConnection) return oldConnections;
+
+
+          set(itemToReceiveConnection.connections, oldConnections => [
+            ...oldConnections,
+            {
+              id: removedConnection.id,
+              relatedId: removedConnection.relatedId,
+              endHandleId: observe(undefined),
+              startHandleId: observe(undefined),
+            },
+          ]);
+
+          return [
+            ...oldConnections.filter(connection => connection.id.value !== dragLineData.lineId),
+          ];
+        });
+        return;
+      }
+    }
+  }, [dragLineContext, node]);
+
+
+  return { handleDropLine }
+}
 
 
 interface IHandleProps extends React.HTMLProps<HTMLDivElement> {
@@ -18,6 +101,7 @@ export const Handle = ({ id, top, left, width = 10, height = 10, position = 'lef
 
   const { addOrUpdate, deleteById } = useHandlesContext();
   const { node } = useDraggableContainerContext();
+  const { handleDropLine } = useHandleDropLine();
 
   const nodeHeight = useObserverValue(node.height);
   const nodeWidth = useObserverValue(node.width);
@@ -78,11 +162,14 @@ export const Handle = ({ id, top, left, width = 10, height = 10, position = 'lef
 
   return (
     <div
+      {...rest}
+      onMouseUp={handleDropLine}
+      onMouseDown={e => e.stopPropagation()}
       style={{
         borderRadius: '50%',
         cursor: 'crosshair',
         backgroundColor: 'gray',
-        ...rest,
+        ...rest.style,
         width,
         height,
         top: coords.top,

@@ -1,0 +1,12 @@
+
+
+Próximos passos são:
+- Finalizar de configurar os handles
+  - Drop handle quase pronto, falta ver o dado do handle id para mudar a line e ligar no handle certo
+  - Por algum motivo os ids do handle não vem, mas se der um ctrl+s no code ele passa a vim, deve ser algum array de dependência errado
+- Permitir criar linha a partir de um handle:
+  - Analisar a necessidade de adicionar o type(source|target) para o handle para saber se é hadnle de começar linha ou terminar linha
+  - Analisar criar um linha para fazer o drag da criação da linha
+
+
+

@@ -3,14 +3,13 @@ import { observe, selector, useObserverValue } from 'react-observing';
 
 import { ICustomLineProps, IHandle, ILine, useDragLineContext, useHandlesContext, useSelectedItemsId } from '../../context';
 import { DefaultLine } from './DefaultLine';
-import { IDroppedData } from '../../types';
+import { LineContextProvider } from './LineContext';
 
 
 interface IDraggableContainerProps extends ILine {
-  onDrop?: (data: IDroppedData<any>) => void;
   customLineComponent?: (props: ICustomLineProps) => React.ReactNode;
 }
-export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, customLineComponent: CustomLineComponent, ...lineProps }) => {
+export const Line: React.FC<IDraggableContainerProps> = ({ customLineComponent: CustomLineComponent, ...lineProps }) => {
   const handles = useObserverValue(useHandlesContext().handles);
   const dragLineContext = useDragLineContext();
   const selectedIds = useSelectedItemsId();
@@ -44,10 +43,10 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, customLineCom
       position: observe('right'),
     };
 
-    const nodeHandles = handles.filter(handle => handle.node.id.value === nodeStart.id.value);
-    if (!nodeHandles || nodeHandles.length === 0) return defaultHandle;
-
-    const handle = nodeHandles.find(handle => handle.id.value === lineProps.nodeStartHandleId.value);
+    const handle = handles.find(handle => (
+      handle.node.id.value === nodeStart.id.value
+      && handle.id.value === lineProps.nodeStartHandleId.value
+    ));
     if (!handle) return defaultHandle;
 
     if (dragLineContextValue && dragLineContextValue.type === 'start' && dragLineContextValue.lineId === lineProps.id.value) {
@@ -93,10 +92,10 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, customLineCom
       position: observe('left'),
     };
 
-    const nodeHandles = handles.filter(handle => handle.node.id.value === nodeEnd.id.value);
-    if (!nodeHandles || nodeHandles.length === 0) return defaultHandle;
-
-    const handle = nodeHandles.find(handle => handle.id.value === lineProps.nodeEndHandleId.value);
+    const handle = handles.find(handle => (
+      handle.node.id.value === nodeEnd.id.value
+      && handle.id.value === lineProps.nodeEndHandleId.value
+    ));
     if (!handle) return defaultHandle;
 
     if (dragLineContextValue && dragLineContextValue.type === 'end' && dragLineContextValue.lineId === lineProps.id.value) {
@@ -131,18 +130,32 @@ export const Line: React.FC<IDraggableContainerProps> = ({ onDrop, customLineCom
   }, [selectedIds, lineProps.id]);
 
 
-  return createElement(CustomLineComponent ? CustomLineComponent : DefaultLine, {
-    lineId: lineProps.id,
+  return (
+    <LineContextProvider
+      lineId={lineProps.id}
 
-    nodeStart,
-    nodeStartHandle,
-    nodeId: lineProps.nodeId,
+      nodeStart={nodeStart}
+      nodeStartHandle={nodeStartHandle}
+      nodeId={lineProps.nodeId}
 
-    nodeEnd,
-    nodeEndHandle,
-    relatedNodeId: lineProps.relatedNodeId,
+      nodeEnd={nodeEnd}
+      nodeEndHandle={nodeEndHandle}
+      relatedNodeId={lineProps.relatedNodeId}
+    >
+      {createElement(CustomLineComponent ? CustomLineComponent : DefaultLine, {
+        lineId: lineProps.id,
 
-    isDragging,
-    isSelected,
-  });
+        nodeStart,
+        nodeStartHandle,
+        nodeId: lineProps.nodeId,
+
+        nodeEnd,
+        nodeEndHandle,
+        relatedNodeId: lineProps.relatedNodeId,
+
+        isDragging,
+        isSelected,
+      })}
+    </LineContextProvider>
+  );
 }

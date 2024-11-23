@@ -10,6 +10,8 @@ interface IDragLineContextData {
   type: 'start' | 'end';
   top: IObservable<number>;
   left: IObservable<number>;
+  handleEndId: TId | undefined;
+  handleStartId: TId | undefined;
 }
 
 const DragLineContext = createContext<IObservable<IDragLineContextData | undefined>>(observe(undefined));

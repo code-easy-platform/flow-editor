@@ -1,31 +1,38 @@
 import { useCallback, useRef } from 'react';
 import { useDrop } from 'react-use-drag-and-drop';
 import { useFrame } from 'react-frame-component';
-import { observe, set } from 'react-observing';
+import { observe, set, useObserverValue } from 'react-observing';
 
 import { useBoardScrollContext, useBoardZoomContext, useDragLineContext, useToggleSelectedItem } from '../context';
+import { useLineContextContext } from './line/LineContext';
 import { getCtrlKeyBySystem } from '../services';
 import { IDroppedData } from '../types';
 
 
 interface IBaseLineProps extends Omit<React.SVGProps<SVGPathElement>, 'onDrop' | 'onDragOver' | 'onDragLeave'> {
-  lineId: string | undefined;
-  nodeId: string;
   onDrop?: (data: IDroppedData<any>) => void;
   onDragOver?: (data: IDroppedData<any>) => void;
   onDragLeave?: (data: IDroppedData<any>) => void;
 }
-export const BaseLine = ({ onDragOver, onDragLeave, onDrop, lineId, nodeId, ...rest }: IBaseLineProps) => {
+export const BaseLine = ({ onDragOver, onDragLeave, onDrop, ...rest }: IBaseLineProps) => {
   const addSelectedItem = useToggleSelectedItem()
   const dragLineContext = useDragLineContext();
   const scrollObject = useBoardScrollContext();
+  const lineContext = useLineContextContext();
   const zoomObject = useBoardZoomContext();
   const { window } = useFrame();
 
+  console.log(lineContext.nodeEndHandle.id.value);
+
+  const lineId = useObserverValue(lineContext.lineId);
+  const nodeId = useObserverValue(lineContext.nodeId);
+
 
   const handleStartMouseDown = useCallback((e: React.MouseEvent) => {
-    if (lineId) addSelectedItem([lineId], getCtrlKeyBySystem(e.nativeEvent));
+    if (!lineId) return;
     if (!window) return;
+
+    addSelectedItem([lineId], getCtrlKeyBySystem(e.nativeEvent));
 
     const handleMouseMove = (e: MouseEvent) => {
       const newLeft = (e.pageX - scrollObject.left.value) / zoomObject.value;
@@ -34,6 +41,8 @@ export const BaseLine = ({ onDragOver, onDragLeave, onDrop, lineId, nodeId, ...r
       if (dragLineContext.value) {
         set(dragLineContext.value.left, newLeft);
         set(dragLineContext.value.top, newTop);
+        dragLineContext.value.handleEndId = lineContext.nodeEndHandle.id.value;
+        dragLineContext.value.handleStartId = lineContext.nodeStartHandle.id.value;
       } else {
         set(dragLineContext, {
           lineId,
@@ -41,6 +50,8 @@ export const BaseLine = ({ onDragOver, onDragLeave, onDrop, lineId, nodeId, ...r
           type: 'start',
           top: observe(newTop),
           left: observe(newLeft),
+          handleEndId: lineContext.nodeEndHandle.id.value,
+          handleStartId: lineContext.nodeStartHandle.id.value,
         });
       }
     }
@@ -53,11 +64,13 @@ export const BaseLine = ({ onDragOver, onDragLeave, onDrop, lineId, nodeId, ...r
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
-  }, [addSelectedItem, dragLineContext, window, scrollObject, zoomObject, nodeId, lineId]);
+  }, [addSelectedItem, lineContext.nodeStartHandle.id, lineContext.nodeEndHandle.id, dragLineContext, window, scrollObject, zoomObject, nodeId, lineId]);
 
   const handleEndMouseDown = useCallback((e: React.MouseEvent) => {
-    if (lineId) addSelectedItem([lineId], getCtrlKeyBySystem(e.nativeEvent));
+    if (!lineId) return;
     if (!window) return;
+
+    addSelectedItem([lineId], getCtrlKeyBySystem(e.nativeEvent));
 
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -67,6 +80,8 @@ export const BaseLine = ({ onDragOver, onDragLeave, onDrop, lineId, nodeId, ...r
       if (dragLineContext.value) {
         set(dragLineContext.value.left, newLeft);
         set(dragLineContext.value.top, newTop);
+        dragLineContext.value.handleEndId = lineContext.nodeEndHandle.id.value;
+        dragLineContext.value.handleStartId = lineContext.nodeStartHandle.id.value;
       } else {
         set(dragLineContext, {
           lineId,
@@ -74,6 +89,8 @@ export const BaseLine = ({ onDragOver, onDragLeave, onDrop, lineId, nodeId, ...r
           type: 'end',
           top: observe(newTop),
           left: observe(newLeft),
+          handleEndId: lineContext.nodeEndHandle.id.value,
+          handleStartId: lineContext.nodeStartHandle.id.value,
         });
       }
     }
@@ -86,7 +103,7 @@ export const BaseLine = ({ onDragOver, onDragLeave, onDrop, lineId, nodeId, ...r
 
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseup', handleMouseUp)
-  }, [addSelectedItem, dragLineContext, window, scrollObject, zoomObject, nodeId, lineId]);
+  }, [addSelectedItem, lineContext.nodeStartHandle.id, lineContext.nodeEndHandle.id, dragLineContext, window, scrollObject, zoomObject, nodeId, lineId]);
 
 
   const handleMoveDown = useCallback((event: React.MouseEvent<SVGPathElement>) => {
